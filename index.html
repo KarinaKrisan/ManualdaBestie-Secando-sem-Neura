@@ -196,7 +196,7 @@
                 <div class="flex justify-center gap-3 mt-4">
                     <div class="flex items-center gap-1.5 bg-green-50 px-2 py-1 rounded-lg border border-green-100">
                         <div class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
-                        <span class="text-xs font-bold text-green-700">Mato</span>
+                        <span class="text-xs font-bold text-green-700">Salada</span>
                     </div>
                     <div class="flex items-center gap-1.5 bg-rose-50 px-2 py-1 rounded-lg border border-rose-100">
                         <div class="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
@@ -390,6 +390,14 @@
                                     <div class="text-red-400 font-medium text-xs">❌ Açúcar Puro, Achocolatado Normal</div>
                                 </div>
                             </div>
+                            <!-- Item 6: Bebidas (NOVO) -->
+                            <div class="flex items-center justify-between p-4 bg-violet-50/50 rounded-2xl border border-violet-100">
+                                <span class="font-extrabold text-violet-800">Bebidas</span>
+                                <div class="text-right text-sm">
+                                    <div class="text-green-600 font-bold mb-1">✅ Água, Café, Chá Mate Limão Zero</div>
+                                    <div class="text-red-400 font-medium text-xs">❌ Sucos de Caixinha, Álcool, Açucaradas</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -557,7 +565,7 @@
         new Chart(ctxPlate, {
             type: 'pie',
             data: {
-                labels: ['Salada/Mato', 'Proteína', 'Carbo/Energia'],
+                labels: ['Salada', 'Proteína', 'Carbo/Energia'],
                 datasets: [{
                     data: [50, 25, 25],
                     // CORES VIBRANTES MANTIDAS
