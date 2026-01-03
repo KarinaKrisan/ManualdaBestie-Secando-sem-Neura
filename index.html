@@ -723,75 +723,64 @@
         const daysDisplay = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
         let reminderInterval;
 
+        // Função de Atualização de UI para Login
+        function updateUIForLogin(currentUser) {
+            if (currentUser) {
+                document.getElementById('loading-overlay').classList.add('hidden');
+                document.getElementById('login-screen').classList.add('hidden-fade'); // Esconde login
+                
+                document.getElementById('sync-status').innerText = "☁️ Conectado"; 
+                document.getElementById('auth-section').innerHTML = `
+                    <div class="flex items-center gap-2 bg-violet-50 p-2 rounded-lg border border-violet-100">
+                        <img src="${currentUser.photoURL || 'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" class="w-8 h-8 rounded-full">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs text-violet-800 font-bold truncate">Olá, ${currentUser.displayName?.split(' ')[0] || 'Bestie'}!</p>
+                            <button onclick="logout()" class="text-[10px] text-red-400 hover:underline">Sair</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
         // Inicialização
         async function initApp() {
-            // Safety timeout to ensure loading screen goes away even if Firebase is slow
+            // Safety timeout
             setTimeout(() => {
                 const overlay = document.getElementById('loading-overlay');
                 if (overlay && !overlay.classList.contains('hidden')) {
                     console.warn("Loading timeout - hiding overlay manually");
                     overlay.classList.add('hidden');
-                    // Ensure login screen is visible if we are stuck
                     if (!user) {
                         document.getElementById('login-screen').classList.remove('hidden-fade');
                     }
                 }
-            }, 5000); // 5 seconds timeout
+            }, 5000); 
 
             try {
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                // Configura botão de login/logout
                 setupAuthUI();
 
-                // Lógica de Autenticação:
-                // 1. Se estiver no Preview (tem token), loga automático para mostrar o app funcionando.
-                // 2. Se estiver Exportado (uso real), aguarda o usuário clicar em "Entrar com Google".
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } 
-                // NOTA: Removi o signInAnonymously automático do 'else' para forçar o uso do Google no ambiente real.
 
                 onAuthStateChanged(auth, (currentUser) => {
                     user = currentUser;
                     if (user) {
-                        // LOGADO
-                        try {
-                            document.getElementById('loading-overlay').classList.add('hidden');
-                            document.getElementById('login-screen').classList.add('hidden-fade'); // Esconde login
-                            
-                            document.getElementById('sync-status').innerText = "☁️ Conectado"; 
-                            document.getElementById('auth-section').innerHTML = `
-                                <div class="flex items-center gap-2 bg-violet-50 p-2 rounded-lg border border-violet-100">
-                                    <img src="${user.photoURL || 'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" class="w-8 h-8 rounded-full">
-                                    <div class="flex-1 min-w-0">
-                                        <p class="text-xs text-violet-800 font-bold truncate">Olá, ${user.displayName?.split(' ')[0] || 'Bestie'}!</p>
-                                        <button onclick="logout()" class="text-[10px] text-red-400 hover:underline">Sair</button>
-                                    </div>
-                                </div>
-                            `;
-                            setupRealtimeListener();
-                        } catch(err) {
-                            console.error("Erro na atualização da UI pós-login", err);
-                            // Force unlock if UI update fails
-                            document.getElementById('loading-overlay').classList.add('hidden');
-                            document.getElementById('login-screen').classList.add('hidden-fade');
-                        }
+                        updateUIForLogin(user);
+                        setupRealtimeListener();
                     } else {
-                        // NÃO LOGADO
                         document.getElementById('loading-overlay').classList.add('hidden');
                         
-                        // Mostra tela de login apenas se não tiver optado por offline
                         if (!sessionStorage.getItem('offlineMode')) {
                             document.getElementById('login-screen').classList.remove('hidden-fade');
                         }
 
                         document.getElementById('sync-status').innerText = "📱 Offline";
-                        setupAuthUI(); // Mostra botão de login na sidebar também
-                        
-                        // Carrega dados locais enquanto não loga
+                        setupAuthUI(); 
                         loadLocalData();
                     }
                 });
@@ -799,7 +788,7 @@
             } catch (e) {
                 console.warn("Erro ao conectar Firebase:", e);
                 document.getElementById('loading-overlay').classList.add('hidden');
-                document.getElementById('login-screen').classList.add('hidden-fade'); // Erro? Libera o app offline
+                document.getElementById('login-screen').classList.add('hidden-fade'); 
                 loadLocalData();
             }
             
@@ -827,12 +816,27 @@
             const originalContent = btn.innerHTML;
             btn.innerHTML = `⏳ Entrando...`;
             btn.disabled = true;
+            
+            // Timeout de segurança no botão (15s)
+            const buttonTimeout = setTimeout(() => {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+                alert("O login demorou muito. Tente novamente.");
+            }, 15000);
 
             const provider = new GoogleAuthProvider();
             try {
-                await signInWithPopup(auth, provider);
-                // onAuthStateChanged will handle the UI update
+                const result = await signInWithPopup(auth, provider);
+                clearTimeout(buttonTimeout);
+                
+                // Sucesso! Atualiza UI imediatamente
+                if (result.user) {
+                    user = result.user;
+                    updateUIForLogin(user);
+                    setupRealtimeListener(); // Inicia sync
+                }
             } catch (error) {
+                clearTimeout(buttonTimeout);
                 console.error("Erro no login Google:", error);
                 
                 // Reset button
@@ -841,6 +845,7 @@
 
                 let msg = "Erro ao conectar. ";
                 if (error.code === 'auth/popup-blocked') msg += "O navegador bloqueou o popup. Permita popups para este site.";
+                else if (error.code === 'auth/popup-closed-by-user') msg += "Você fechou a janela de login.";
                 else if (error.code === 'auth/unauthorized-domain') msg += "Domínio não autorizado no Firebase Console. Adicione este domínio lá!";
                 else msg += error.message;
                 alert(msg);
