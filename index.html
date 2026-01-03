@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual da Bestie: Secando sem Neura 💅</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fdfbf7; /* Warm neutral background */
+            color: #44403c; /* Stone 700 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+        .tab-active {
+            background-color: #fb7185; /* Rose 400 */
+            color: white;
+            font-weight: bold;
+        }
+        .tab-inactive {
+            background-color: #e7e5e4; /* Stone 200 */
+            color: #57534e; /* Stone 600 */
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals with Rose Accents (Cream, Stone, Dusty Pink) -->
+    <!-- Application Structure Plan: 
+         1. Header: Welcoming "Bestie" vibe, setting the goal.
+         2. Dashboard Overview: Hydration tracker (critical per report) and The Plate Logic (visualizing the 50/25/25 rule).
+         3. Interactive Menu: Tab-based system to explore meal options without overwhelming the user with text.
+         4. Smart Swaps: A filterable/visual comparison of "Do's" and "Don'ts".
+         5. Survival Guide: Tips for money saving and weekends.
+         Structure chosen to break the text-heavy markdown into bite-sized, actionable visual pieces. -->
+    <!-- Visualization & Content Choices:
+         1. Hydration: Doughnut Chart. Goal: Inform/Track. Justification: Visualizes the daily target of 3.5L effectively.
+         2. The Plate: Pie Chart. Goal: Inform/Structure. Justification: The 50/25/25 rule is best understood spatially.
+         3. Menu Tabs: HTML/JS Interface. Goal: Organize. Justification: Hides complexity, focuses on "What do I eat now?".
+         4. Swaps Matrix: CSS Grid with coloring. Goal: Compare. Justification: Quick reference for shopping.
+         5. NO SVG/Mermaid: All icons are Unicode or CSS shapes. Charts are Chart.js Canvas. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <!-- Header Section -->
+    <header class="bg-stone-100 border-b-4 border-rose-300 py-8 px-4 text-center shadow-sm">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-3xl md:text-5xl font-extrabold text-rose-500 mb-2 tracking-tight">Manual da Bestie 💅</h1>
+            <p class="text-lg md:text-xl text-stone-600 font-semibold">Secando sem Neura e sem Gastar 💸</p>
+            <div class="mt-4 inline-block bg-white px-4 py-2 rounded-full shadow-sm border border-stone-200">
+                <span class="text-rose-400 font-bold">Meta:</span> Ficar fina comendo arroz, feijão e batata!
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow container mx-auto px-4 py-6 max-w-5xl space-y-12">
+
+        <!-- Intro Section -->
+        <section class="text-center space-y-4">
+            <p class="text-lg text-stone-700 leading-relaxed max-w-2xl mx-auto">
+                Amiga, esquece comida com gosto de papelão! Esse app é o resumo do seu plano personalizado. 
+                Aqui a gente foca no que cabe no bolso e no que é gostoso. O segredo? 
+                <strong>Controle de porção</strong> e muita água!
+            </p>
+        </section>
+
+        <!-- Dashboard Grid: Hydration & The Plate -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- Hydration Card -->
+            <div class="bg-white p-6 rounded-3xl shadow-lg border border-stone-100 flex flex-col items-center card-hover">
+                <h2 class="text-2xl font-bold text-sky-500 mb-2">💧 Água é Vida</h2>
+                <p class="text-sm text-stone-500 mb-4 text-center">Como cortamos os integrais, a água é o que vai te desinchar. Meta: 3,5 Litrões!</p>
+                
+                <div class="chart-container">
+                    <canvas id="hydrationChart"></canvas>
+                </div>
+                
+                <div class="mt-4 flex gap-2">
+                    <button onclick="addWater()" class="bg-sky-100 hover:bg-sky-200 text-sky-700 font-bold py-2 px-4 rounded-full transition">+ 250ml</button>
+                    <button onclick="resetWater()" class="bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold py-2 px-4 rounded-full transition">Zerar</button>
+                </div>
+                <p class="mt-2 text-xs text-stone-400">Dica: Arruma uma garrafa PET e deixa do lado!</p>
+            </div>
+
+            <!-- The Plate Logic Card -->
+            <div class="bg-white p-6 rounded-3xl shadow-lg border border-stone-100 flex flex-col items-center card-hover">
+                <h2 class="text-2xl font-bold text-rose-500 mb-2">🍽️ A Lógica do Prato</h2>
+                <p class="text-sm text-stone-500 mb-4 text-center">Dá pra comer arroz e pão? DÁ! O segredo é a proporção. Olha só:</p>
+                
+                <div class="chart-container">
+                    <canvas id="plateChart"></canvas>
+                </div>
+
+                <div class="mt-4 text-center text-stone-600 text-sm">
+                    <span class="font-bold text-green-600">50% Mato</span> • 
+                    <span class="font-bold text-rose-500">25% Proteína</span> • 
+                    <span class="font-bold text-yellow-600">25% Energia</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Menu Section -->
+        <section class="bg-white rounded-3xl shadow-lg border border-stone-100 overflow-hidden">
+            <div class="p-6 bg-rose-50 border-b border-rose-100">
+                <h2 class="text-2xl font-bold text-rose-600">📅 Cardápio "Bom, Bonito e Barato"</h2>
+                <p class="text-stone-600 mt-2">Clica nas abas pra ver suas opções. Escolhe uma por dia e seja feliz!</p>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div class="flex flex-wrap border-b border-stone-200">
+                <button class="flex-1 py-4 px-2 text-center font-semibold transition tab-active" id="tab-cafe" onclick="switchTab('cafe')">☕ Café</button>
+                <button class="flex-1 py-4 px-2 text-center font-semibold transition tab-inactive" id="tab-almoco" onclick="switchTab('almoco')">🥗 Almoço</button>
+                <button class="flex-1 py-4 px-2 text-center font-semibold transition tab-inactive" id="tab-lanche" onclick="switchTab('lanche')">🍓 Lanche</button>
+                <button class="flex-1 py-4 px-2 text-center font-semibold transition tab-inactive" id="tab-jantar" onclick="switchTab('jantar')">🌙 Jantar</button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="p-6 min-h-[300px]">
+                
+                <!-- Café da Manhã -->
+                <div id="content-cafe" class="space-y-4">
+                    <div class="bg-stone-50 p-4 rounded-xl border border-stone-200">
+                        <h3 class="font-bold text-lg text-rose-500">Opção 1 (Amo ❤️)</h3>
+                        <p class="text-stone-700">1 Pãozinho francês na chapa (sem miolo) + 2 Ovos mexidos.</p>
+                        <p class="text-sm text-stone-500 mt-1">Bebida: Café preto, ou Leite desnatado com 1 colherzinha de Achocolatado Light/Zero.</p>
+                    </div>
+                    <div class="bg-stone-50 p-4 rounded-xl border border-stone-200">
+                        <h3 class="font-bold text-lg text-rose-500">Opção 2 (Sustança 🌽)</h3>
+                        <p class="text-stone-700">Cuscuz (4 colheres hidratado) com 1 fatia de queijo mussarela ou 1 ovo.</p>
+                    </div>
+                    <div class="bg-stone-50 p-4 rounded-xl border border-stone-200">
+                        <h3 class="font-bold text-lg text-rose-500">Opção 3 (Chique ✨)</h3>
+                        <p class="text-stone-700">Tapioca (goma fina) recheada com frango desfiado e requeijão light.</p>
+                    </div>
+                </div>
+
+                <!-- Almoço -->
+                <div id="content-almoco" class="hidden space-y-4">
+                    <div class="bg-green-50 p-4 rounded-xl border border-green-100 mb-4">
+                        <p class="font-bold text-green-700">🥗 A Base (Todo dia):</p>
+                        <p class="text-stone-700">Metade do prato de Salada (Repolho, Alface americana, Tomate, Pepino) + Legumes (Abóbora, Cenoura, Brócolis).</p>
+                    </div>
+                    <div class="bg-stone-50 p-4 rounded-xl border border-stone-200">
+                        <h3 class="font-bold text-lg text-rose-500">Montagem do PF</h3>
+                        <ul class="list-disc list-inside text-stone-700 space-y-2">
+                            <li><strong>Proteína:</strong> 1 filé de frango grelhado OU 2 ovos cozidos.</li>
+                            <li><strong>Carbo:</strong> 3 colheres de sopa de Arroz Branco + 1 concha de Feijão.</li>
+                            <li><strong>Troca Esperta:</strong> Cansou do arroz? Troca por 1 Batata Inglesa média (assada/cozida).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Lanche -->
+                <div id="content-lanche" class="hidden space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-stone-50 p-4 rounded-xl border border-stone-200">
+                            <h3 class="font-bold text-lg text-rose-500">🍓 Fresquinho</h3>
+                            <p class="text-stone-700">1 Iogurte Natural (ou bebida láctea zero) + Morangos picados.</p>
+                        </div>
+                        <div class="bg-stone-50 p-4 rounded-xl border border-stone-200">
+                            <h3 class="font-bold text-lg text-rose-500">🍞 Clássico</h3>
+                            <p class="text-stone-700">Pão de forma tostado com requeijão + Leite com Toddy Light.</p>
+                        </div>
+                        <div class="bg-stone-50 p-4 rounded-xl border border-stone-200">
+                            <h3 class="font-bold text-lg text-rose-500">🍿 Cinema</h3>
+                            <p class="text-stone-700">Pipoca de panela (1 xícara peq). Pouco óleo e sal!</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-stone-400 mt-2 text-center">Se a fome for pequena de manhã: 1 fatia de Melancia ou Gelatina Zero.</p>
+                </div>
+
+                <!-- Jantar -->
+                <div id="content-jantar" class="hidden space-y-4">
+                    <div class="bg-stone-50 p-4 rounded-xl border border-stone-200">
+                        <h3 class="font-bold text-lg text-rose-500">Economia Total 💸</h3>
+                        <p class="text-stone-700">Repete o almoço! Zero desperdício e economiza tempo.</p>
+                    </div>
+                    <div class="bg-stone-50 p-4 rounded-xl border border-stone-200">
+                        <h3 class="font-bold text-lg text-rose-500">Omeleteira 🍳</h3>
+                        <p class="text-stone-700">Omelete caprichado com 2 ovos, queijo, tomate e orégano.</p>
+                    </div>
+                    <div class="bg-stone-50 p-4 rounded-xl border border-stone-200">
+                        <h3 class="font-bold text-lg text-rose-500">Sopinha 🍲</h3>
+                        <p class="text-stone-700">Sopa de legumes com frango (use abóbora pra ficar cremosa).</p>
+                    </div>
+                    <div class="mt-4 border-t border-stone-100 pt-4">
+                        <p class="font-bold text-stone-600">Ceia (Se tiver fome antes de dormir):</p>
+                        <p class="text-sm text-stone-500">Morangos, cubos de Melancia, ou 1 pedacinho de chocolate meio amargo.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Swaps & Tips Grid -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Swaps Section -->
+            <div class="lg:col-span-2 bg-white p-6 rounded-3xl shadow-lg border border-stone-100">
+                <h2 class="text-2xl font-bold text-rose-600 mb-4">🔄 Trocas Inteligentes</h2>
+                <p class="text-stone-600 mb-4">Cola isso na geladeira! O que comprar e do que fugir.</p>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-stone-500 text-sm border-b-2 border-stone-100">
+                                <th class="p-2 w-1/4">Grupo</th>
+                                <th class="p-2 text-green-600">✅ SE JOGA (Sim!)</th>
+                                <th class="p-2 text-red-500">❌ FOGE QUE É CILADA</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm md:text-base">
+                            <tr class="border-b border-stone-50 hover:bg-stone-50">
+                                <td class="p-3 font-bold text-stone-700">Proteínas</td>
+                                <td class="p-3">Ovos (barato!), Frango, Carnes magras, Atum.</td>
+                                <td class="p-3 text-stone-400">Salsicha, Linguiça, Gordura.</td>
+                            </tr>
+                            <tr class="border-b border-stone-50 hover:bg-stone-50">
+                                <td class="p-3 font-bold text-stone-700">Carbos</td>
+                                <td class="p-3">Batata Inglesa, Arroz Branco, Pãozinho, Macarrão.</td>
+                                <td class="p-3 text-stone-400">Coisas Integrais (ecat), Biscoito recheado.</td>
+                            </tr>
+                            <tr class="border-b border-stone-50 hover:bg-stone-50">
+                                <td class="p-3 font-bold text-stone-700">Vegetais</td>
+                                <td class="p-3">Repolho, Alface americana, Cenoura, Abóbora.</td>
+                                <td class="p-3 text-stone-400">Chuchu, Ervilha, Agrião.</td>
+                            </tr>
+                            <tr class="border-b border-stone-50 hover:bg-stone-50">
+                                <td class="p-3 font-bold text-stone-700">Frutas</td>
+                                <td class="p-3">Melancia, Morango, Banana, Maçã.</td>
+                                <td class="p-3 text-stone-400">Abacaxi, Frutas em calda.</td>
+                            </tr>
+                            <tr class="hover:bg-stone-50">
+                                <td class="p-3 font-bold text-stone-700">Extras</td>
+                                <td class="p-3">Gelatina Zero, Achocolatado Light, Adoçante.</td>
+                                <td class="p-3 text-stone-400">Açúcar puro, Toddy normal.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tips & Weekend Section -->
+            <div class="space-y-6">
+                <!-- Weekend Card -->
+                <div class="bg-rose-50 p-6 rounded-3xl shadow-md border border-rose-100">
+                    <h3 class="text-xl font-bold text-rose-600 mb-2">🎉 Fim de Semana</h3>
+                    <p class="text-stone-700 text-sm mb-3">Ninguém é de ferro! Você tem direito a <strong>2 Refeições Livres</strong>.</p>
+                    <ul class="text-sm text-stone-600 space-y-2">
+                        <li>🍕 Pizza sábado à noite? Pode!</li>
+                        <li>🍖 Churrasco domingo? Vai!</li>
+                        <li class="font-bold text-rose-500">Regra de Ouro: Comeu, acabou! Volta pro plano na próxima.</li>
+                    </ul>
+                </div>
+
+                <!-- Money Tips Card -->
+                <div class="bg-yellow-50 p-6 rounded-3xl shadow-md border border-yellow-100">
+                    <h3 class="text-xl font-bold text-yellow-600 mb-2">💸 Dicas de Amiga</h3>
+                    <ul class="text-sm text-stone-600 space-y-2">
+                        <li>🥬 <strong>Xepa da Feira:</strong> Vai no finalzinho que é tudo mais barato.</li>
+                        <li>🥚 <strong>Ovo é Vida:</strong> Carne tá cara? Omelete nela!</li>
+                        <li>🍱 <strong>Marmita:</strong> Leva a tua! Comer na rua gasta muito.</li>
+                        <li>📦 <strong>Descasque mais:</strong> Foge das caixinhas prontas.</li>
+                    </ul>
+                </div>
+                
+                <!-- Activity Card -->
+                <div class="bg-sky-50 p-6 rounded-3xl shadow-md border border-sky-100">
+                    <h3 class="text-xl font-bold text-sky-600 mb-2">🏃‍♀️ Bora mexer?</h3>
+                    <p class="text-stone-700 text-sm">Caminhada de 30 min por dia. A gente tá comendo batata e arroz, tem que gastar essa energia!</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-stone-800 text-stone-300 py-8 text-center mt-12">
+        <p class="font-semibold">Feito pra você arrasar! ✨</p>
+        <p class="text-xs text-stone-500 mt-2">Lembre-se: Isso é um guia educativo. Consulte profissionais de saúde sempre.</p>
+    </footer>
+
+    <!-- Script Logic -->
+    <script>
+        // State Management
+        const state = {
+            waterIntake: 0,
+            waterGoal: 3500, // 3.5L in ml
+            activeTab: 'cafe'
+        };
+
+        // DOM Elements
+        const tabIds = ['cafe', 'almoco', 'lanche', 'jantar'];
+        
+        // --- Hydration Chart Logic ---
+        const ctxHydro = document.getElementById('hydrationChart').getContext('2d');
+        const hydrationChart = new Chart(ctxHydro, {
+            type: 'doughnut',
+            data: {
+                labels: ['Bebido', 'Falta'],
+                datasets: [{
+                    data: [0, 3500],
+                    backgroundColor: ['#0ea5e9', '#e7e5e4'], // Sky 500, Stone 200
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false }
+                }
+            },
+            plugins: [{
+                id: 'textCenter',
+                beforeDraw: function(chart) {
+                    var width = chart.width,
+                        height = chart.height,
+                        ctx = chart.ctx;
+
+                    ctx.restore();
+                    var fontSize = (height / 114).toFixed(2);
+                    ctx.font = "bold " + fontSize + "em Nunito";
+                    ctx.textBaseline = "middle";
+                    ctx.fillStyle = "#0ea5e9";
+
+                    var text = (state.waterIntake / 1000).toFixed(2) + "L",
+                        textX = Math.round((width - ctx.measureText(text).width) / 2),
+                        textY = height / 2;
+
+                    ctx.fillText(text, textX, textY);
+                    ctx.save();
+                }
+            }]
+        });
+
+        // Hydration Functions
+        function addWater() {
+            if(state.waterIntake < state.waterGoal) {
+                state.waterIntake += 250;
+                updateHydrationChart();
+            }
+        }
+
+        function resetWater() {
+            state.waterIntake = 0;
+            updateHydrationChart();
+        }
+
+        function updateHydrationChart() {
+            const remaining = Math.max(0, state.waterGoal - state.waterIntake);
+            hydrationChart.data.datasets[0].data = [state.waterIntake, remaining];
+            
+            // Celebration color if goal reached
+            if (remaining === 0) {
+                hydrationChart.data.datasets[0].backgroundColor[0] = '#10b981'; // Emerald 500
+            } else {
+                hydrationChart.data.datasets[0].backgroundColor[0] = '#0ea5e9'; // Sky 500
+            }
+            
+            hydrationChart.update();
+        }
+
+        // --- Plate Logic Chart ---
+        const ctxPlate = document.getElementById('plateChart').getContext('2d');
+        new Chart(ctxPlate, {
+            type: 'pie',
+            data: {
+                labels: ['Salada/Mato (50%)', 'Proteína (25%)', 'Carbo/Energia (25%)'],
+                datasets: [{
+                    data: [50, 25, 25],
+                    backgroundColor: [
+                        '#86efac', // Green 300 (Salad)
+                        '#fda4af', // Rose 300 (Protein)
+                        '#fde047'  // Yellow 300 (Carbs)
+                    ],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { family: 'Nunito', size: 14 },
+                            color: '#57534e'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.dataIndex === 0) return label + "Repolho, Alface, Tomate...";
+                                if (context.dataIndex === 1) return label + "Ovos, Frango, Carne...";
+                                if (context.dataIndex === 2) return label + "Arroz, Batata, Mandioca...";
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // --- Tab Logic ---
+        function switchTab(selectedTab) {
+            state.activeTab = selectedTab;
+            
+            tabIds.forEach(id => {
+                const btn = document.getElementById(`tab-${id}`);
+                const content = document.getElementById(`content-${id}`);
+                
+                if (id === selectedTab) {
+                    btn.classList.remove('tab-inactive');
+                    btn.classList.add('tab-active');
+                    content.classList.remove('hidden');
+                } else {
+                    btn.classList.remove('tab-active');
+                    btn.classList.add('tab-inactive');
+                    content.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
