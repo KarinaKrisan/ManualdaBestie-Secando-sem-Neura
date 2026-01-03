@@ -2,7 +2,14 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Meta tags para PWA e Mobile -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#f5f3ff">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3076/3076134.png">
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiTWFudWFsIGRhIEJlc3RpZSIs" />
+
     <title>Manual da Bestie: Secando sem Neura 💅</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -18,6 +25,7 @@
             font-family: 'Nunito', sans-serif;
             background-color: #f5f3ff; /* Violet 50 base */
             color: #4c1d95; /* Violet 900 text */
+            -webkit-tap-highlight-color: transparent; /* Remove highlight azul ao tocar em mobile */
         }
 
         /* Layout Dashboard */
@@ -152,6 +160,26 @@
         }
         .animate-enter { animation: slideIn 0.4s ease-out forwards; }
     </style>
+    <!-- Script para instalar Manifesto dinamicamente -->
+    <script>
+        const manifest = {
+            "name": "Manual da Bestie",
+            "short_name": "Bestie App",
+            "start_url": ".",
+            "display": "standalone",
+            "background_color": "#f5f3ff",
+            "theme_color": "#f5f3ff",
+            "icons": [{
+                "src": "https://cdn-icons-png.flaticon.com/512/3076/3076134.png",
+                "sizes": "512x512",
+                "type": "image/png"
+            }]
+        };
+        const stringManifest = JSON.stringify(manifest);
+        const blob = new Blob([stringManifest], {type: 'application/json'});
+        const manifestURL = URL.createObjectURL(blob);
+        document.querySelector('link[rel="manifest"]').setAttribute('href', manifestURL);
+    </script>
 </head>
 <body>
 
