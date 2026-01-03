@@ -9,325 +9,378 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <!-- 
-      === CSS SEPARADO (SIMULADO) === 
-      Organização de estilos personalizados para o novo layout Dashboard 
+      === CSS CUSTOMIZADO === 
+      Design System "Bestie Glow Up"
     -->
     <style>
-        /* Tipografia e Base */
+        /* Base */
         body {
             font-family: 'Nunito', sans-serif;
-            background-color: #fdf2f8; /* Pink 50 */
+            background-color: #fff1f2; /* Rose 50 base */
             color: #44403c; /* Stone 700 */
         }
 
-        /* Layout Específico do Dashboard */
-        .dashboard-container {
+        /* Layout Dashboard */
+        .dashboard-wrapper {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
 
         @media (min-width: 1024px) {
-            .dashboard-container {
+            .dashboard-wrapper {
                 flex-direction: row;
                 height: 100vh;
-                overflow: hidden; /* Previne scroll na página toda, foca nas colunas */
+                overflow: hidden;
             }
             
-            .sidebar-panel {
-                width: 400px;
+            .sidebar {
+                width: 380px;
                 flex-shrink: 0;
                 height: 100%;
                 overflow-y: auto;
-                position: relative;
-                z-index: 10;
-                box-shadow: 4px 0 24px rgba(0,0,0,0.05);
+                background: white;
+                border-right: 1px solid #fecdd3; /* Rose 200 */
+                z-index: 20;
             }
 
-            .content-panel {
+            .main-content {
                 flex-grow: 1;
                 height: 100%;
                 overflow-y: auto;
+                background: linear-gradient(135deg, #fff1f2 0%, #fff 100%);
             }
         }
 
-        /* Componentes de Gráfico */
-        .chart-wrapper {
+        /* Cartões e Elementos */
+        .card-soft {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 4px 20px rgba(251, 113, 133, 0.08); /* Sombra Rose Suave */
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card-soft:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(251, 113, 133, 0.12);
+        }
+
+        /* Gráficos */
+        .chart-box {
             position: relative;
+            height: 220px;
             width: 100%;
-            height: 250px; /* Altura fixa para consistência */
-            margin-bottom: 1rem;
         }
 
-        /* Componentes de Interface */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+        /* Navegação (Abas Pílula) */
+        .pill-nav {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            padding: 6px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            border: 1px solid #ffe4e6;
         }
 
-        .nav-tab {
+        .pill-btn {
+            padding: 12px;
+            border-radius: 16px;
+            font-weight: 800;
+            font-size: 0.9rem;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            cursor: pointer;
+            color: #78716c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        
-        .nav-tab.active {
-            background-color: #fb7185; /* Rose 400 */
+
+        .pill-btn.active {
+            background: #fb7185; /* Rose 400 */
             color: white;
             box-shadow: 0 4px 12px rgba(251, 113, 133, 0.3);
-            transform: translateY(-2px);
+            transform: scale(1.02);
         }
 
-        .nav-tab.inactive {
-            background-color: white;
-            color: #78716c; /* Stone 500 */
-            border: 1px solid #e7e5e4;
+        .pill-btn:hover:not(.active) {
+            background: #fff0f1;
+            color: #e11d48;
         }
 
-        .nav-tab.inactive:hover {
-            background-color: #fff1f2;
-            color: #fb7185;
+        /* Scrollbar Cute */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #fda4af; border-radius: 10px; }
+        
+        /* Animações */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        /* Scrollbar Personalizada */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #fecdd3;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #fb7185;
-        }
+        .animate-enter { animation: slideIn 0.4s ease-out forwards; }
     </style>
-    <!-- Chosen Palette: Fresh Modern Dashboard (White, Rose, Stone) -->
 </head>
 <body>
 
-    <div class="dashboard-container">
+    <div class="dashboard-wrapper">
         
-        <!-- SIDEBAR (Esquerda): Identidade e Rastreadores -->
-        <aside class="sidebar-panel bg-white p-6 lg:p-8 flex flex-col gap-8">
-            <!-- Header -->
+        <!-- SIDEBAR: Identidade & Metas -->
+        <aside class="sidebar p-8 flex flex-col gap-8 relative">
+            <!-- Branding -->
             <div class="text-center lg:text-left">
-                <div class="inline-block px-3 py-1 bg-rose-100 text-rose-500 rounded-full text-xs font-bold mb-2 tracking-wider uppercase">Manual da Bestie</div>
-                <h1 class="text-3xl font-extrabold text-stone-800 leading-tight">Secando sem <span class="text-rose-500">Neura</span> 💅</h1>
-                <p class="text-stone-500 mt-2 text-sm">Ficar fina comendo o que gosta, gastando pouco.</p>
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-rose-100 text-rose-600 rounded-full text-xs font-bold mb-3 tracking-wide uppercase">
+                    <span>✨</span> Manual da Bestie
+                </div>
+                <h1 class="text-4xl font-extrabold text-stone-800 leading-tight tracking-tight">
+                    Secando sem <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-orange-400">Neura</span> 💅
+                </h1>
+                <p class="text-stone-500 mt-3 font-medium leading-relaxed">
+                    Ficar fina comendo arroz, feijão e batata, gastando pouco.
+                </p>
             </div>
 
-            <!-- Tracker de Água (Destaque) -->
-            <div class="bg-sky-50 rounded-3xl p-6 border border-sky-100">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="font-bold text-sky-600 flex items-center gap-2">
-                        💧 Hidratação
-                    </h2>
-                    <span id="water-display" class="text-2xl font-black text-sky-600">0.0L</span>
+            <!-- Card: Hidratação (Destaque) -->
+            <div class="card-soft p-6 bg-gradient-to-br from-white to-sky-50 border-sky-100">
+                <div class="flex justify-between items-end mb-4">
+                    <div>
+                        <h2 class="font-bold text-sky-600 text-sm uppercase tracking-wider mb-1">Hidratação Diária</h2>
+                        <span id="water-display" class="text-3xl font-black text-sky-500">0.0L</span>
+                    </div>
+                    <div class="bg-sky-100 p-2 rounded-full text-sky-500">
+                        💧
+                    </div>
                 </div>
                 
-                <div class="chart-wrapper">
+                <div class="chart-box">
                     <canvas id="hydrationChart"></canvas>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2 mt-4">
-                    <button onclick="addWater()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-4 rounded-xl transition shadow-md shadow-sky-200 text-sm flex items-center justify-center gap-2">
+                <div class="flex gap-3 mt-6">
+                    <button onclick="addWater()" class="flex-1 bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-sky-200 transition active:scale-95 flex items-center justify-center gap-2">
                         <span>+</span> 250ml
                     </button>
-                    <button onclick="resetWater()" class="bg-white hover:bg-sky-50 text-sky-600 font-bold py-3 px-4 rounded-xl transition border border-sky-100 text-sm">
-                        Zerar
+                    <button onclick="resetWater()" class="px-4 py-3 rounded-xl border-2 border-sky-100 text-sky-400 font-bold hover:bg-sky-50 transition">
+                        ↺
                     </button>
                 </div>
             </div>
 
-            <!-- Gráfico do Prato (Compacto) -->
-            <div class="bg-stone-50 rounded-3xl p-6 border border-stone-100">
-                <h2 class="font-bold text-stone-600 mb-4 text-sm uppercase tracking-wide">A Lógica do Prato</h2>
-                <div class="chart-wrapper" style="height: 180px;">
+            <!-- Card: Lógica do Prato -->
+            <div class="card-soft p-6 border-stone-100">
+                <h2 class="font-bold text-stone-600 text-sm uppercase tracking-wider mb-4 text-center">A Lógica do Prato</h2>
+                <div class="chart-box" style="height: 180px;">
                     <canvas id="plateChart"></canvas>
                 </div>
-                <div class="flex justify-center gap-4 text-xs mt-2 font-bold text-stone-500">
-                    <span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-green-500"></div> Mato</span>
-                    <span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-rose-500"></div> Proteína</span>
-                    <span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-yellow-500"></div> Carbo</span>
+                <!-- Legenda Customizada -->
+                <div class="flex justify-center gap-3 mt-4">
+                    <div class="flex items-center gap-1.5 bg-green-50 px-2 py-1 rounded-lg border border-green-100">
+                        <div class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                        <span class="text-xs font-bold text-green-700">Mato</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 bg-rose-50 px-2 py-1 rounded-lg border border-rose-100">
+                        <div class="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
+                        <span class="text-xs font-bold text-rose-700">Proteína</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 bg-yellow-50 px-2 py-1 rounded-lg border border-yellow-100">
+                        <div class="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+                        <span class="text-xs font-bold text-yellow-700">Carbo</span>
+                    </div>
                 </div>
-            </div>
-            
-            <!-- Footer Mobile only -->
-            <div class="lg:hidden text-center text-xs text-stone-400 mt-4">
-                Role para ver o cardápio 👇
             </div>
         </aside>
 
-        <!-- MAIN CONTENT (Direita): Cardápio e Dicas -->
-        <main class="content-panel bg-rose-50/50 p-4 lg:p-10">
-            <div class="max-w-4xl mx-auto space-y-8">
+        <!-- MAIN CONTENT: O Guia Prático -->
+        <main class="main-content p-4 lg:p-10">
+            <div class="max-w-5xl mx-auto space-y-10">
                 
-                <!-- Section: Cardápio Interativo -->
+                <!-- SEÇÃO 1: O Cardápio -->
                 <section>
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-2xl font-bold text-stone-800">📅 Seu Cardápio</h2>
-                        <!-- REMOVIDO: Span "Escolha uma aba" -->
+                    <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-stone-800">📅 Seu Cardápio</h2>
+                            <p class="text-stone-500 text-sm">Escolha o momento do dia e veja a mágica.</p>
+                        </div>
                     </div>
 
-                    <!-- Abas de Navegação -->
-                    <div class="grid grid-cols-4 gap-2 md:gap-4 mb-6">
-                        <button onclick="switchTab('cafe')" id="tab-cafe" class="nav-tab active py-3 md:py-4 rounded-2xl font-bold text-xs md:text-base flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2">
+                    <!-- Navegação Pílula -->
+                    <div class="pill-nav mb-8 sticky top-2 z-10 shadow-sm">
+                        <button onclick="switchTab('cafe')" id="tab-cafe" class="pill-btn active">
                             <span>☕</span> <span class="hidden md:inline">Café</span>
                         </button>
-                        <button onclick="switchTab('almoco')" id="tab-almoco" class="nav-tab inactive py-3 md:py-4 rounded-2xl font-bold text-xs md:text-base flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2">
+                        <button onclick="switchTab('almoco')" id="tab-almoco" class="pill-btn">
                             <span>🥗</span> <span class="hidden md:inline">Almoço</span>
                         </button>
-                        <button onclick="switchTab('lanche')" id="tab-lanche" class="nav-tab inactive py-3 md:py-4 rounded-2xl font-bold text-xs md:text-base flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2">
+                        <button onclick="switchTab('lanche')" id="tab-lanche" class="pill-btn">
                             <span>🍓</span> <span class="hidden md:inline">Lanche</span>
                         </button>
-                        <button onclick="switchTab('jantar')" id="tab-jantar" class="nav-tab inactive py-3 md:py-4 rounded-2xl font-bold text-xs md:text-base flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2">
+                        <button onclick="switchTab('jantar')" id="tab-jantar" class="pill-btn">
                             <span>🌙</span> <span class="hidden md:inline">Jantar</span>
                         </button>
                     </div>
 
-                    <!-- Conteúdo das Abas -->
-                    <div class="glass-card p-6 md:p-8 rounded-3xl shadow-sm min-h-[300px]">
-                        
+                    <!-- Conteúdo Dinâmico -->
+                    <div class="card-soft p-6 md:p-10 min-h-[320px] relative overflow-hidden">
+                        <!-- Decorative bg blob -->
+                        <div class="absolute top-0 right-0 w-64 h-64 bg-rose-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 -translate-y-1/2 translate-x-1/2"></div>
+
                         <!-- Café -->
-                        <div id="content-cafe" class="space-y-4 animate-fade-in">
-                            <div class="flex items-start gap-4 p-4 rounded-2xl bg-white border border-stone-100 shadow-sm">
-                                <div class="text-3xl">❤️</div>
+                        <div id="content-cafe" class="space-y-4 animate-enter relative z-10">
+                            <div class="flex gap-4 p-5 rounded-2xl bg-white border border-rose-100 shadow-sm hover:border-rose-300 transition group">
+                                <div class="text-3xl bg-rose-50 w-14 h-14 rounded-full flex items-center justify-center group-hover:scale-110 transition">❤️</div>
                                 <div>
                                     <h3 class="font-bold text-rose-500 text-lg">Opção 1 (A Favorita)</h3>
-                                    <p class="text-stone-700 font-medium">1 Pãozinho francês na chapa (sem miolo) + 2 Ovos mexidos.</p>
-                                    <p class="text-sm text-stone-500 mt-1">Bebida: Café preto ou Leite desnatado + 1 colherzinha de Achocolatado Light.</p>
+                                    <p class="text-stone-700 mt-1">1 Pãozinho francês na chapa (sem miolo) + 2 Ovos mexidos.</p>
+                                    <p class="text-xs font-bold text-stone-400 mt-2 uppercase tracking-wide">Bebida</p>
+                                    <p class="text-sm text-stone-600">Café preto ou Leite desnatado + 1 colherzinha de Achocolatado Light.</p>
                                 </div>
                             </div>
-                            <div class="flex items-start gap-4 p-4 rounded-2xl bg-white border border-stone-100 shadow-sm opacity-75 hover:opacity-100 transition">
-                                <div class="text-3xl">🌽</div>
+                            <div class="flex gap-4 p-5 rounded-2xl bg-white border border-stone-100 shadow-sm hover:border-yellow-300 transition group">
+                                <div class="text-3xl bg-yellow-50 w-14 h-14 rounded-full flex items-center justify-center group-hover:scale-110 transition">🌽</div>
                                 <div>
-                                    <h3 class="font-bold text-stone-600">Opção 2 (Sustança)</h3>
-                                    <p class="text-stone-700">Cuscuz (4 colheres hidratado) com 1 fatia de queijo mussarela ou 1 ovo.</p>
+                                    <h3 class="font-bold text-stone-700 text-lg">Opção 2 (Sustança)</h3>
+                                    <p class="text-stone-600 mt-1">Cuscuz (4 colheres hidratado) com 1 fatia de queijo mussarela ou 1 ovo.</p>
                                 </div>
                             </div>
-                            <div class="flex items-start gap-4 p-4 rounded-2xl bg-white border border-stone-100 shadow-sm opacity-75 hover:opacity-100 transition">
-                                <div class="text-3xl">✨</div>
+                            <div class="flex gap-4 p-5 rounded-2xl bg-white border border-stone-100 shadow-sm hover:border-purple-300 transition group">
+                                <div class="text-3xl bg-purple-50 w-14 h-14 rounded-full flex items-center justify-center group-hover:scale-110 transition">✨</div>
                                 <div>
-                                    <h3 class="font-bold text-stone-600">Opção 3 (Chique)</h3>
-                                    <p class="text-stone-700">Tapioca (goma fina) recheada com frango desfiado e requeijão light.</p>
+                                    <h3 class="font-bold text-stone-700 text-lg">Opção 3 (Chique)</h3>
+                                    <p class="text-stone-600 mt-1">Tapioca (goma fina) recheada com frango desfiado e requeijão light.</p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Almoço -->
-                        <div id="content-almoco" class="hidden space-y-6 animate-fade-in">
-                            <div class="bg-green-50 p-6 rounded-2xl border border-green-100 text-center">
-                                <h3 class="font-bold text-green-700 text-xl mb-2">A Regra de Ouro 🥗</h3>
-                                <p class="text-stone-600">Metade do prato é <strong>SALADA</strong> (Repolho, Alface, Tomate) + <strong>LEGUMES</strong> (Abóbora, Cenoura, Brócolis).</p>
+                        <div id="content-almoco" class="hidden space-y-6 animate-enter relative z-10">
+                            <div class="bg-green-50 p-6 rounded-2xl border border-green-200 text-center shadow-inner">
+                                <h3 class="font-bold text-green-800 text-xl mb-2 flex items-center justify-center gap-2">
+                                    <span>🥗</span> A Regra de Ouro
+                                </h3>
+                                <p class="text-green-900 font-medium">Metade do prato é <strong>SALADA</strong> (Repolho, Alface, Tomate) + <strong>LEGUMES</strong> (Abóbora, Cenoura, Brócolis).</p>
                             </div>
-                            <div class="grid md:grid-cols-2 gap-4">
-                                <div class="p-5 rounded-2xl bg-white border border-stone-100">
-                                    <span class="text-xs font-bold text-rose-400 uppercase tracking-wider">Proteína</span>
-                                    <p class="font-bold text-stone-700 text-lg">1 Filé de frango ou 2 Ovos</p>
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div class="p-6 rounded-2xl bg-white border border-stone-100 shadow-sm">
+                                    <span class="inline-block px-2 py-1 bg-rose-100 text-rose-500 rounded text-xs font-bold uppercase mb-2">Proteína</span>
+                                    <p class="font-bold text-stone-800 text-xl">1 Filé de frango <span class="text-stone-400 text-base font-normal">ou</span> 2 Ovos</p>
                                 </div>
-                                <div class="p-5 rounded-2xl bg-white border border-stone-100">
-                                    <span class="text-xs font-bold text-yellow-500 uppercase tracking-wider">Carbo</span>
-                                    <p class="font-bold text-stone-700 text-lg">3 col. Arroz + 1 concha Feijão</p>
-                                    <p class="text-xs text-stone-400 mt-1">Ou troque o arroz por 1 Batata Inglesa</p>
+                                <div class="p-6 rounded-2xl bg-white border border-stone-100 shadow-sm">
+                                    <span class="inline-block px-2 py-1 bg-yellow-100 text-yellow-600 rounded text-xs font-bold uppercase mb-2">Carbo (Energia)</span>
+                                    <p class="font-bold text-stone-800 text-xl">3 col. Arroz + 1 concha Feijão</p>
+                                    <p class="text-xs text-stone-500 mt-2 italic border-t border-stone-100 pt-2">Troca: Arroz → 1 Batata Inglesa</p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Lanche -->
-                        <div id="content-lanche" class="hidden animate-fade-in">
+                        <div id="content-lanche" class="hidden animate-enter relative z-10">
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div class="bg-white p-6 rounded-2xl border border-stone-100 text-center hover:shadow-md transition">
-                                    <div class="text-4xl mb-3">🍓</div>
-                                    <h3 class="font-bold text-rose-500">Fresquinho</h3>
-                                    <p class="text-sm text-stone-600 mt-2">Iogurte Natural + Morangos picados.</p>
+                                <div class="bg-white p-6 rounded-2xl border border-stone-100 text-center hover:shadow-lg hover:-translate-y-1 transition duration-300">
+                                    <div class="text-5xl mb-4 bg-rose-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto">🍓</div>
+                                    <h3 class="font-bold text-rose-500 text-lg">Fresquinho</h3>
+                                    <p class="text-sm text-stone-600 mt-2 font-medium">Iogurte Natural + Morangos picados.</p>
                                 </div>
-                                <div class="bg-white p-6 rounded-2xl border border-stone-100 text-center hover:shadow-md transition">
-                                    <div class="text-4xl mb-3">🍞</div>
-                                    <h3 class="font-bold text-stone-600">Clássico</h3>
-                                    <p class="text-sm text-stone-600 mt-2">Pão tostado c/ requeijão + Leite com Toddy Light.</p>
+                                <div class="bg-white p-6 rounded-2xl border border-stone-100 text-center hover:shadow-lg hover:-translate-y-1 transition duration-300">
+                                    <div class="text-5xl mb-4 bg-orange-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto">🍞</div>
+                                    <h3 class="font-bold text-stone-700 text-lg">Clássico</h3>
+                                    <p class="text-sm text-stone-600 mt-2 font-medium">Pão tostado c/ requeijão + Leite com Toddy Light.</p>
                                 </div>
-                                <div class="bg-white p-6 rounded-2xl border border-stone-100 text-center hover:shadow-md transition">
-                                    <div class="text-4xl mb-3">🍿</div>
-                                    <h3 class="font-bold text-yellow-500">Cinema</h3>
-                                    <p class="text-sm text-stone-600 mt-2">Pipoca de panela (1 xícara peq). Pouco sal!</p>
+                                <div class="bg-white p-6 rounded-2xl border border-stone-100 text-center hover:shadow-lg hover:-translate-y-1 transition duration-300">
+                                    <div class="text-5xl mb-4 bg-yellow-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto">🍿</div>
+                                    <h3 class="font-bold text-yellow-600 text-lg">Cinema</h3>
+                                    <p class="text-sm text-stone-600 mt-2 font-medium">Pipoca de panela (1 xícara peq). Pouco sal!</p>
                                 </div>
                             </div>
-                            <div class="mt-6 text-center">
-                                <span class="inline-block bg-stone-100 text-stone-500 px-4 py-2 rounded-lg text-sm">
-                                    Fome pequena de manhã? Vá de <strong>Melancia</strong> ou <strong>Gelatina Zero</strong>.
+                            <div class="mt-8 text-center">
+                                <span class="inline-flex items-center gap-2 bg-stone-100 text-stone-600 px-5 py-2 rounded-full text-sm font-bold shadow-inner">
+                                    <span>💡</span> Fome pequena? Vá de Melancia ou Gelatina Zero.
                                 </span>
                             </div>
                         </div>
 
                         <!-- Jantar -->
-                        <div id="content-jantar" class="hidden space-y-4 animate-fade-in">
-                            <div class="flex items-center gap-4 p-5 rounded-2xl bg-white border border-stone-100 shadow-sm border-l-4 border-l-green-400">
-                                <div class="flex-grow">
-                                    <h3 class="font-bold text-stone-700">💸 Economia Total</h3>
-                                    <p class="text-stone-600">Repete o almoço! Melhor estratégia.</p>
+                        <div id="content-jantar" class="hidden space-y-4 animate-enter relative z-10">
+                            <div class="grid md:grid-cols-3 gap-4">
+                                <div class="p-6 rounded-2xl bg-white border border-green-100 shadow-sm relative overflow-hidden group">
+                                    <div class="absolute top-0 left-0 w-2 h-full bg-green-400"></div>
+                                    <h3 class="font-bold text-stone-700 text-lg group-hover:text-green-600 transition">💸 Economia</h3>
+                                    <p class="text-stone-500 text-sm mt-1">Repete o almoço! Melhor estratégia.</p>
                                 </div>
-                            </div>
-                            <div class="flex items-center gap-4 p-5 rounded-2xl bg-white border border-stone-100 shadow-sm border-l-4 border-l-yellow-400">
-                                <div class="flex-grow">
-                                    <h3 class="font-bold text-stone-700">🍳 Omeleteira</h3>
-                                    <p class="text-stone-600">2 ovos, queijo, tomate e orégano.</p>
+                                <div class="p-6 rounded-2xl bg-white border border-yellow-100 shadow-sm relative overflow-hidden group">
+                                    <div class="absolute top-0 left-0 w-2 h-full bg-yellow-400"></div>
+                                    <h3 class="font-bold text-stone-700 text-lg group-hover:text-yellow-600 transition">🍳 Omeleteira</h3>
+                                    <p class="text-stone-500 text-sm mt-1">2 ovos, queijo, tomate e orégano.</p>
                                 </div>
-                            </div>
-                            <div class="flex items-center gap-4 p-5 rounded-2xl bg-white border border-stone-100 shadow-sm border-l-4 border-l-rose-400">
-                                <div class="flex-grow">
-                                    <h3 class="font-bold text-stone-700">🍲 Sopinha</h3>
-                                    <p class="text-stone-600">Legumes com frango (base de abóbora).</p>
+                                <div class="p-6 rounded-2xl bg-white border border-rose-100 shadow-sm relative overflow-hidden group">
+                                    <div class="absolute top-0 left-0 w-2 h-full bg-rose-400"></div>
+                                    <h3 class="font-bold text-stone-700 text-lg group-hover:text-rose-500 transition">🍲 Sopinha</h3>
+                                    <p class="text-stone-500 text-sm mt-1">Legumes com frango (base de abóbora).</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <!-- Section: Trocas e Dicas (Grid Assimétrico) -->
-                <section class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-8">
+                <!-- SEÇÃO 2: Trocas e Dicas (Layout Assimétrico) -->
+                <section class="grid grid-cols-1 md:grid-cols-12 gap-6 pb-12">
                     
-                    <!-- Trocas -->
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-stone-100">
-                        <h3 class="font-bold text-stone-800 text-xl mb-4">🔄 Trocas da Bestie</h3>
-                        <div class="space-y-3 text-sm">
-                            <div class="flex justify-between items-center p-3 bg-stone-50 rounded-xl">
-                                <span class="font-bold text-stone-600">Proteína</span>
-                                <div class="text-right">
-                                    <span class="text-green-600 block">✅ Ovos, Frango, Atum</span>
-                                    <span class="text-red-400 text-xs block">❌ Salsicha, Linguiça</span>
+                    <!-- Coluna Esquerda: Trocas (Maior) -->
+                    <div class="md:col-span-7 card-soft p-8 bg-white">
+                        <h3 class="font-bold text-stone-800 text-xl mb-6 flex items-center gap-2">
+                            <span class="bg-purple-100 p-1.5 rounded-lg text-purple-600 text-base">🔄</span> Trocas da Bestie
+                        </h3>
+                        <div class="space-y-4">
+                            <!-- Item 1 -->
+                            <div class="flex items-center justify-between p-4 bg-stone-50 rounded-2xl border border-stone-100">
+                                <span class="font-extrabold text-stone-700">Proteína</span>
+                                <div class="text-right text-sm">
+                                    <div class="text-green-600 font-bold mb-1">✅ Ovos, Frango, Atum</div>
+                                    <div class="text-red-400 font-medium text-xs">❌ Salsicha, Linguiça</div>
                                 </div>
                             </div>
-                            <div class="flex justify-between items-center p-3 bg-stone-50 rounded-xl">
-                                <span class="font-bold text-stone-600">Carbo</span>
-                                <div class="text-right">
-                                    <span class="text-green-600 block">✅ Batata Inglesa, Arroz</span>
-                                    <span class="text-red-400 text-xs block">❌ Integrais, Biscoito</span>
+                            <!-- Item 2 -->
+                            <div class="flex items-center justify-between p-4 bg-stone-50 rounded-2xl border border-stone-100">
+                                <span class="font-extrabold text-stone-700">Carbo</span>
+                                <div class="text-right text-sm">
+                                    <div class="text-green-600 font-bold mb-1">✅ Batata Inglesa, Arroz</div>
+                                    <div class="text-red-400 font-medium text-xs">❌ Integrais, Biscoito</div>
                                 </div>
                             </div>
-                            <div class="flex justify-between items-center p-3 bg-stone-50 rounded-xl">
-                                <span class="font-bold text-stone-600">Vegetais</span>
-                                <div class="text-right">
-                                    <span class="text-green-600 block">✅ Repolho, Alface, Abóbora</span>
-                                    <span class="text-red-400 text-xs block">❌ Chuchu, Ervilha</span>
+                            <!-- Item 3 -->
+                            <div class="flex items-center justify-between p-4 bg-stone-50 rounded-2xl border border-stone-100">
+                                <span class="font-extrabold text-stone-700">Vegetais</span>
+                                <div class="text-right text-sm">
+                                    <div class="text-green-600 font-bold mb-1">✅ Repolho, Alface</div>
+                                    <div class="text-red-400 font-medium text-xs">❌ Chuchu, Ervilha</div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Fim de Semana e Dicas -->
-                    <div class="space-y-4">
-                        <div class="bg-rose-100 p-6 rounded-3xl border border-rose-200">
-                            <h3 class="font-bold text-rose-700 mb-2">🎉 Fim de Semana</h3>
-                            <p class="text-rose-900 text-sm">
+                    <!-- Coluna Direita: Dicas e Fim de Semana (Menor) -->
+                    <div class="md:col-span-5 flex flex-col gap-6">
+                        <!-- Fim de Semana -->
+                        <div class="card-soft p-6 bg-rose-50 border-rose-100 flex-grow relative overflow-hidden">
+                            <div class="absolute -right-4 -top-4 w-24 h-24 bg-rose-200 rounded-full opacity-50 blur-xl"></div>
+                            <h3 class="font-bold text-rose-700 mb-3 text-lg">🎉 Fim de Semana</h3>
+                            <p class="text-rose-900 text-sm leading-relaxed">
                                 Você tem direito a <strong>2 Refeições Livres</strong>. Pizza ou Churrasco? Pode!
-                                <br><span class="text-xs font-bold mt-2 block opacity-75">Regra: Comeu, acabou. Volta pro foco!</span>
                             </p>
+                            <div class="mt-4 text-xs font-bold text-rose-600 bg-white/60 p-2 rounded-lg inline-block">
+                                ⚠️ Regra: Comeu, acabou. Volta pro foco!
+                            </div>
                         </div>
-                        <div class="bg-yellow-50 p-6 rounded-3xl border border-yellow-100">
-                            <h3 class="font-bold text-yellow-700 mb-2">💸 Dica de Ouro</h3>
-                            <p class="text-yellow-800 text-sm">
+                        
+                        <!-- Dica de Ouro -->
+                        <div class="card-soft p-6 bg-yellow-50 border-yellow-100">
+                            <h3 class="font-bold text-yellow-700 mb-2 flex items-center gap-2">
+                                <span>💸</span> Dica de Ouro
+                            </h3>
+                            <p class="text-yellow-900 text-sm">
                                 Vá na <strong>Xepa da Feira</strong>. Morango tá caro? Compra Banana. O importante é não parar.
                             </p>
                         </div>
@@ -358,16 +411,17 @@
                 labels: ['Bebido', 'Falta'],
                 datasets: [{
                     data: [0, 3500],
-                    // CORES MAIS VIBRANTES: Azul Sky 600 e Sky 100
-                    backgroundColor: ['#0284c7', '#e0f2fe'], 
+                    // CORES VIBRANTES MANTIDAS
+                    backgroundColor: ['#0ea5e9', '#e0f2fe'], 
                     borderWidth: 0,
+                    borderRadius: 20, // Borda arredondada no gráfico
                     hoverOffset: 4
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: '75%',
+                cutout: '80%', // Mais fino e elegante
                 plugins: {
                     legend: { display: false },
                     tooltip: { enabled: false }
@@ -396,11 +450,11 @@
             const liters = (state.waterIntake / 1000).toFixed(1) + "L";
             document.getElementById('water-display').innerText = liters;
 
-            // Celebration color: Emerald 600 (Mais vibrante)
+            // Celebration color
             if (remaining === 0) {
-                hydrationChart.data.datasets[0].backgroundColor[0] = '#16a34a'; 
+                hydrationChart.data.datasets[0].backgroundColor[0] = '#10b981'; 
             } else {
-                hydrationChart.data.datasets[0].backgroundColor[0] = '#0284c7'; // Sky 600
+                hydrationChart.data.datasets[0].backgroundColor[0] = '#0ea5e9'; 
             }
             
             hydrationChart.update();
@@ -414,13 +468,14 @@
                 labels: ['Salada/Mato', 'Proteína', 'Carbo/Energia'],
                 datasets: [{
                     data: [50, 25, 25],
-                    // CORES MAIS VIBRANTES: Green 500, Rose 500, Yellow 500
+                    // CORES VIBRANTES MANTIDAS
                     backgroundColor: [
-                        '#22c55e', 
-                        '#f43f5e', 
-                        '#eab308'  
+                        '#22c55e', // Green 500
+                        '#f43f5e', // Rose 500
+                        '#eab308'  // Yellow 500
                     ],
-                    borderWidth: 0
+                    borderWidth: 0,
+                    hoverOffset: 8
                 }]
             },
             options: {
@@ -441,12 +496,10 @@
                 const content = document.getElementById(`content-${id}`);
                 
                 if (id === selectedTab) {
-                    btn.classList.remove('inactive');
                     btn.classList.add('active');
                     content.classList.remove('hidden');
                 } else {
                     btn.classList.remove('active');
-                    btn.classList.add('inactive');
                     content.classList.add('hidden');
                 }
             });
