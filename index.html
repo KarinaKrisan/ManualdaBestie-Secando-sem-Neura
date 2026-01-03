@@ -211,11 +211,10 @@
         </aside>
 
         <!-- MAIN CONTENT: O Guia Prático -->
-        <main class="main-content px-4 lg:px-10 pb-10">
-            <div class="max-w-5xl mx-auto"> <!-- Removido space-y-6 para evitar conflito com margens -->
+        <main class="main-content px-4 lg:px-10 pb-6"> <!-- Reduzido pb-10 para pb-6 -->
+            <div class="max-w-5xl mx-auto"> 
                 
                 <!-- SEÇÃO 1: Header + Cardápio (FIXO NO TOPO) -->
-                <!-- Adicionado mb-6 para dar espaço após o header fixo -->
                 <section class="sticky-header">
                     <div class="flex flex-col md:flex-row md:items-end justify-between mb-4 gap-2">
                         <div>
@@ -343,36 +342,53 @@
                 </div>
 
                 <!-- SEÇÃO 2: Trocas e Dicas (Layout Assimétrico) -->
-                <section class="grid grid-cols-1 md:grid-cols-12 gap-6 pb-12">
+                <section class="grid grid-cols-1 md:grid-cols-12 gap-6 pb-6"> <!-- Reduzido pb-12 para pb-6 -->
                     
                     <!-- Coluna Esquerda: Trocas (Maior) -->
-                    <div class="md:col-span-7 card-soft p-8 bg-white">
+                    <!-- REDUZIDO PADDING DE p-8 para p-6 -->
+                    <div class="md:col-span-7 card-soft p-6 bg-white">
                         <h3 class="font-bold text-violet-800 text-xl mb-6 flex items-center gap-2">
                             <span class="bg-violet-100 p-1.5 rounded-lg text-violet-600 text-base">🔄</span> Trocas da Bestie
                         </h3>
                         <div class="space-y-4">
-                            <!-- Item 1 -->
+                            <!-- Item 1: Proteína -->
                             <div class="flex items-center justify-between p-4 bg-stone-50 rounded-2xl border border-stone-100">
                                 <span class="font-extrabold text-stone-700">Proteína</span>
                                 <div class="text-right text-sm">
-                                    <div class="text-green-600 font-bold mb-1">✅ Ovos, Frango, Atum, Lombo Suíno, Carne Moída</div>
+                                    <div class="text-green-600 font-bold mb-1">✅ Ovos, Frango, Atum, Lombo, Carne Moída</div>
                                     <div class="text-red-400 font-medium text-xs">❌ Salsicha, Linguiça</div>
                                 </div>
                             </div>
-                            <!-- Item 2 -->
+                            <!-- Item 2: Carbo -->
                             <div class="flex items-center justify-between p-4 bg-stone-50 rounded-2xl border border-stone-100">
                                 <span class="font-extrabold text-stone-700">Carbo</span>
                                 <div class="text-right text-sm">
-                                    <div class="text-green-600 font-bold mb-1">✅ Batata Inglesa, Arroz</div>
-                                    <div class="text-red-400 font-medium text-xs">❌ Integrais, Biscoito</div>
+                                    <div class="text-green-600 font-bold mb-1">✅ Batata Inglesa, Arroz, Mandioca</div>
+                                    <div class="text-red-400 font-medium text-xs">❌ Integrais, Biscoito Recheado</div>
                                 </div>
                             </div>
-                            <!-- Item 3 -->
+                            <!-- Item 3: Vegetais -->
                             <div class="flex items-center justify-between p-4 bg-stone-50 rounded-2xl border border-stone-100">
                                 <span class="font-extrabold text-stone-700">Vegetais</span>
                                 <div class="text-right text-sm">
-                                    <div class="text-green-600 font-bold mb-1">✅ Repolho, Alface</div>
-                                    <div class="text-red-400 font-medium text-xs">❌ Chuchu, Ervilha</div>
+                                    <div class="text-green-600 font-bold mb-1">✅ Repolho, Alface, Abóbora, Cenoura</div>
+                                    <div class="text-red-400 font-medium text-xs">❌ Chuchu, Ervilha, Milho</div>
+                                </div>
+                            </div>
+                            <!-- Item 4: Frutas -->
+                            <div class="flex items-center justify-between p-4 bg-stone-50 rounded-2xl border border-stone-100">
+                                <span class="font-extrabold text-stone-700">Frutas</span>
+                                <div class="text-right text-sm">
+                                    <div class="text-green-600 font-bold mb-1">✅ Melancia, Morango, Banana</div>
+                                    <div class="text-red-400 font-medium text-xs">❌ Abacaxi, Frutas em Calda</div>
+                                </div>
+                            </div>
+                            <!-- Item 5: Extras -->
+                            <div class="flex items-center justify-between p-4 bg-stone-50 rounded-2xl border border-stone-100">
+                                <span class="font-extrabold text-stone-700">Extras</span>
+                                <div class="text-right text-sm">
+                                    <div class="text-green-600 font-bold mb-1">✅ Gelatina Zero, Adoçante, Cacau</div>
+                                    <div class="text-red-400 font-medium text-xs">❌ Açúcar Puro, Achocolatado Normal</div>
                                 </div>
                             </div>
                         </div>
@@ -402,7 +418,7 @@
                             </p>
                         </div>
 
-                         <!-- NEW: SOS TPM & RUA -->
+                         <!-- SOS TPM & RUA -->
                         <div class="card-soft p-6 bg-purple-50 border-purple-100">
                             <h3 class="font-bold text-purple-700 mb-2 flex items-center gap-2">
                                 <span>🍫</span> SOS Formiga
@@ -426,7 +442,7 @@
                             </ul>
                         </div>
 
-                        <!-- NEW: Suplementos -->
+                        <!-- Suplementos -->
                         <div class="card-soft p-6 bg-teal-50 border-teal-100">
                             <h3 class="font-bold text-teal-700 mb-2 flex items-center gap-2">
                                 <span>💊</span> Kit da Bestie (Quando der $$)
