@@ -16,7 +16,7 @@
         /* Base */
         body {
             font-family: 'Nunito', sans-serif;
-            background-color: #f5f3ff; /* Violet 50 base (Nova cor de fundo!) */
+            background-color: #f5f3ff; /* Violet 50 base */
             color: #4c1d95; /* Violet 900 text */
         }
 
@@ -49,6 +49,7 @@
                 height: 100%;
                 overflow-y: auto;
                 background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); /* Gradiente Lilás */
+                position: relative; /* Necessário para o sticky funcionar bem dentro */
             }
         }
 
@@ -73,17 +74,19 @@
             width: 100%;
         }
 
-        /* Header Fixo (Sticky Header) */
+        /* Header Fixo (Sticky Header) - REFORÇADO */
         .sticky-header {
+            position: -webkit-sticky; /* Safari */
             position: sticky;
             top: 0;
-            z-index: 40;
-            background: rgba(245, 243, 255, 0.85); /* Fundo semi-transparente */
+            z-index: 50; /* Aumentado para garantir que fique acima de tudo */
+            background: rgba(245, 243, 255, 0.95); /* Fundo mais sólido */
             backdrop-filter: blur(12px);
-            padding-top: 1.5rem;
+            padding-top: 1rem;
             padding-bottom: 1rem;
-            margin-bottom: 1rem;
-            border-bottom: 1px solid rgba(221, 214, 254, 0.5);
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(221, 214, 254, 0.8);
+            /* Compensação visual para margens laterais em mobile se necessário */
         }
 
         /* Navegação (Abas Pílula) */
@@ -209,13 +212,13 @@
 
         <!-- MAIN CONTENT: O Guia Prático -->
         <main class="main-content px-4 lg:px-10 pb-10">
-            <div class="max-w-5xl mx-auto space-y-6">
+            <div class="max-w-5xl mx-auto"> <!-- Removido space-y-6 para evitar conflito com margens -->
                 
                 <!-- SEÇÃO 1: Header + Cardápio (FIXO NO TOPO) -->
+                <!-- Adicionado mb-6 para dar espaço após o header fixo -->
                 <section class="sticky-header">
                     <div class="flex flex-col md:flex-row md:items-end justify-between mb-4 gap-2">
                         <div>
-                            <!-- NOVOS TEXTOS AQUI -->
                             <h2 class="text-2xl font-bold text-violet-900">😋 O Que Tem Pra Hoje?</h2>
                             <p class="text-violet-500 text-sm">Clica e escolhe, amada!</p>
                         </div>
@@ -239,7 +242,7 @@
                 </section>
 
                 <!-- Conteúdo Dinâmico (Rolável) -->
-                <div class="card-soft p-6 md:p-10 min-h-[320px] relative overflow-hidden mt-2">
+                <div class="card-soft p-6 md:p-10 min-h-[320px] relative overflow-hidden mt-2 mb-8">
                     <!-- Decorative bg blob -->
                     <div class="absolute top-0 right-0 w-64 h-64 bg-violet-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 -translate-y-1/2 translate-x-1/2"></div>
 
@@ -382,7 +385,7 @@
                             <div class="absolute -right-4 -top-4 w-24 h-24 bg-rose-200 rounded-full opacity-50 blur-xl"></div>
                             <h3 class="font-bold text-rose-700 mb-3 text-lg">🎉 Fim de Semana</h3>
                             <p class="text-rose-900 text-sm leading-relaxed">
-                                Ninguém é de ferro! Aproveite suas <strong>2 Refeições Livres</strong> pra comer o que ama (Pizza? Burguer? Sim!).
+                                Ninguém é de ferro! Aproveite suas <strong>2 Refeições Livres por fim de semana</strong> (elas se renovam desde que você siga a dieta corretamente na semana!) pra comer o que ama.
                             </p>
                             <div class="mt-4 text-xs font-bold text-rose-600 bg-white/60 p-2 rounded-lg inline-block">
                                 ⚠️ O segredo: Não chute o balde o fim de semana todo. Fez a refeição livre? Na próxima, volta pro plano!
