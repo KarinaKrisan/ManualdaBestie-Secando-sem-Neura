@@ -175,6 +175,22 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-enter { animation: slideIn 0.4s ease-out forwards; }
+        
+        /* Loading Overlay */
+        #loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: opacity 0.5s;
+        }
+        #loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
     </style>
     <!-- Script para instalar Manifesto dinamicamente -->
     <script>
@@ -208,6 +224,14 @@
 </head>
 <body>
 
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="text-center">
+            <div class="text-4xl animate-bounce mb-2">💅</div>
+            <p class="text-violet-600 font-bold">Conectando...</p>
+        </div>
+    </div>
+
     <div class="dashboard-wrapper">
         
         <!-- SIDEBAR: Identidade & Metas -->
@@ -215,7 +239,7 @@
             <!-- Branding -->
             <div class="text-center lg:text-left">
                 <div class="inline-flex items-center gap-2 px-3 py-1 bg-violet-100 text-violet-600 rounded-full text-xs font-bold mb-3 tracking-wide uppercase">
-                    <span>✨</span> Manual da Bestie
+                    <span id="sync-status">☁️</span> Manual da Bestie
                 </div>
                 <h1 class="text-4xl font-extrabold text-violet-900 leading-tight tracking-tight">
                     Secando sem <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-500">Neura</span> 💅
@@ -374,7 +398,7 @@
                             </div>
                             <div class="p-6 rounded-2xl bg-white border border-violet-100 shadow-sm">
                                 <span class="inline-block px-2 py-1 bg-yellow-100 text-yellow-600 rounded text-xs font-bold uppercase mb-2">Carbo (Energia)</span>
-                                <p class="font-bold text-violet-800 text-lg">
+                                <p class="font-bold text-violet-800 text-xl">
                                     90g Arroz <span class="text-sm font-normal">(3 col. sopa)</span> + 
                                     <br>140g Feijão <span class="text-sm font-normal">(1 concha)</span>
                                 </p>
@@ -617,16 +641,35 @@
         </main>
     </div>
 
-    <!-- Script Logic -->
-    <script>
-        // State Management
+    <!-- Scripts do Firebase e App -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, onSnapshot, collection } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+
+        // Configuração do Firebase
+        // Lógica: Usa a config do ambiente se existir (Preview), senão usa a SUA config (Exportado)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyDO1yt104pggWrI6G6zY89bgBPHaaFJa2M",
+            authDomain: "manual-da-bestie.firebaseapp.com",
+            projectId: "manual-da-bestie",
+            storageBucket: "manual-da-bestie.firebasestorage.app",
+            messagingSenderId: "421582504940",
+            appId: "1:421582504940:web:6a236e1ad1f001daf236c9"
+        };
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'manual-da-bestie';
+        
+        let db, auth, user;
+        
+        // Estado Global
         const state = {
             waterIntake: 0,
-            waterGoal: 3500, // 3.5L in ml
+            waterGoal: 3500, // 3.5L
             activeTab: 'cafe',
             reminderActive: false,
-            // Inicializar hábitos se não existirem
-            habits: JSON.parse(localStorage.getItem('bestieHabits')) || {
+            // Hábito inicial
+            habits: {
                 Segunda: { treino: false, dieta: false },
                 Terca: { treino: false, dieta: false },
                 Quarta: { treino: false, dieta: false },
@@ -639,19 +682,206 @@
 
         const daysOfWeek = ['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo'];
         const daysDisplay = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
-
         let reminderInterval;
 
-        // Initialize functionality when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
+        // Inicialização
+        async function initApp() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                // Tenta autenticação silenciosa primeiro (Regra do Ambiente)
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    // Fallback para anônimo para garantir funcionamento imediato
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (currentUser) => {
+                    user = currentUser;
+                    if (user) {
+                        document.getElementById('loading-overlay').classList.add('hidden');
+                        document.getElementById('sync-status').innerText = "☁️"; // Ícone de nuvem quando conectado
+                        setupRealtimeListener();
+                    }
+                });
+
+            } catch (e) {
+                console.warn("Erro ao conectar Firebase (Modo Offline ativado):", e);
+                document.getElementById('loading-overlay').classList.add('hidden');
+                document.getElementById('sync-status').innerText = "📱"; // Ícone de celular para modo offline
+                
+                // Fallback para localStorage
+                const saved = localStorage.getItem('bestieState');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    state.waterIntake = parsed.waterIntake || 0;
+                    state.habits = parsed.habits || state.habits;
+                    updateHydrationDisplay(false);
+                    renderTracker();
+                }
+            }
+            
             initReminder();
             renderTracker();
-        });
+            updateHydrationDisplay(false);
+        }
 
-        // --- Tracker Functions ---
+        // Função de Login com Google (Para uso futuro/botão)
+        window.loginWithGoogle = async function() {
+            const provider = new GoogleAuthProvider();
+            try {
+                await signInWithPopup(auth, provider);
+                alert("Conectada com Google! ✨");
+            } catch (error) {
+                console.error("Erro no login Google:", error);
+                alert("Erro ao logar. Verifique se o domínio está autorizado no Firebase Console.");
+            }
+        }
+
+        // Listener de Dados em Tempo Real
+        function setupRealtimeListener() {
+            if (!user || !db) return;
+            
+            // Caminho padronizado para garantir permissões
+            const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'daily_progress');
+            
+            onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    // Atualiza estado local com dados da nuvem
+                    if (data.waterIntake !== undefined) state.waterIntake = data.waterIntake;
+                    if (data.habits !== undefined) state.habits = data.habits;
+                    
+                    // Atualiza UI
+                    updateHydrationDisplay(false); // false para não gerar loop infinito de salvamento
+                    renderTracker();
+                }
+            }, (error) => {
+                console.error("Erro ao sincronizar dados:", error);
+            });
+        }
+
+        // Salvar Dados
+        async function saveData() {
+            if (user && db) {
+                const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'daily_progress');
+                try {
+                    await setDoc(docRef, {
+                        waterIntake: state.waterIntake,
+                        habits: state.habits,
+                        lastUpdated: new Date().toISOString()
+                    }, { merge: true });
+                } catch (e) {
+                    console.error("Erro ao salvar:", e);
+                }
+            } else {
+                // Fallback LocalStorage
+                localStorage.setItem('bestieState', JSON.stringify({
+                    waterIntake: state.waterIntake,
+                    habits: state.habits
+                }));
+            }
+        }
+
+        // Funções Globais (acessíveis pelo HTML)
+        window.addWater = function() {
+            if(state.waterIntake < state.waterGoal) {
+                state.waterIntake += 250;
+                updateHydrationDisplay(true);
+            }
+        };
+
+        window.resetWater = function() {
+            state.waterIntake = 0;
+            updateHydrationDisplay(true);
+        };
+
+        window.toggleHabit = function(day, type) {
+            state.habits[day][type] = !state.habits[day][type];
+            renderTracker(); // Atualiza visual imediato
+            saveData(); // Salva na nuvem
+        };
+
+        window.clearTracker = function() {
+            if(confirm('Tem certeza que quer limpar a semana, amiga?')) {
+                Object.keys(state.habits).forEach(day => {
+                    state.habits[day] = { treino: false, dieta: false };
+                });
+                renderTracker();
+                saveData();
+            }
+        };
+
+        window.toggleReminder = function() {
+            if (!("Notification" in window)) {
+                alert("Seu navegador não suporta notificações, amiga! 😢");
+                return;
+            }
+
+            if (state.reminderActive) {
+                stopReminder();
+            } else {
+                if (Notification.permission === "granted") {
+                    startReminder(true);
+                } else if (Notification.permission !== "denied") {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === "granted") {
+                            startReminder(true);
+                        }
+                    });
+                } else {
+                    alert("Você bloqueou as notificações. Ative nas configurações do navegador para usar!");
+                }
+            }
+        };
+
+        window.switchTab = function(selectedTab) {
+            state.activeTab = selectedTab;
+            const tabIds = ['cafe', 'almoco', 'lanche', 'jantar', 'checkin'];
+            
+            tabIds.forEach(id => {
+                const btn = document.getElementById(`tab-${id}`);
+                const content = document.getElementById(`content-${id}`);
+                
+                if (id === selectedTab) {
+                    btn.classList.add('active');
+                    content.classList.remove('hidden');
+                } else {
+                    btn.classList.remove('active');
+                    content.classList.add('hidden');
+                }
+            });
+        }
+
+        // Funções Auxiliares
+        function updateHydrationDisplay(shouldSave = true) {
+            const remaining = Math.max(0, state.waterGoal - state.waterIntake);
+            
+            // Atualiza gráfico (se existir instância)
+            if (hydrationChart) {
+                hydrationChart.data.datasets[0].data = [state.waterIntake, remaining];
+                if (remaining === 0) {
+                    hydrationChart.data.datasets[0].backgroundColor[0] = '#10b981'; 
+                } else {
+                    hydrationChart.data.datasets[0].backgroundColor[0] = '#0ea5e9'; 
+                }
+                hydrationChart.update();
+            }
+            
+            const liters = (state.waterIntake / 1000).toFixed(1) + "L";
+            const display = document.getElementById('water-display');
+            if(display) display.innerText = liters;
+
+            if (shouldSave) saveData();
+        }
+
         function renderTracker() {
             const container = document.getElementById('tracker-list');
-            container.innerHTML = ''; // Limpa
+            if(!container) return;
+            container.innerHTML = ''; 
 
             daysOfWeek.forEach((day, index) => {
                 const dayData = state.habits[day];
@@ -675,15 +905,9 @@
             updateProgress();
         }
 
-        function toggleHabit(day, type) {
-            state.habits[day][type] = !state.habits[day][type];
-            localStorage.setItem('bestieHabits', JSON.stringify(state.habits));
-            renderTracker();
-        }
-
         function updateProgress() {
             let completed = 0;
-            let total = 14; // 7 dias * 2 hábitos
+            let total = 14; 
             
             Object.values(state.habits).forEach(day => {
                 if(day.treino) completed++;
@@ -691,112 +915,21 @@
             });
 
             const percent = Math.round((completed / total) * 100);
-            document.getElementById('progress-bar').style.width = percent + '%';
-            document.getElementById('progress-text').innerText = percent + '% Completo';
+            const bar = document.getElementById('progress-bar');
+            const text = document.getElementById('progress-text');
+            
+            if(bar) bar.style.width = percent + '%';
+            if(text) text.innerText = percent + '% Completo';
         }
 
-        function clearTracker() {
-            if(confirm('Tem certeza que quer limpar a semana, amiga?')) {
-                Object.keys(state.habits).forEach(day => {
-                    state.habits[day] = { treino: false, dieta: false };
-                });
-                localStorage.setItem('bestieHabits', JSON.stringify(state.habits));
-                renderTracker();
-            }
-        }
-
-        // --- Logic to check saved reminder state ---
+        // Lembretes
         function initReminder() {
             const savedState = localStorage.getItem('waterReminder');
             if (savedState === 'true') {
                 if (Notification.permission === "granted") {
-                    startReminder(false); // false = don't show "activated" notification again on reload, just start loop
+                    startReminder(false);
                 } else {
-                    localStorage.setItem('waterReminder', 'false'); // Reset if permission lost
-                }
-            }
-        }
-
-        // DOM Elements
-        const tabIds = ['cafe', 'almoco', 'lanche', 'jantar', 'checkin'];
-        
-        // --- Hydration Chart Logic ---
-        const ctxHydro = document.getElementById('hydrationChart').getContext('2d');
-        const hydrationChart = new Chart(ctxHydro, {
-            type: 'doughnut',
-            data: {
-                labels: ['Bebido', 'Falta'],
-                datasets: [{
-                    data: [0, 3500],
-                    // CORES VIBRANTES MANTIDAS
-                    backgroundColor: ['#0ea5e9', '#e0f2fe'], 
-                    borderWidth: 0,
-                    borderRadius: 20, // Borda arredondada no gráfico
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '80%', // Mais fino e elegante
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { enabled: false }
-                }
-            }
-        });
-
-        // Hydration Functions
-        function addWater() {
-            if(state.waterIntake < state.waterGoal) {
-                state.waterIntake += 250;
-                updateHydrationDisplay();
-            }
-        }
-
-        function resetWater() {
-            state.waterIntake = 0;
-            updateHydrationDisplay();
-        }
-
-        function updateHydrationDisplay() {
-            const remaining = Math.max(0, state.waterGoal - state.waterIntake);
-            hydrationChart.data.datasets[0].data = [state.waterIntake, remaining];
-            
-            // Update Text
-            const liters = (state.waterIntake / 1000).toFixed(1) + "L";
-            document.getElementById('water-display').innerText = liters;
-
-            // Celebration color
-            if (remaining === 0) {
-                hydrationChart.data.datasets[0].backgroundColor[0] = '#10b981'; 
-            } else {
-                hydrationChart.data.datasets[0].backgroundColor[0] = '#0ea5e9'; 
-            }
-            
-            hydrationChart.update();
-        }
-
-        // --- Notification Reminder Logic ---
-        function toggleReminder() {
-            if (!("Notification" in window)) {
-                alert("Seu navegador não suporta notificações, amiga! 😢");
-                return;
-            }
-
-            if (state.reminderActive) {
-                stopReminder();
-            } else {
-                if (Notification.permission === "granted") {
-                    startReminder(true);
-                } else if (Notification.permission !== "denied") {
-                    Notification.requestPermission().then(permission => {
-                        if (permission === "granted") {
-                            startReminder(true);
-                        }
-                    });
-                } else {
-                    alert("Você bloqueou as notificações. Ative nas configurações do navegador para usar!");
+                    localStorage.setItem('waterReminder', 'false');
                 }
             }
         }
@@ -804,25 +937,20 @@
         function startReminder(showToast) {
             state.reminderActive = true;
             localStorage.setItem('waterReminder', 'true');
-            
             updateReminderButton(true);
 
             if (showToast) {
                 new Notification("Lembretes ativados! 💧", {
                     body: "Vou te avisar a cada 1 hora para beber água!"
-                    // Removido o ícone antigo para ficar mais limpo
                 });
             }
 
-            // Clear existing to avoid doubles
             if (reminderInterval) clearInterval(reminderInterval);
-            
             reminderInterval = setInterval(() => {
                 new Notification("Hora de beber água, Bestie! 💅", {
                     body: "Sua meta de 3.5L está esperando!"
-                    // Removido o ícone antigo para ficar mais limpo
                 });
-            }, 3600000); // 1 hora
+            }, 3600000);
         }
 
         function stopReminder() {
@@ -835,6 +963,7 @@
 
         function updateReminderButton(isActive) {
             const btn = document.getElementById("btn-reminder");
+            if (!btn) return;
             if (isActive) {
                 btn.classList.remove("bg-sky-100", "text-sky-600", "border-sky-200");
                 btn.classList.add("bg-sky-500", "text-white", "border-sky-500", "bell-ring");
@@ -846,7 +975,31 @@
             }
         }
 
-        // --- Plate Logic Chart ---
+        // Inicializar
+        initApp();
+
+        // --- Gráficos (Escopo Global para Chart.js) ---
+        const ctxHydro = document.getElementById('hydrationChart').getContext('2d');
+        const hydrationChart = new Chart(ctxHydro, {
+            type: 'doughnut',
+            data: {
+                labels: ['Bebido', 'Falta'],
+                datasets: [{
+                    data: [0, 3500],
+                    backgroundColor: ['#0ea5e9', '#e0f2fe'], 
+                    borderWidth: 0,
+                    borderRadius: 20, 
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '80%', 
+                plugins: { legend: { display: false }, tooltip: { enabled: false } }
+            }
+        });
+
         const ctxPlate = document.getElementById('plateChart').getContext('2d');
         new Chart(ctxPlate, {
             type: 'pie',
@@ -854,12 +1007,7 @@
                 labels: ['Salada', 'Proteína', 'Carbo/Energia'],
                 datasets: [{
                     data: [50, 25, 25],
-                    // CORES VIBRANTES MANTIDAS
-                    backgroundColor: [
-                        '#22c55e', // Green 500
-                        '#f43f5e', // Rose 500
-                        '#eab308'  // Yellow 500
-                    ],
+                    backgroundColor: ['#22c55e', '#f43f5e', '#eab308'],
                     borderWidth: 0,
                     hoverOffset: 8
                 }]
@@ -867,29 +1015,9 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                }
+                plugins: { legend: { display: false } }
             }
         });
-
-        // --- Tab Logic ---
-        function switchTab(selectedTab) {
-            state.activeTab = selectedTab;
-            
-            tabIds.forEach(id => {
-                const btn = document.getElementById(`tab-${id}`);
-                const content = document.getElementById(`content-${id}`);
-                
-                if (id === selectedTab) {
-                    btn.classList.add('active');
-                    content.classList.remove('hidden');
-                } else {
-                    btn.classList.remove('active');
-                    content.classList.add('hidden');
-                }
-            });
-        }
     </script>
 </body>
 </html>
