@@ -107,7 +107,7 @@
             border-radius: 16px;
             padding: 5px;
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr); /* Alterado para 5 colunas */
             gap: 6px;
             border: 1px solid #ddd6fe;
             box-shadow: 0 2px 10px rgba(139, 92, 246, 0.05);
@@ -117,7 +117,7 @@
             padding: 10px;
             border-radius: 12px;
             font-weight: 800;
-            font-size: 0.9rem;
+            font-size: 0.85rem; /* Levemente reduzido para caber 5 */
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: none;
             cursor: pointer;
@@ -125,7 +125,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .pill-btn.active {
@@ -138,6 +138,18 @@
         .pill-btn:hover:not(.active) {
             background: #f3e8ff;
             color: #7c3aed;
+        }
+
+        /* Checkbox Habits */
+        .habit-btn {
+            transition: all 0.2s;
+            border: 2px solid #e5e7eb;
+        }
+        .habit-btn.completed {
+            background-color: #a78bfa; /* Violet 400 */
+            border-color: #8b5cf6;
+            color: white;
+            transform: scale(1.05);
         }
 
         /* Animação do Sino */
@@ -296,6 +308,10 @@
                         <button onclick="switchTab('jantar')" id="tab-jantar" class="pill-btn">
                             <span>🌙</span> <span class="hidden md:inline">Jantar</span>
                         </button>
+                        <!-- Nova Aba: Check-in -->
+                        <button onclick="switchTab('checkin')" id="tab-checkin" class="pill-btn">
+                            <span>✅</span> <span class="hidden md:inline">Check-in</span>
+                        </button>
                     </div>
                 </section>
 
@@ -419,6 +435,34 @@
                                 <h3 class="font-bold text-violet-700 text-lg group-hover:text-rose-500 transition">🍲 Sopinha</h3>
                                 <p class="text-violet-500 text-sm mt-1">Legumes + <strong>100g</strong> frango desfiado.</p>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Novo Conteúdo: Check-in (Rastreador) -->
+                    <div id="content-checkin" class="hidden space-y-6 animate-enter relative z-10">
+                        <div class="text-center mb-6">
+                            <h3 class="font-bold text-violet-800 text-2xl">Rastreador da Semana</h3>
+                            <p class="text-violet-500 text-sm">Marca aí, bestie! A constância é o segredo. ✨</p>
+                        </div>
+
+                        <!-- Barra de Progresso -->
+                        <div class="bg-white p-4 rounded-2xl shadow-sm border border-violet-100 mb-6">
+                            <div class="flex justify-between text-xs font-bold text-violet-400 mb-1 uppercase tracking-wide">
+                                <span>Foco na Semana</span>
+                                <span id="progress-text">0%</span>
+                            </div>
+                            <div class="w-full bg-violet-100 rounded-full h-3">
+                                <div id="progress-bar" class="bg-gradient-to-r from-violet-500 to-fuchsia-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Lista de Dias -->
+                        <div class="grid gap-3" id="tracker-list">
+                            <!-- JS vai preencher aqui -->
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <button onclick="clearTracker()" class="text-xs text-stone-400 underline hover:text-red-400 transition">Limpar histórico</button>
                         </div>
                     </div>
                 </div>
@@ -580,13 +624,86 @@
             waterIntake: 0,
             waterGoal: 3500, // 3.5L in ml
             activeTab: 'cafe',
-            reminderActive: false
+            reminderActive: false,
+            // Inicializar hábitos se não existirem
+            habits: JSON.parse(localStorage.getItem('bestieHabits')) || {
+                Segunda: { treino: false, dieta: false },
+                Terca: { treino: false, dieta: false },
+                Quarta: { treino: false, dieta: false },
+                Quinta: { treino: false, dieta: false },
+                Sexta: { treino: false, dieta: false },
+                Sabado: { treino: false, dieta: false },
+                Domingo: { treino: false, dieta: false }
+            }
         };
+
+        const daysOfWeek = ['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo'];
+        const daysDisplay = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
 
         let reminderInterval;
 
         // Initialize functionality when DOM is ready
-        document.addEventListener('DOMContentLoaded', initReminder);
+        document.addEventListener('DOMContentLoaded', () => {
+            initReminder();
+            renderTracker();
+        });
+
+        // --- Tracker Functions ---
+        function renderTracker() {
+            const container = document.getElementById('tracker-list');
+            container.innerHTML = ''; // Limpa
+
+            daysOfWeek.forEach((day, index) => {
+                const dayData = state.habits[day];
+                
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between bg-white p-3 rounded-xl border border-stone-100 shadow-sm';
+                
+                div.innerHTML = `
+                    <span class="font-bold text-violet-800 w-20 text-sm">${daysDisplay[index]}</span>
+                    <div class="flex gap-2">
+                        <button onclick="toggleHabit('${day}', 'treino')" class="habit-btn ${dayData.treino ? 'completed' : 'bg-stone-50 text-stone-300'} px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1">
+                            ${dayData.treino ? '💪 Feito' : '🏋️‍♀️ Treino'}
+                        </button>
+                        <button onclick="toggleHabit('${day}', 'dieta')" class="habit-btn ${dayData.dieta ? 'completed' : 'bg-stone-50 text-stone-300'} px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1">
+                            ${dayData.dieta ? '🥗 Feito' : '🥗 Dieta'}
+                        </button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            updateProgress();
+        }
+
+        function toggleHabit(day, type) {
+            state.habits[day][type] = !state.habits[day][type];
+            localStorage.setItem('bestieHabits', JSON.stringify(state.habits));
+            renderTracker();
+        }
+
+        function updateProgress() {
+            let completed = 0;
+            let total = 14; // 7 dias * 2 hábitos
+            
+            Object.values(state.habits).forEach(day => {
+                if(day.treino) completed++;
+                if(day.dieta) completed++;
+            });
+
+            const percent = Math.round((completed / total) * 100);
+            document.getElementById('progress-bar').style.width = percent + '%';
+            document.getElementById('progress-text').innerText = percent + '% Completo';
+        }
+
+        function clearTracker() {
+            if(confirm('Tem certeza que quer limpar a semana, amiga?')) {
+                Object.keys(state.habits).forEach(day => {
+                    state.habits[day] = { treino: false, dieta: false };
+                });
+                localStorage.setItem('bestieHabits', JSON.stringify(state.habits));
+                renderTracker();
+            }
+        }
 
         // --- Logic to check saved reminder state ---
         function initReminder() {
@@ -601,7 +718,7 @@
         }
 
         // DOM Elements
-        const tabIds = ['cafe', 'almoco', 'lanche', 'jantar'];
+        const tabIds = ['cafe', 'almoco', 'lanche', 'jantar', 'checkin'];
         
         // --- Hydration Chart Logic ---
         const ctxHydro = document.getElementById('hydrationChart').getContext('2d');
