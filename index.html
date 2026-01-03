@@ -243,7 +243,7 @@
         </div>
         
         <div class="w-full max-w-xs space-y-4">
-            <button onclick="loginWithGoogle()" class="w-full bg-white text-stone-600 font-bold py-3.5 px-4 rounded-2xl border border-stone-200 shadow-md hover:bg-stone-50 transition active:scale-95 flex items-center justify-center gap-3">
+            <button id="google-login-btn" onclick="loginWithGoogle()" class="w-full bg-white text-stone-600 font-bold py-3.5 px-4 rounded-2xl border border-stone-200 shadow-md hover:bg-stone-50 transition active:scale-95 flex items-center justify-center gap-3">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5">
                 Entrar com Google
             </button>
@@ -726,6 +726,19 @@
 
         // Inicialização
         async function initApp() {
+            // Safety timeout to ensure loading screen goes away even if Firebase is slow
+            setTimeout(() => {
+                const overlay = document.getElementById('loading-overlay');
+                if (overlay && !overlay.classList.contains('hidden')) {
+                    console.warn("Loading timeout - hiding overlay manually");
+                    overlay.classList.add('hidden');
+                    // Ensure login screen is visible if we are stuck
+                    if (!user) {
+                        document.getElementById('login-screen').classList.remove('hidden-fade');
+                    }
+                }
+            }, 5000); // 5 seconds timeout
+
             try {
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
@@ -746,20 +759,27 @@
                     user = currentUser;
                     if (user) {
                         // LOGADO
-                        document.getElementById('loading-overlay').classList.add('hidden');
-                        document.getElementById('login-screen').classList.add('hidden-fade'); // Esconde login
-                        
-                        document.getElementById('sync-status').innerText = "☁️ Conectado"; 
-                        document.getElementById('auth-section').innerHTML = `
-                            <div class="flex items-center gap-2 bg-violet-50 p-2 rounded-lg border border-violet-100">
-                                <img src="${user.photoURL || 'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" class="w-8 h-8 rounded-full">
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-xs text-violet-800 font-bold truncate">Olá, ${user.displayName?.split(' ')[0] || 'Bestie'}!</p>
-                                    <button onclick="logout()" class="text-[10px] text-red-400 hover:underline">Sair</button>
+                        try {
+                            document.getElementById('loading-overlay').classList.add('hidden');
+                            document.getElementById('login-screen').classList.add('hidden-fade'); // Esconde login
+                            
+                            document.getElementById('sync-status').innerText = "☁️ Conectado"; 
+                            document.getElementById('auth-section').innerHTML = `
+                                <div class="flex items-center gap-2 bg-violet-50 p-2 rounded-lg border border-violet-100">
+                                    <img src="${user.photoURL || 'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" class="w-8 h-8 rounded-full">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs text-violet-800 font-bold truncate">Olá, ${user.displayName?.split(' ')[0] || 'Bestie'}!</p>
+                                        <button onclick="logout()" class="text-[10px] text-red-400 hover:underline">Sair</button>
+                                    </div>
                                 </div>
-                            </div>
-                        `;
-                        setupRealtimeListener();
+                            `;
+                            setupRealtimeListener();
+                        } catch(err) {
+                            console.error("Erro na atualização da UI pós-login", err);
+                            // Force unlock if UI update fails
+                            document.getElementById('loading-overlay').classList.add('hidden');
+                            document.getElementById('login-screen').classList.add('hidden-fade');
+                        }
                     } else {
                         // NÃO LOGADO
                         document.getElementById('loading-overlay').classList.add('hidden');
@@ -803,11 +823,23 @@
 
         // Funções de Autenticação Globais
         window.loginWithGoogle = async function() {
+            // Visual Feedback
+            const btn = document.querySelector('#google-login-btn');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = `⏳ Entrando...`;
+            btn.disabled = true;
+
             const provider = new GoogleAuthProvider();
             try {
                 await signInWithPopup(auth, provider);
+                // onAuthStateChanged will handle the UI update
             } catch (error) {
                 console.error("Erro no login Google:", error);
+                
+                // Reset button
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+
                 let msg = "Erro ao conectar. ";
                 if (error.code === 'auth/popup-blocked') msg += "O navegador bloqueou o popup. Permita popups para este site.";
                 else if (error.code === 'auth/unauthorized-domain') msg += "Domínio não autorizado no Firebase Console. Adicione este domínio lá!";
@@ -860,7 +892,8 @@
             }, (error) => {
                 console.error("Erro ao sincronizar dados:", error);
                 if (error.code === 'permission-denied') {
-                    alert("Erro de permissão! Verifique as regras do Firestore no console.");
+                    // Fail silently for user experience, data just won't sync
+                    console.warn("Permissão negada. Dados não serão salvos na nuvem.");
                 }
             });
         }
@@ -877,9 +910,6 @@
                     }, { merge: true });
                 } catch (e) {
                     console.error("Erro ao salvar na nuvem:", e);
-                    if (e.code === 'permission-denied') {
-                        alert("Não foi possível salvar! Verifique as regras do Firestore.");
-                    }
                 }
             }
             
