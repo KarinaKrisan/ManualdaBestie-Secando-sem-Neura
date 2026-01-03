@@ -206,8 +206,8 @@
                     <div>
                         <div class="flex items-center gap-2 mb-1">
                             <h2 class="font-bold text-sky-600 text-sm uppercase tracking-wider">Hidratação Diária</h2>
-                            <!-- Botão de Lembrete -->
-                            <button onclick="toggleReminder()" id="btn-reminder" class="flex items-center gap-1 text-[10px] font-bold bg-sky-100 text-sky-600 px-2 py-1 rounded-full hover:bg-sky-200 transition border border-sky-200 cursor-pointer">
+                            <!-- Botão de Lembrete Melhorado -->
+                            <button onclick="toggleReminder()" id="btn-reminder" class="flex items-center gap-1 text-[10px] font-bold bg-sky-100 text-sky-600 px-3 py-1.5 rounded-full hover:bg-sky-200 transition border border-sky-200 cursor-pointer shadow-sm active:scale-95">
                                 🔔 <span>Ativar Lembrete</span>
                             </button>
                         </div>
@@ -549,6 +549,21 @@
 
         let reminderInterval;
 
+        // Initialize functionality when DOM is ready
+        document.addEventListener('DOMContentLoaded', initReminder);
+
+        // --- Logic to check saved reminder state ---
+        function initReminder() {
+            const savedState = localStorage.getItem('waterReminder');
+            if (savedState === 'true') {
+                if (Notification.permission === "granted") {
+                    startReminder(false); // false = don't show "activated" notification again on reload, just start loop
+                } else {
+                    localStorage.setItem('waterReminder', 'false'); // Reset if permission lost
+                }
+            }
+        }
+
         // DOM Elements
         const tabIds = ['cafe', 'almoco', 'lanche', 'jantar'];
         
@@ -616,47 +631,65 @@
                 return;
             }
 
-            if (Notification.permission === "granted") {
-                toggleState();
-            } else if (Notification.permission !== "denied") {
-                Notification.requestPermission().then(permission => {
-                    if (permission === "granted") {
-                        toggleState();
-                    }
-                });
+            if (state.reminderActive) {
+                stopReminder();
             } else {
-                alert("Você bloqueou as notificações. Ative nas configurações do navegador para usar!");
+                if (Notification.permission === "granted") {
+                    startReminder(true);
+                } else if (Notification.permission !== "denied") {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === "granted") {
+                            startReminder(true);
+                        }
+                    });
+                } else {
+                    alert("Você bloqueou as notificações. Ative nas configurações do navegador para usar!");
+                }
             }
         }
 
-        function toggleState() {
-            const btn = document.getElementById("btn-reminder");
-            const icon = btn.querySelector("span");
+        function startReminder(showToast) {
+            state.reminderActive = true;
+            localStorage.setItem('waterReminder', 'true');
+            
+            updateReminderButton(true);
 
-            if (state.reminderActive) {
-                clearInterval(reminderInterval);
-                state.reminderActive = false;
-                btn.classList.remove("bg-sky-500", "text-white", "border-sky-500", "bell-ring");
-                btn.classList.add("bg-sky-100", "text-sky-600", "border-sky-200");
-                btn.innerHTML = "🔔 <span>Ativar Lembrete</span>";
-                alert("Lembretes pausados.");
-            } else {
-                state.reminderActive = true;
-                btn.classList.remove("bg-sky-100", "text-sky-600", "border-sky-200");
-                btn.classList.add("bg-sky-500", "text-white", "border-sky-500", "bell-ring"); // Added animation class
-                btn.innerHTML = "🔕 <span>Desativar</span>";
-                
+            if (showToast) {
                 new Notification("Lembretes ativados! 💧", {
                     body: "Vou te avisar a cada 1 hora para beber água!",
                     icon: "https://cdn-icons-png.flaticon.com/512/3248/3248369.png"
                 });
+            }
 
-                reminderInterval = setInterval(() => {
-                    new Notification("Hora de beber água, Bestie! 💅", {
-                        body: "Sua meta de 3.5L está esperando!",
-                        icon: "https://cdn-icons-png.flaticon.com/512/3248/3248369.png"
-                    });
-                }, 3600000); // 1 hora (3600000 ms)
+            // Clear existing to avoid doubles
+            if (reminderInterval) clearInterval(reminderInterval);
+            
+            reminderInterval = setInterval(() => {
+                new Notification("Hora de beber água, Bestie! 💅", {
+                    body: "Sua meta de 3.5L está esperando!",
+                    icon: "https://cdn-icons-png.flaticon.com/512/3248/3248369.png"
+                });
+            }, 3600000); // 1 hora
+        }
+
+        function stopReminder() {
+            state.reminderActive = false;
+            localStorage.setItem('waterReminder', 'false');
+            clearInterval(reminderInterval);
+            updateReminderButton(false);
+            alert("Lembretes pausados.");
+        }
+
+        function updateReminderButton(isActive) {
+            const btn = document.getElementById("btn-reminder");
+            if (isActive) {
+                btn.classList.remove("bg-sky-100", "text-sky-600", "border-sky-200");
+                btn.classList.add("bg-sky-500", "text-white", "border-sky-500", "bell-ring");
+                btn.innerHTML = "🔕 <span>Desativar</span>";
+            } else {
+                btn.classList.remove("bg-sky-500", "text-white", "border-sky-500", "bell-ring");
+                btn.classList.add("bg-sky-100", "text-sky-600", "border-sky-200");
+                btn.innerHTML = "🔔 <span>Ativar Lembrete</span>";
             }
         }
 
