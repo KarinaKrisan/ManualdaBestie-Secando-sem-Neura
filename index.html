@@ -176,19 +176,20 @@
         }
         .animate-enter { animation: slideIn 0.4s ease-out forwards; }
         
-        /* Loading Overlay */
-        #loading-overlay {
+        /* Loading Overlay e Login Screen */
+        #loading-overlay, #login-screen {
             position: fixed;
             inset: 0;
-            background: rgba(255, 255, 255, 0.9);
+            background: #f5f3ff;
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 100;
-            transition: opacity 0.5s;
+            transition: opacity 0.5s, visibility 0.5s;
         }
-        #loading-overlay.hidden {
+        .hidden-fade {
             opacity: 0;
+            visibility: hidden;
             pointer-events: none;
         }
     </style>
@@ -224,12 +225,45 @@
 </head>
 <body>
 
-    <!-- Loading Overlay -->
+    <!-- Loading Overlay (Carregamento inicial) -->
     <div id="loading-overlay">
         <div class="text-center">
             <div class="text-4xl animate-bounce mb-2">💅</div>
-            <p class="text-violet-600 font-bold">Conectando...</p>
+            <p class="text-violet-600 font-bold">Carregando...</p>
         </div>
+    </div>
+
+    <!-- Login Screen (Tela Inicial) -->
+    <div id="login-screen" class="hidden-fade flex-col p-6 text-center">
+        <div class="mb-8">
+            <img src="icon.png" class="w-24 h-24 rounded-3xl shadow-xl mx-auto mb-4 border-4 border-white" alt="Logo">
+            <h1 class="text-4xl font-extrabold text-violet-900 mb-2">Manual da Bestie</h1>
+            <p class="text-violet-500 font-medium">Secando sem Neura 💅</p>
+        </div>
+        
+        <div class="w-full max-w-xs space-y-4">
+            <button onclick="loginWithGoogle()" class="w-full bg-white text-stone-600 font-bold py-3.5 px-4 rounded-2xl border border-stone-200 shadow-md hover:bg-stone-50 transition active:scale-95 flex items-center justify-center gap-3">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5">
+                Entrar com Google
+            </button>
+            
+            <div class="relative py-2">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-violet-200"></div>
+                </div>
+                <div class="relative flex justify-center text-xs">
+                    <span class="px-2 bg-[#f5f3ff] text-violet-300">OU</span>
+                </div>
+            </div>
+
+            <button onclick="skipLogin()" class="w-full text-violet-400 font-bold text-sm py-2 hover:text-violet-600 transition">
+                Continuar sem conta (Offline)
+            </button>
+        </div>
+        
+        <p class="mt-8 text-[10px] text-violet-300 max-w-xs mx-auto">
+            Ao entrar, seus dados serão sincronizados na nuvem para você acessar de qualquer lugar.
+        </p>
     </div>
 
     <div class="dashboard-wrapper">
@@ -248,9 +282,9 @@
                     Ficar fina comendo arroz, feijão e batata, gastando pouco.
                 </p>
                 
-                <!-- Área de Login (Nova) -->
+                <!-- Área de Login na Sidebar (Para logout ou info) -->
                 <div id="auth-section">
-                    <!-- Botão será injetado aqui via JS -->
+                    <!-- Conteúdo injetado via JS -->
                 </div>
             </div>
 
@@ -649,11 +683,10 @@
     <!-- Scripts do Firebase e App -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc, onSnapshot, collection } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
         // Configuração do Firebase
-        // Lógica: Usa a config do ambiente se existir (Preview), senão usa a SUA config (Exportado)
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyDO1yt104pggWrI6G6zY89bgBPHaaFJa2M",
             authDomain: "manual-da-bestie.firebaseapp.com",
@@ -663,6 +696,7 @@
             appId: "1:421582504940:web:6a236e1ad1f001daf236c9"
         };
 
+        // ID do App para o caminho do banco de dados
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'manual-da-bestie';
         
         let db, auth, user;
@@ -696,37 +730,57 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                // Tenta autenticação silenciosa primeiro (Regra do Ambiente)
+                // Configura botão de login/logout
+                setupAuthUI();
+
+                // Lógica de Autenticação:
+                // 1. Se estiver no Preview (tem token), loga automático para mostrar o app funcionando.
+                // 2. Se estiver Exportado (uso real), aguarda o usuário clicar em "Entrar com Google".
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    // Fallback para anônimo para garantir funcionamento imediato
-                    await signInAnonymously(auth);
-                }
+                } 
+                // NOTA: Removi o signInAnonymously automático do 'else' para forçar o uso do Google no ambiente real.
 
                 onAuthStateChanged(auth, (currentUser) => {
                     user = currentUser;
                     if (user) {
+                        // LOGADO
                         document.getElementById('loading-overlay').classList.add('hidden');
-                        document.getElementById('sync-status').innerText = "☁️"; // Ícone de nuvem quando conectado
+                        document.getElementById('login-screen').classList.add('hidden-fade'); // Esconde login
+                        
+                        document.getElementById('sync-status').innerText = "☁️ Conectado"; 
+                        document.getElementById('auth-section').innerHTML = `
+                            <div class="flex items-center gap-2 bg-violet-50 p-2 rounded-lg border border-violet-100">
+                                <img src="${user.photoURL || 'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" class="w-8 h-8 rounded-full">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs text-violet-800 font-bold truncate">Olá, ${user.displayName?.split(' ')[0] || 'Bestie'}!</p>
+                                    <button onclick="logout()" class="text-[10px] text-red-400 hover:underline">Sair</button>
+                                </div>
+                            </div>
+                        `;
                         setupRealtimeListener();
+                    } else {
+                        // NÃO LOGADO
+                        document.getElementById('loading-overlay').classList.add('hidden');
+                        
+                        // Mostra tela de login apenas se não tiver optado por offline
+                        if (!sessionStorage.getItem('offlineMode')) {
+                            document.getElementById('login-screen').classList.remove('hidden-fade');
+                        }
+
+                        document.getElementById('sync-status').innerText = "📱 Offline";
+                        setupAuthUI(); // Mostra botão de login na sidebar também
+                        
+                        // Carrega dados locais enquanto não loga
+                        loadLocalData();
                     }
                 });
 
             } catch (e) {
-                console.warn("Erro ao conectar Firebase (Modo Offline ativado):", e);
+                console.warn("Erro ao conectar Firebase:", e);
                 document.getElementById('loading-overlay').classList.add('hidden');
-                document.getElementById('sync-status').innerText = "📱"; // Ícone de celular para modo offline
-                
-                // Fallback para localStorage
-                const saved = localStorage.getItem('bestieState');
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    state.waterIntake = parsed.waterIntake || 0;
-                    state.habits = parsed.habits || state.habits;
-                    updateHydrationDisplay(false);
-                    renderTracker();
-                }
+                document.getElementById('login-screen').classList.add('hidden-fade'); // Erro? Libera o app offline
+                loadLocalData();
             }
             
             initReminder();
@@ -734,38 +788,70 @@
             updateHydrationDisplay(false);
         }
 
-        // Função de Login com Google (Para uso futuro/botão)
+        function setupAuthUI() {
+            const authSection = document.getElementById('auth-section');
+            if(authSection) {
+                authSection.innerHTML = `
+                    <button onclick="loginWithGoogle()" class="w-full bg-white text-stone-600 font-bold py-2 px-4 rounded-xl border border-stone-200 shadow-sm hover:bg-stone-50 transition flex items-center justify-center gap-2 text-sm">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-4 h-4">
+                        Entrar com Google
+                    </button>
+                `;
+            }
+        }
+
+        // Funções de Autenticação Globais
         window.loginWithGoogle = async function() {
             const provider = new GoogleAuthProvider();
             try {
                 await signInWithPopup(auth, provider);
-                alert("Conectada com Google! ✨");
             } catch (error) {
                 console.error("Erro no login Google:", error);
-                alert("Erro ao logar. Verifique se o domínio está autorizado no Firebase Console.");
+                alert("Erro ao conectar com Google. Verifique se o domínio está autorizado no Firebase.");
             }
         }
 
-        // Listener de Dados em Tempo Real
+        window.skipLogin = function() {
+            sessionStorage.setItem('offlineMode', 'true');
+            document.getElementById('login-screen').classList.add('hidden-fade');
+        }
+
+        window.logout = async function() {
+            try {
+                await signOut(auth);
+                sessionStorage.removeItem('offlineMode');
+                window.location.reload(); 
+            } catch (error) {
+                console.error("Erro ao sair:", error);
+            }
+        }
+
+        function loadLocalData() {
+            const saved = localStorage.getItem('bestieState');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                state.waterIntake = parsed.waterIntake || 0;
+                state.habits = parsed.habits || state.habits;
+                updateHydrationDisplay(false);
+                renderTracker();
+            }
+        }
+
+        // Listener de Dados em Tempo Real (O Caminho Mágico!)
         function setupRealtimeListener() {
             if (!user || !db) return;
             
-            // Caminho padronizado para garantir permissões
             const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'daily_progress');
             
             onSnapshot(docRef, (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    // Atualiza estado local com dados da nuvem
                     if (data.waterIntake !== undefined) state.waterIntake = data.waterIntake;
                     if (data.habits !== undefined) state.habits = data.habits;
                     
-                    // Atualiza UI
-                    updateHydrationDisplay(false); // false para não gerar loop infinito de salvamento
+                    updateHydrationDisplay(false); 
                     renderTracker();
                 }
-            }, (error) => {
-                console.error("Erro ao sincronizar dados:", error);
             });
         }
 
@@ -780,15 +866,15 @@
                         lastUpdated: new Date().toISOString()
                     }, { merge: true });
                 } catch (e) {
-                    console.error("Erro ao salvar:", e);
+                    console.error("Erro ao salvar na nuvem:", e);
                 }
-            } else {
-                // Fallback LocalStorage
-                localStorage.setItem('bestieState', JSON.stringify({
-                    waterIntake: state.waterIntake,
-                    habits: state.habits
-                }));
             }
+            
+            // Sempre salva local como backup
+            localStorage.setItem('bestieState', JSON.stringify({
+                waterIntake: state.waterIntake,
+                habits: state.habits
+            }));
         }
 
         // Funções Globais (acessíveis pelo HTML)
