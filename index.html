@@ -7,8 +7,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#f5f3ff">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3076/3076134.png">
-    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiTWFudWFsIGRhIEJlc3RpZSIs" />
+    
+    <!-- Logo do Github (icon.png) -->
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="shortcut icon" href="icon.png" type="image/png">
+    
+    <link rel="manifest" href="" />
 
     <title>Manual da Bestie: Secando sem Neura 💅</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -162,6 +166,15 @@
     </style>
     <!-- Script para instalar Manifesto dinamicamente -->
     <script>
+        let iconUrl = 'icon.png';
+        try {
+            // Tenta resolver URL absoluta para o manifesto.
+            // Se falhar (ex: em alguns iframes ou blobs), usa o caminho relativo.
+            iconUrl = new URL('icon.png', window.location.href).href;
+        } catch (e) {
+            console.log('Usando caminho relativo para o ícone do PWA.');
+        }
+
         const manifest = {
             "name": "Manual da Bestie",
             "short_name": "Bestie App",
@@ -170,7 +183,7 @@
             "background_color": "#f5f3ff",
             "theme_color": "#f5f3ff",
             "icons": [{
-                "src": "https://cdn-icons-png.flaticon.com/512/3076/3076134.png",
+                "src": iconUrl, 
                 "sizes": "512x512",
                 "type": "image/png"
             }]
@@ -450,3 +463,293 @@
                     <!-- Coluna Direita: Dicas e Fim de Semana (Menor) -->
                     <div class="md:col-span-5 flex flex-col gap-6">
                         <!-- Fim de Semana -->
+                        <div class="card-soft p-6 bg-rose-50 border-rose-100 flex-grow relative overflow-hidden">
+                            <div class="absolute -right-4 -top-4 w-24 h-24 bg-rose-200 rounded-full opacity-50 blur-xl"></div>
+                            <h3 class="font-bold text-rose-700 mb-3 text-lg">🎉 Fim de Semana</h3>
+                            <p class="text-rose-900 text-sm leading-relaxed">
+                                Ninguém é de ferro! Aproveite suas <strong>2 Refeições Livres por fim de semana</strong> (elas se renovam desde que você siga a dieta corretamente na semana!) pra comer o que ama.
+                            </p>
+                            <div class="mt-4 text-xs font-bold text-rose-600 bg-white/60 p-2 rounded-lg inline-block">
+                                ⚠️ O segredo: Não chute o balde o fim de semana todo. Fez a refeição livre? Na próxima, volta pro plano!
+                            </div>
+                        </div>
+                        
+                        <!-- Dica de Ouro -->
+                        <div class="card-soft p-6 bg-yellow-50 border-yellow-100">
+                            <h3 class="font-bold text-yellow-700 mb-2 flex items-center gap-2">
+                                <span>💸</span> Dica de Ouro
+                            </h3>
+                            <p class="text-yellow-900 text-sm">
+                                Vá na <strong>Xepa da Feira</strong>. Morango tá caro? Compra Banana. O importante é não parar.
+                            </p>
+                        </div>
+
+                         <!-- SOS TPM & RUA -->
+                        <div class="card-soft p-6 bg-purple-50 border-purple-100">
+                            <h3 class="font-bold text-purple-700 mb-2 flex items-center gap-2">
+                                <span>🍫</span> SOS Formiga
+                            </h3>
+                            
+                            <!-- Em Casa -->
+                            <p class="text-purple-900 text-xs font-bold uppercase tracking-wider mb-1 mt-2">🏠 Em Casa (Baratinho)</p>
+                            <ul class="text-sm text-purple-800 space-y-1 list-disc list-inside mb-4">
+                                <li><strong>Banana "Caramelada":</strong> Micro-ondas + canela.</li>
+                                <li><strong>Gelatina Zero:</strong> Faz potão, caloria quase zero.</li>
+                                <li><strong>Mingauzinho:</strong> Leite + aveia + achocolatado light.</li>
+                            </ul>
+
+                            <!-- Na Rua -->
+                            <p class="text-purple-900 text-xs font-bold uppercase tracking-wider mb-1 border-t border-purple-200 pt-2">🚨 Deu Surto na Rua</p>
+                            <ul class="text-sm text-purple-800 space-y-1 list-disc list-inside">
+                                <li><strong>1 Paçoca:</strong> Vende no caixa, mata a vontade e é barato.</li>
+                                <li><strong>1 Bombom Unitário:</strong> Compra UM (Ouro Branco/Sonho de Valsa) e sai correndo da loja!</li>
+                                <li><strong>Coca Zero / Guaraná Zero:</strong> O doce do adoçante ajuda muito a acalmar.</li>
+                                <li><strong>Bananinha sem açúcar:</strong> Aquelas de mercado/farmácia.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Suplementos -->
+                        <div class="card-soft p-6 bg-teal-50 border-teal-100">
+                            <h3 class="font-bold text-teal-700 mb-2 flex items-center gap-2">
+                                <span>💊</span> Kit da Bestie (Quando der $$)
+                            </h3>
+                            <p class="text-teal-900 text-sm mb-3">
+                                Comida de verdade vem primeiro! Mas se sobrar uma grana, investe nesses aqui (nessa ordem):
+                            </p>
+                            <ul class="text-sm text-teal-800 space-y-3">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-lg mt-0.5">🌾</span>
+                                    <div>
+                                        <strong>Fiber (Growth/Similar):</strong> 
+                                        <p class="text-xs mt-0.5 opacity-90">Psyllium em pó. Salva o intestino e enche a barriga. Mistura no suco ou água!</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-lg mt-0.5">🥤</span>
+                                    <div>
+                                        <strong>Whey Protein:</strong> 
+                                        <p class="text-xs mt-0.5 opacity-90">Lanche rápido e mata a vontade de doce (faz creminho com pouca água ou mistura no iogurte).</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-lg mt-0.5">💪</span>
+                                    <div>
+                                        <strong>Creatina:</strong> 
+                                        <p class="text-xs mt-0.5 opacity-90">Oclaro! Dá força no treino e protege seus músculos. 3g a 5g todo dia.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                             <div class="mt-4 text-xs font-bold text-teal-600 bg-white/60 p-2 rounded-lg inline-block">
+                                ⚠️ Dica: Compra direto nos sites das fábricas (tipo Growth) que sai bem mais barato que na farmácia!
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Script Logic -->
+    <script>
+        // State Management
+        const state = {
+            waterIntake: 0,
+            waterGoal: 3500, // 3.5L in ml
+            activeTab: 'cafe',
+            reminderActive: false
+        };
+
+        let reminderInterval;
+
+        // Initialize functionality when DOM is ready
+        document.addEventListener('DOMContentLoaded', initReminder);
+
+        // --- Logic to check saved reminder state ---
+        function initReminder() {
+            const savedState = localStorage.getItem('waterReminder');
+            if (savedState === 'true') {
+                if (Notification.permission === "granted") {
+                    startReminder(false); // false = don't show "activated" notification again on reload, just start loop
+                } else {
+                    localStorage.setItem('waterReminder', 'false'); // Reset if permission lost
+                }
+            }
+        }
+
+        // DOM Elements
+        const tabIds = ['cafe', 'almoco', 'lanche', 'jantar'];
+        
+        // --- Hydration Chart Logic ---
+        const ctxHydro = document.getElementById('hydrationChart').getContext('2d');
+        const hydrationChart = new Chart(ctxHydro, {
+            type: 'doughnut',
+            data: {
+                labels: ['Bebido', 'Falta'],
+                datasets: [{
+                    data: [0, 3500],
+                    // CORES VIBRANTES MANTIDAS
+                    backgroundColor: ['#0ea5e9', '#e0f2fe'], 
+                    borderWidth: 0,
+                    borderRadius: 20, // Borda arredondada no gráfico
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '80%', // Mais fino e elegante
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false }
+                }
+            }
+        });
+
+        // Hydration Functions
+        function addWater() {
+            if(state.waterIntake < state.waterGoal) {
+                state.waterIntake += 250;
+                updateHydrationDisplay();
+            }
+        }
+
+        function resetWater() {
+            state.waterIntake = 0;
+            updateHydrationDisplay();
+        }
+
+        function updateHydrationDisplay() {
+            const remaining = Math.max(0, state.waterGoal - state.waterIntake);
+            hydrationChart.data.datasets[0].data = [state.waterIntake, remaining];
+            
+            // Update Text
+            const liters = (state.waterIntake / 1000).toFixed(1) + "L";
+            document.getElementById('water-display').innerText = liters;
+
+            // Celebration color
+            if (remaining === 0) {
+                hydrationChart.data.datasets[0].backgroundColor[0] = '#10b981'; 
+            } else {
+                hydrationChart.data.datasets[0].backgroundColor[0] = '#0ea5e9'; 
+            }
+            
+            hydrationChart.update();
+        }
+
+        // --- Notification Reminder Logic ---
+        function toggleReminder() {
+            if (!("Notification" in window)) {
+                alert("Seu navegador não suporta notificações, amiga! 😢");
+                return;
+            }
+
+            if (state.reminderActive) {
+                stopReminder();
+            } else {
+                if (Notification.permission === "granted") {
+                    startReminder(true);
+                } else if (Notification.permission !== "denied") {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === "granted") {
+                            startReminder(true);
+                        }
+                    });
+                } else {
+                    alert("Você bloqueou as notificações. Ative nas configurações do navegador para usar!");
+                }
+            }
+        }
+
+        function startReminder(showToast) {
+            state.reminderActive = true;
+            localStorage.setItem('waterReminder', 'true');
+            
+            updateReminderButton(true);
+
+            if (showToast) {
+                new Notification("Lembretes ativados! 💧", {
+                    body: "Vou te avisar a cada 1 hora para beber água!",
+                    icon: "https://cdn-icons-png.flaticon.com/512/3248/3248369.png"
+                });
+            }
+
+            // Clear existing to avoid doubles
+            if (reminderInterval) clearInterval(reminderInterval);
+            
+            reminderInterval = setInterval(() => {
+                new Notification("Hora de beber água, Bestie! 💅", {
+                    body: "Sua meta de 3.5L está esperando!",
+                    icon: "https://cdn-icons-png.flaticon.com/512/3248/3248369.png"
+                });
+            }, 3600000); // 1 hora
+        }
+
+        function stopReminder() {
+            state.reminderActive = false;
+            localStorage.setItem('waterReminder', 'false');
+            clearInterval(reminderInterval);
+            updateReminderButton(false);
+            alert("Lembretes pausados.");
+        }
+
+        function updateReminderButton(isActive) {
+            const btn = document.getElementById("btn-reminder");
+            if (isActive) {
+                btn.classList.remove("bg-sky-100", "text-sky-600", "border-sky-200");
+                btn.classList.add("bg-sky-500", "text-white", "border-sky-500", "bell-ring");
+                btn.innerHTML = "🔕";
+            } else {
+                btn.classList.remove("bg-sky-500", "text-white", "border-sky-500", "bell-ring");
+                btn.classList.add("bg-sky-100", "text-sky-600", "border-sky-200");
+                btn.innerHTML = "🔔";
+            }
+        }
+
+        // --- Plate Logic Chart ---
+        const ctxPlate = document.getElementById('plateChart').getContext('2d');
+        new Chart(ctxPlate, {
+            type: 'pie',
+            data: {
+                labels: ['Salada', 'Proteína', 'Carbo/Energia'],
+                datasets: [{
+                    data: [50, 25, 25],
+                    // CORES VIBRANTES MANTIDAS
+                    backgroundColor: [
+                        '#22c55e', // Green 500
+                        '#f43f5e', // Rose 500
+                        '#eab308'  // Yellow 500
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        // --- Tab Logic ---
+        function switchTab(selectedTab) {
+            state.activeTab = selectedTab;
+            
+            tabIds.forEach(id => {
+                const btn = document.getElementById(`tab-${id}`);
+                const content = document.getElementById(`content-${id}`);
+                
+                if (id === selectedTab) {
+                    btn.classList.add('active');
+                    content.classList.remove('hidden');
+                } else {
+                    btn.classList.remove('active');
+                    content.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
