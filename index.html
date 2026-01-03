@@ -669,8 +669,8 @@
 
             if (showToast) {
                 new Notification("Lembretes ativados! 💧", {
-                    body: "Vou te avisar a cada 1 hora para beber água!",
-                    icon: "https://cdn-icons-png.flaticon.com/512/3248/3248369.png"
+                    body: "Vou te avisar a cada 1 hora para beber água!"
+                    // Removido o ícone antigo para ficar mais limpo
                 });
             }
 
@@ -679,8 +679,8 @@
             
             reminderInterval = setInterval(() => {
                 new Notification("Hora de beber água, Bestie! 💅", {
-                    body: "Sua meta de 3.5L está esperando!",
-                    icon: "https://cdn-icons-png.flaticon.com/512/3248/3248369.png"
+                    body: "Sua meta de 3.5L está esperando!"
+                    // Removido o ícone antigo para ficar mais limpo
                 });
             }, 3600000); // 1 hora
         }
