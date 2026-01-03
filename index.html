@@ -20,19 +20,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <!-- 
-      === REGRAS DE SEGURANÇA FIRESTORE (Copie para o Console do Firebase) ===
-      
-      rules_version = '2';
-      service cloud.firestore {
-        match /databases/{database}/documents {
-          match /artifacts/{appId}/users/{userId}/data/daily_progress {
-            allow read, write: if request.auth != null && request.auth.uid == userId;
-          }
-        }
-      }
-    -->
-
-    <!-- 
       === CSS CUSTOMIZADO === 
       Design System "Lilac Glow"
     -->
@@ -208,9 +195,14 @@
     </style>
     <!-- Script para instalar Manifesto dinamicamente -->
     <script>
-        // Configuração do Ícone PWA
-        // Use "icon.png" se estiver no mesmo diretório, ou a URL completa do CDN para testes
-        const iconUrl = "https://cdn-icons-png.flaticon.com/512/3076/3076134.png"; 
+        let iconUrl = 'icon.png';
+        try {
+            // Tenta resolver URL absoluta para o manifesto.
+            // Se falhar (ex: em alguns iframes ou blobs), usa o caminho relativo.
+            iconUrl = new URL('icon.png', window.location.href).href;
+        } catch (e) {
+            console.log('Usando caminho relativo para o ícone do PWA.');
+        }
 
         const manifest = {
             "name": "Manual da Bestie",
@@ -245,7 +237,7 @@
     <div id="login-screen" class="hidden-fade flex-col p-6 text-center">
         <div class="mb-8">
             <!-- Logo: use icon.png se tiver local -->
-            <img src="https://cdn-icons-png.flaticon.com/512/3076/3076134.png" class="w-24 h-24 rounded-3xl shadow-xl mx-auto mb-4 border-4 border-white" alt="Logo">
+            <img src="icon.png" class="w-24 h-24 rounded-3xl shadow-xl mx-auto mb-4 border-4 border-white" alt="Logo">
             <h1 class="text-4xl font-extrabold text-violet-900 mb-2">Manual da Bestie</h1>
             <p class="text-violet-500 font-medium">Secando sem Neura 💅</p>
         </div>
@@ -865,6 +857,11 @@
                     updateHydrationDisplay(false); 
                     renderTracker();
                 }
+            }, (error) => {
+                console.error("Erro ao sincronizar dados:", error);
+                if (error.code === 'permission-denied') {
+                    alert("Erro de permissão! Verifique as regras do Firestore no console.");
+                }
             });
         }
 
@@ -880,6 +877,9 @@
                     }, { merge: true });
                 } catch (e) {
                     console.error("Erro ao salvar na nuvem:", e);
+                    if (e.code === 'permission-denied') {
+                        alert("Não foi possível salvar! Verifique as regras do Firestore.");
+                    }
                 }
             }
             
