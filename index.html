@@ -9,8 +9,8 @@
     <meta name="theme-color" content="#f5f3ff">
     
     <!-- Logo: Substitua o href por "icon.png" quando subir para seu site -->
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3076/3076134.png">
-    <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/512/3076/3076134.png" type="image/png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="shortcut icon" href="icon.png" type="image/png">
     
     <link rel="manifest" href="" />
 
@@ -98,7 +98,6 @@
             padding-bottom: 1rem;
             margin-bottom: 1.5rem;
             border-bottom: 1px solid rgba(221, 214, 254, 0.8);
-            /* Compensação visual para margens laterais em mobile se necessário */
         }
 
         /* Navegação (Abas Pílula) */
@@ -1057,16 +1056,7 @@
         }
 
         // Lembretes
-        function initReminder() {
-            const savedState = localStorage.getItem('waterReminder');
-            if (savedState === 'true') {
-                if (Notification.permission === "granted") {
-                    startReminder(false);
-                } else {
-                    localStorage.setItem('waterReminder', 'false');
-                }
-            }
-        }
+        // Função duplicada initReminder foi removida daqui
 
         function startReminder(showToast) {
             state.reminderActive = true;
@@ -1114,6 +1104,17 @@
         }
 
         // Inicializar
+        function initReminder() {
+            const savedState = localStorage.getItem('waterReminder');
+            if (savedState === 'true') {
+                if (Notification.permission === "granted") {
+                    startReminder(false);
+                } else {
+                    localStorage.setItem('waterReminder', 'false');
+                }
+            }
+        }
+
         initApp();
 
         // --- Gráficos (Escopo Global para Chart.js) ---
