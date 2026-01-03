@@ -128,6 +128,18 @@
             color: #7c3aed;
         }
 
+        /* Animação do Sino */
+        @keyframes ring {
+            0% { transform: rotate(0); }
+            10% { transform: rotate(30deg); }
+            30% { transform: rotate(-28deg); }
+            50% { transform: rotate(34deg); }
+            70% { transform: rotate(-32deg); }
+            90% { transform: rotate(30deg); }
+            100% { transform: rotate(0); }
+        }
+        .bell-ring { animation: ring 4s .7s ease-in-out infinite; }
+
         /* Scrollbar Cute */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -162,12 +174,18 @@
 
             <!-- Card: Hidratação (Destaque) -->
             <div class="card-soft p-6 bg-gradient-to-br from-white to-sky-50 border-sky-100">
-                <div class="flex justify-between items-end mb-4">
+                <div class="flex justify-between items-start mb-4">
                     <div>
-                        <h2 class="font-bold text-sky-600 text-sm uppercase tracking-wider mb-1">Hidratação Diária</h2>
+                        <div class="flex items-center gap-2 mb-1">
+                            <h2 class="font-bold text-sky-600 text-sm uppercase tracking-wider">Hidratação Diária</h2>
+                            <!-- Botão de Lembrete -->
+                            <button onclick="toggleReminder()" id="btn-reminder" class="flex items-center gap-1 text-[10px] font-bold bg-sky-100 text-sky-600 px-2 py-1 rounded-full hover:bg-sky-200 transition border border-sky-200 cursor-pointer">
+                                🔔 <span>Ativar Lembrete</span>
+                            </button>
+                        </div>
                         <span id="water-display" class="text-3xl font-black text-sky-500">0.0L</span>
                     </div>
-                    <div class="bg-sky-100 p-2 rounded-full text-sky-500">
+                    <div class="bg-sky-100 p-2 rounded-full text-sky-500 text-xl">
                         💧
                     </div>
                 </div>
@@ -497,8 +515,11 @@
         const state = {
             waterIntake: 0,
             waterGoal: 3500, // 3.5L in ml
-            activeTab: 'cafe'
+            activeTab: 'cafe',
+            reminderActive: false
         };
+
+        let reminderInterval;
 
         // DOM Elements
         const tabIds = ['cafe', 'almoco', 'lanche', 'jantar'];
@@ -558,6 +579,57 @@
             }
             
             hydrationChart.update();
+        }
+
+        // --- Notification Reminder Logic ---
+        function toggleReminder() {
+            if (!("Notification" in window)) {
+                alert("Seu navegador não suporta notificações, amiga! 😢");
+                return;
+            }
+
+            if (Notification.permission === "granted") {
+                toggleState();
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        toggleState();
+                    }
+                });
+            } else {
+                alert("Você bloqueou as notificações. Ative nas configurações do navegador para usar!");
+            }
+        }
+
+        function toggleState() {
+            const btn = document.getElementById("btn-reminder");
+            const icon = btn.querySelector("span");
+
+            if (state.reminderActive) {
+                clearInterval(reminderInterval);
+                state.reminderActive = false;
+                btn.classList.remove("bg-sky-500", "text-white", "border-sky-500", "bell-ring");
+                btn.classList.add("bg-sky-100", "text-sky-600", "border-sky-200");
+                btn.innerHTML = "🔔 <span>Ativar Lembrete</span>";
+                alert("Lembretes pausados.");
+            } else {
+                state.reminderActive = true;
+                btn.classList.remove("bg-sky-100", "text-sky-600", "border-sky-200");
+                btn.classList.add("bg-sky-500", "text-white", "border-sky-500", "bell-ring"); // Added animation class
+                btn.innerHTML = "🔕 <span>Desativar</span>";
+                
+                new Notification("Lembretes ativados! 💧", {
+                    body: "Vou te avisar a cada 1 hora para beber água!",
+                    icon: "https://cdn-icons-png.flaticon.com/512/3248/3248369.png"
+                });
+
+                reminderInterval = setInterval(() => {
+                    new Notification("Hora de beber água, Bestie! 💅", {
+                        body: "Sua meta de 3.5L está esperando!",
+                        icon: "https://cdn-icons-png.flaticon.com/512/3248/3248369.png"
+                    });
+                }, 3600000); // 1 hora (3600000 ms)
+            }
         }
 
         // --- Plate Logic Chart ---
