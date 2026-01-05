@@ -21,7 +21,6 @@
                             DEFAULT: '#fb7185', // rose-400
                             dark: '#be123c', // rose-700
                             bg: '#fff1f2', // rose-50
-                            accent: '#f472b6', // pink-400
                         }
                     }
                 }
@@ -40,6 +39,11 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
         .fade-in {
             animation: fadeIn 0.3s ease-in-out;
         }
@@ -47,22 +51,15 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        /* Custom card styles */
-        .menu-card {
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .menu-card:active {
-            transform: scale(0.97);
-        }
     </style>
 </head>
-<body class="text-gray-700 pb-20 selection:bg-pink-200">
+<body class="text-gray-700 pb-20">
 
     <!-- Header -->
     <header class="fixed top-0 w-full z-40 bg-white/90 backdrop-blur-md shadow-sm border-b border-pink-100">
         <div class="max-w-md mx-auto px-4 h-16 flex items-center justify-between">
             <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-bestie to-bestie-accent text-white flex items-center justify-center shadow-md shadow-pink-200">
+                <div class="w-8 h-8 rounded-full bg-bestie text-white flex items-center justify-center">
                     <i class="fa-solid fa-heart text-sm"></i>
                 </div>
                 <h1 class="font-bold text-lg text-bestie-dark tracking-wide">Manual da Bestie</h1>
@@ -75,118 +72,103 @@
 
     <!-- Main Content Area -->
     <main class="max-w-md mx-auto pt-20 px-4 min-h-screen" id="app-content">
-        <!-- Content injected via JS -->
+        <!-- Content inject via JS -->
     </main>
 
-    <!-- Recipe Details Modal -->
+    <!-- Recipe Details Modal (Hidden by default) -->
     <div id="recipe-modal" class="fixed inset-0 z-50 hidden">
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onclick="closeRecipeModal()"></div>
-        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl h-[90vh] overflow-y-auto transform transition-transform duration-300 translate-y-full md:max-w-md md:mx-auto md:inset-x-0 shadow-2xl" id="modal-panel">
-            <div class="relative pb-10">
-                <div id="modal-image-container" class="h-64 bg-gray-200 relative">
-                    <img id="modal-img" src="" alt="Recipe" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                    <button onclick="closeRecipeModal()" class="absolute top-4 right-4 w-9 h-9 bg-black/20 backdrop-blur text-white rounded-full flex items-center justify-center hover:bg-black/30 transition">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeRecipeModal()"></div>
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl h-[85vh] overflow-y-auto transform transition-transform duration-300 translate-y-full md:max-w-md md:mx-auto md:inset-x-0" id="modal-panel">
+            <!-- Modal Content -->
+            <div class="relative">
+                <div id="modal-image-container" class="h-56 bg-gray-200 relative">
+                    <img id="modal-img" src="" alt="Recipe" class="w-full h-full object-cover rounded-t-3xl">
+                    <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <button onclick="closeRecipeModal()" class="absolute top-4 right-4 w-8 h-8 bg-white/20 backdrop-blur text-white rounded-full flex items-center justify-center">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                 </div>
                 
-                <div class="p-6 -mt-8 bg-white rounded-t-3xl relative z-10">
-                    <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6"></div>
+                <div class="p-6 -mt-6 bg-white rounded-t-3xl relative">
+                    <div class="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-6"></div>
                     
                     <div class="flex justify-between items-start mb-4">
                         <div>
-                            <span id="modal-tag" class="text-[10px] font-bold text-bestie uppercase tracking-wider bg-pink-50 px-2.5 py-1 rounded-lg border border-pink-100">Categoria</span>
-                            <h2 id="modal-title" class="text-2xl font-bold text-gray-800 mt-2 leading-tight">Nome da Receita</h2>
+                            <span id="modal-tag" class="text-xs font-semibold text-bestie uppercase tracking-wider bg-pink-50 px-2 py-1 rounded-md">Categoria</span>
+                            <h2 id="modal-title" class="text-2xl font-bold text-gray-800 mt-1 leading-tight">Nome da Receita</h2>
                         </div>
-                        <div class="flex flex-col items-center bg-green-50 px-3 py-2 rounded-xl border border-green-100">
-                            <span class="text-lg font-bold text-green-600 leading-none" id="modal-cal">0</span>
-                            <span class="text-[10px] text-green-600 font-medium">kcal</span>
+                        <div class="flex flex-col items-end">
+                            <span class="text-lg font-bold text-bestie-dark whitespace-nowrap"><span id="modal-cal">0</span> kcal</span>
+                        </div>
+                    </div>
+                    
+                    <p id="modal-desc" class="text-sm text-gray-500 mb-4 italic leading-relaxed">
+                        <!-- Description injected here -->
+                    </p>
+
+                    <div class="flex items-center gap-4 text-sm text-gray-500 mb-6 border-y border-pink-50 py-3 justify-between px-2">
+                        <div class="flex items-center gap-1">
+                            <i class="fa-regular fa-clock text-bestie"></i>
+                            <span id="modal-time">0 min</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <i class="fa-solid fa-fire text-bestie"></i>
+                            <span id="modal-difficulty">Fácil</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <i class="fa-solid fa-user-group text-bestie"></i>
+                            <span id="modal-yield">2 porções</span>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-2 mb-8">
-                        <div class="flex flex-col items-center bg-gray-50 p-2 rounded-xl border border-gray-100">
-                            <i class="fa-regular fa-clock text-bestie mb-1"></i>
-                            <span class="text-xs font-medium" id="modal-time">0 min</span>
-                        </div>
-                        <div class="flex flex-col items-center bg-gray-50 p-2 rounded-xl border border-gray-100">
-                            <i class="fa-solid fa-fire text-orange-400 mb-1"></i>
-                            <span class="text-xs font-medium">Fácil</span>
-                        </div>
-                        <div class="flex flex-col items-center bg-gray-50 p-2 rounded-xl border border-gray-100">
-                            <i class="fa-solid fa-user-group text-blue-400 mb-1"></i>
-                            <span class="text-xs font-medium" id="modal-yield">1 porção</span>
-                        </div>
-                    </div>
-
-                    <div class="mb-8">
-                        <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2 text-lg">
-                            <span class="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center text-bestie text-sm"><i class="fa-solid fa-basket-shopping"></i></span>
-                            Ingredientes
+                    <div class="mb-6">
+                        <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-basket-shopping text-bestie"></i> Ingredientes
                         </h3>
-                        <ul id="modal-ingredients" class="space-y-3 text-sm text-gray-600">
+                        <ul id="modal-ingredients" class="space-y-2 text-sm text-gray-600 pl-2">
                             <!-- JS Inject -->
                         </ul>
                     </div>
 
                     <div class="mb-8">
-                        <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2 text-lg">
-                            <span class="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center text-bestie text-sm"><i class="fa-solid fa-spoon"></i></span>
-                            Modo de Preparo
+                        <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-spoon text-bestie"></i> Modo de Preparo
                         </h3>
-                        <div id="modal-instructions" class="space-y-6 text-sm text-gray-600 relative pl-4 border-l-2 border-pink-100 ml-3">
+                        <div id="modal-instructions" class="space-y-4 text-sm text-gray-600">
                             <!-- JS Inject -->
                         </div>
                     </div>
+                    
+                    <button class="w-full py-3 bg-bestie text-white font-semibold rounded-xl shadow-lg shadow-pink-200 hover:bg-bestie-dark transition active:scale-95">
+                        <i class="fa-regular fa-heart mr-2"></i> Salvar nos Favoritos
+                    </button>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Info Modal (General Purpose for Tips/Logica etc) -->
-    <div id="info-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center px-4">
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeInfoModal()"></div>
-        <div class="bg-white rounded-3xl w-full max-w-sm relative z-10 p-6 shadow-2xl animate-bounce-in transform transition-all">
-            <button onclick="closeInfoModal()" class="absolute top-4 right-4 text-gray-400 hover:text-bestie">
-                <i class="fa-solid fa-xmark text-xl"></i>
-            </button>
-            <div id="info-content">
-                <!-- Content Injected -->
             </div>
         </div>
     </div>
 
     <!-- Bottom Navigation -->
-    <nav class="fixed bottom-0 w-full z-40 bg-white border-t border-pink-100 pb-safe shadow-[0_-5px_20px_rgba(0,0,0,0.03)]">
+    <nav class="fixed bottom-0 w-full z-40 bg-white border-t border-pink-100 pb-safe">
         <div class="max-w-md mx-auto px-6 h-16 flex items-center justify-between">
-            <button onclick="navigate('home')" class="nav-btn active flex flex-col items-center gap-1 text-bestie group">
-                <div class="group-active:scale-90 transition">
-                    <i class="fa-solid fa-house text-xl mb-0.5"></i>
-                </div>
+            <button onclick="navigate('home')" class="nav-btn active flex flex-col items-center gap-1 text-bestie">
+                <i class="fa-solid fa-house text-xl mb-0.5"></i>
                 <span class="text-[10px] font-medium">Início</span>
             </button>
-            <button onclick="navigate('recipes')" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-bestie transition group">
-                <div class="group-active:scale-90 transition">
-                    <i class="fa-solid fa-utensils text-xl mb-0.5"></i>
-                </div>
+            <button onclick="navigate('recipes')" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-bestie transition">
+                <i class="fa-solid fa-utensils text-xl mb-0.5"></i>
                 <span class="text-[10px] font-medium">Receitas</span>
             </button>
-            <div class="relative -top-6">
-                <button class="w-14 h-14 rounded-full bg-gradient-to-r from-bestie to-bestie-accent text-white flex items-center justify-center shadow-lg shadow-pink-300 hover:scale-105 transition active:scale-95 border-4 border-white">
+            <div class="relative -top-5">
+                <button class="w-12 h-12 rounded-full bg-bestie text-white flex items-center justify-center shadow-lg shadow-pink-300 hover:scale-105 transition">
                     <i class="fa-solid fa-plus text-xl"></i>
                 </button>
             </div>
-            <button onclick="navigate('calculator')" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-bestie transition group">
-                <div class="group-active:scale-90 transition">
-                    <i class="fa-solid fa-calculator text-xl mb-0.5"></i>
-                </div>
+            <button onclick="navigate('calculator')" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-bestie transition">
+                <i class="fa-solid fa-calculator text-xl mb-0.5"></i>
                 <span class="text-[10px] font-medium">Calc</span>
             </button>
-            <button onclick="navigate('profile')" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-bestie transition group">
-                <div class="group-active:scale-90 transition">
-                    <i class="fa-regular fa-user text-xl mb-0.5"></i>
-                </div>
+            <button onclick="navigate('profile')" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-bestie transition">
+                <i class="fa-regular fa-user text-xl mb-0.5"></i>
                 <span class="text-[10px] font-medium">Perfil</span>
             </button>
         </div>
@@ -194,230 +176,347 @@
 
     <script>
         // --- DATA ---
+        // Tags: 'cafe', 'almoco', 'jantar', 'lanche', 'vegano', 'vegetariano', 'proteina', 'lowcarb', 'lowfat', 'zeroacucar', 'lowcal', 'simples', 'rapido'
+        
         const recipes = [
+            {
+                id: 15,
+                title: "Shake de proteína de chocolate",
+                displayCategory: "Pré-Treino/Lanche",
+                tags: ['lanche', 'proteina', 'rapido', 'simples', 'zeroacucar'],
+                calories: 284,
+                time: "5 min",
+                difficulty: "Fácil",
+                yield: "2 porções",
+                description: "Shake rápido e delicioso! O cacau em pó dá o sabor e a proteína promove saciedade. Ótima opção pré-treino.",
+                image: "https://images.unsplash.com/photo-1620916297397-a4a5402a3c6c?auto=format&fit=crop&q=80&w=600",
+                ingredients: [
+                    "1 banana madura (150 g)",
+                    "Água (300 mL)",
+                    "Farinha de linhaça (2 colheres de sopa, 20 g)",
+                    "Aveia (3 colheres de sopa, 24 g)",
+                    "Proteína em pó (2 colheres de sopa, 24 g)",
+                    "Cacau em pó (10 g)",
+                    "Pasta de amendoim (1 colher de sopa, 20 g)"
+                ],
+                instructions: [
+                    "Descasque a banana.",
+                    "Coloque-a no liquidificador junto com os outros ingredientes e bata até obter um creme.",
+                    "Aproveite!"
+                ]
+            },
+            {
+                id: 14,
+                title: "Shake proteico de frutas vermelhas",
+                displayCategory: "Pós-Treino",
+                tags: ['lanche', 'proteina', 'lowcal', 'lowfat', 'rapido', 'zeroacucar'],
+                calories: 163,
+                time: "9 min",
+                difficulty: "Fácil",
+                yield: "1 porção",
+                description: "Leve e proteico, feito com claras pasteurizadas e iogurte. Perfeito para recuperação muscular com baixas calorias.",
+                image: "https://images.unsplash.com/photo-1599458316239-015848c08192?auto=format&fit=crop&q=80&w=600",
+                ingredients: [
+                    "Linhaça (5 g)",
+                    "Água (1 colher de sopa, 15 mL)",
+                    "3 claras de ovo (105 g)",
+                    "Iogurte natural sem gordura (100 g)",
+                    "Frutas vermelhas congeladas (100 g)",
+                    "Extrato de baunilha em pó (1 g)",
+                    "Eritritol em pó (1 colher de sopa, 7 g)"
+                ],
+                instructions: [
+                    "Deixe a linhaça de molho na água por cerca de 5 minutos.",
+                    "Em um liquidificador, bata as claras com o iogurte e a linhaça.",
+                    "Adicione o eritritol, as frutas vermelhas e a baunilha e bata mais uma vez, até obter um smoothie cremoso.",
+                    "Transfira para um copo e beba imediatamente."
+                ]
+            },
+            {
+                id: 13,
+                title: "Shake de mirtilo e coco",
+                displayCategory: "Proteico Caseiro",
+                tags: ['lanche', 'proteina', 'rapido', 'simples', 'cafe'],
+                calories: 358,
+                time: "5 min",
+                difficulty: "Fácil",
+                yield: "1 porção",
+                description: "Alternativa saudável aos shakes industrializados. O ingrediente principal é o iogurte grego, garantindo proteínas de qualidade sem aditivos artificiais.",
+                image: "https://images.unsplash.com/photo-1620916297397-a4a5402a3c6c?auto=format&fit=crop&q=80&w=600",
+                ingredients: [
+                    "Iogurte grego natural, sem gordura (300 g)",
+                    "Mirtilo (125 g)",
+                    "Flocos de coco (1 colher de sopa, 5 g)",
+                    "Leite semidesnatado (100 mL)"
+                ],
+                instructions: [
+                    "Coloque o iogurte, o leite, o mirtilo e os flocos de coco em um liquidificador e bata em alta velocidade até que a mistura fique homogênea.",
+                    "Sirva com alguns flocos de coco por cima.",
+                    "Aproveite!"
+                ]
+            },
+            {
+                id: 12,
+                title: "Smoothie de banana e tâmara",
+                displayCategory: "Café/Lanche",
+                tags: ['cafe', 'lanche', 'vegano', 'vegetariano', 'zeroacucar', 'simples'],
+                calories: 237,
+                time: "15 min",
+                difficulty: "Fácil",
+                yield: "2 porções",
+                description: "Delicioso e refrescante, dispensa adoçantes graças às tâmaras. Dica: Deixe as tâmaras de molho no leite durante a noite se tiver pressa pela manhã.",
+                image: "https://images.unsplash.com/photo-1596450522030-9b45663673c2?auto=format&fit=crop&q=80&w=600",
+                ingredients: [
+                    "Tâmara, sem caroço (90 g)",
+                    "Leite de amêndoa (350 mL)",
+                    "1 banana pequena (75 g)",
+                    "Manteiga de amêndoa (2 colheres de chá, 8 g)",
+                    "5 cubos de gelo (110 g)"
+                ],
+                instructions: [
+                    "Para começar, coloque as tâmaras de molho em água fervente por 10 minutos para amolecer.",
+                    "Escoe a água das tâmaras.",
+                    "Adicione todos os ingredientes em um liquidificador e bata até obter uma consistência cremosa.",
+                    "Aproveite!"
+                ]
+            },
+            {
+                id: 11,
+                title: "Shake de proteína com pasta de amendoim",
+                displayCategory: "Proteico",
+                tags: ['lanche', 'proteina', 'rapido', 'simples', 'zeroacucar'],
+                calories: 402,
+                time: "5 min",
+                difficulty: "Fácil",
+                yield: "1 porção",
+                description: "Pasta de amendoim é um dos lanches preferidos dos atletas. Servida em um shake, é uma fonte de proteínas excelente e deliciosa.",
+                image: "https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&q=80&w=600",
+                ingredients: [
+                    "Leite de amêndoa, sem açúcar (150 mL)",
+                    "Pasta de amendoim (1 colher de sopa, 20 g)",
+                    "1 banana madura (150 g)",
+                    "Canela (a gosto)",
+                    "Proteína em pó, sabor chocolate (30 g)"
+                ],
+                instructions: [
+                    "Coloque todos os ingredientes no liquidificador e misture até obter uma mistura homogênea.",
+                    "Consuma imediatamente."
+                ]
+            },
+            {
+                id: 10,
+                title: "Shake de banana e nozes",
+                displayCategory: "Pós-Treino/Café",
+                tags: ['cafe', 'lanche', 'proteina', 'rapido', 'simples'],
+                calories: 434,
+                time: "5 min",
+                difficulty: "Fácil",
+                yield: "1 porção",
+                description: "Nosso shake poderoso com banana, nozes e mel funciona muito bem para estimular seu metabolismo. Ideal pós-treino ou ao acordar.",
+                image: "https://images.unsplash.com/photo-1593094406256-4299b90c1f6b?auto=format&fit=crop&q=80&w=600",
+                ingredients: [
+                    "Iogurte grego natural, sem gordura (150 g)",
+                    "Leite de amêndoa, sem açúcar (300 mL)",
+                    "Mel (1 colher de chá, 10 g)",
+                    "½ banana (75 g)",
+                    "Nozes, picadas (24 g)"
+                ],
+                instructions: [
+                    "Coloque todos os ingredientes, exceto 2 ou 3 nozes, no liquidificador e bata.",
+                    "Coloque o shake em um copo e decore com as nozes restantes.",
+                    "Aproveite!"
+                ]
+            },
+            {
+                id: 9,
+                title: "Smoothie de Morango e Banana",
+                displayCategory: "Café/Lanche",
+                tags: ['cafe', 'lanche', 'vegetariano', 'rapido', 'simples', 'lowcal'],
+                calories: 150,
+                time: "5 min",
+                difficulty: "Fácil",
+                yield: "2 porções",
+                description: "Smoothies podem ser preparados rapidamente e são cheios de frutas frescas. A banana garante a doçura desta receita. Uma delícia refrescante!",
+                image: "https://images.unsplash.com/photo-1626078298288-06795f590b5d?auto=format&fit=crop&q=80&w=600",
+                ingredients: [
+                    "Morango (200 g)",
+                    "1 Banana (150 g)",
+                    "Iogurte light (180 g)",
+                    "Cubos de gelo (50 g)"
+                ],
+                instructions: [
+                    "Lave os morangos e coloque-os em um liquidificador.",
+                    "Corte a banana em pedaços e adicione ao liquidificador com o resto dos ingredientes.",
+                    "Bata até obter uma mistura lisa.",
+                    "Aproveite!"
+                ]
+            },
+            {
+                id: 8,
+                title: "Shake de Chocolate e Hortelã",
+                displayCategory: "Café/Lanche",
+                tags: ['cafe', 'lanche', 'vegano', 'vegetariano', 'zeroacucar', 'simples', 'rapido'],
+                calories: 232,
+                time: "3 min",
+                difficulty: "Fácil",
+                yield: "2 porções",
+                description: "Nosso shake de chocolate com um toque de hortelã é ótimo para o café da manhã ou para um lanche. A doçura natural da banana e os ácidos graxos saudáveis do avocado promoverão saciedade.",
+                image: "https://images.unsplash.com/photo-1577805947697-89e18249d767?auto=format&fit=crop&q=80&w=600",
+                ingredients: [
+                    "Cacau em pó (2 colheres de sopa, 30 g)",
+                    "Hortelã fresca (10 g)",
+                    "½ avocado (110 g)",
+                    "1 banana madura (150 g)",
+                    "Leite de amêndoas não adoçado (300 mL)"
+                ],
+                instructions: [
+                    "Corte o avocado e a banana em pedaços pequenos. Misture com os outros ingredientes e bata tudo em um liquidificador.",
+                    "Distribua o shake em dois copos e decore com folha de hortelã.",
+                    "Aproveite!"
+                ]
+            },
+            {
+                id: 7,
+                title: "Lassi de Manga",
+                displayCategory: "Café da Manhã",
+                tags: ['cafe', 'lanche', 'vegetariano', 'simples', 'rapido', 'lowcal', 'lowfat'],
+                calories: 211,
+                time: "3 min",
+                difficulty: "Muito Fácil",
+                yield: "2 porções",
+                description: "Este shake de manga é uma bebida de beleza. A manga contém betacaroteno, que protege as células. Dica: Use cubos de gelo para deixar bem refrescante!",
+                image: "https://images.unsplash.com/photo-1623065422902-30a2d299bbe4?auto=format&fit=crop&q=80&w=600",
+                ingredients: [
+                    "Manga em cubos, congelada (300 g)", 
+                    "Iogurte light (300 g)", 
+                    "Mel (1 colher de sopa, 20 g)", 
+                    "Cardamomo em pó (5 g)"
+                ],
+                instructions: [
+                    "Bata todos os ingredientes no liquidificador.", 
+                    "Sirva bem gelado e aproveite!"
+                ]
+            },
+            {
+                id: 6,
+                title: "Brócolis e couve-flor ao forno",
+                displayCategory: "Almoço/Jantar",
+                tags: ['almoco', 'jantar', 'vegetariano', 'lowcarb', 'lowcal', 'lowfat'],
+                calories: 356,
+                time: "25 min",
+                difficulty: "Normal",
+                yield: "2 porções",
+                description: "Este prato de brócolis e couve-flor é muito saboroso. Graças ao molho cremoso de queijo, você vai ficar saciado(a) por um bom tempo.",
+                image: "https://images.unsplash.com/photo-1612158652932-55dd1d713c23?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["Couve-flor (200 g)", "Brócolis (200 g)", "Queijo alpino ralado (100 g)", "Creme azedo (45 g)", "Azeite e temperos"],
+                instructions: ["Lave a couve-flor e o brócolis e corte-os. Cozinhe por 7 minutos.", "Misture o queijo com o creme azedo e temperos.", "Coloque os vegetais na assadeira, cubra com molho.", "Asse a 160°C por 15 minutos."]
+            },
             {
                 id: 1,
                 title: "Crepioca Fit",
-                category: "cafe",
+                displayCategory: "Café da Manhã",
+                tags: ['cafe', 'proteina', 'zeroacucar', 'simples', 'rapido', 'lowcal'],
                 calories: 180,
                 time: "10 min",
+                difficulty: "Fácil",
+                yield: "1 porção",
+                description: "A queridinha das dietas! Prática, rápida e versátil para começar o dia.",
                 image: "https://images.unsplash.com/photo-1513442542250-854d436a73f2?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["1 ovo", "2 colheres (sopa) de goma de tapioca", "1 colher (sopa) de requeijão light", "Sal a gosto"],
-                instructions: ["Bata o ovo com a tapioca e o requeijão até ficar homogêneo.", "Tempere com sal e orégano a gosto.", "Despeje em uma frigideira antiaderente untada.", "Doure dos dois lados e sirva recheado com frango ou queijo branco."]
+                instructions: ["Bata o ovo com a tapioca e o requeijão.", "Tempere com sal.", "Despeje em uma frigideira antiaderente untada.", "Doure dos dois lados e sirva recheado a gosto."]
             },
             {
                 id: 2,
                 title: "Salada de Pote",
-                category: "almoco",
+                displayCategory: "Almoço Prático",
+                tags: ['almoco', 'jantar', 'lowcal', 'lowcarb', 'proteina', 'rapido', 'simples'],
                 calories: 320,
                 time: "15 min",
+                difficulty: "Fácil",
+                yield: "1 pote",
+                description: "Perfeita para levar para o trabalho. O segredo está na ordem dos ingredientes!",
                 image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600",
-                ingredients: ["Mix de folhas (alface, rúcula)", "100g de frango desfiado temperado", "Tomate cereja cortado ao meio", "Cenoura ralada", "Molho: iogurte, mostarda e limão"],
-                instructions: ["Comece colocando o molho no fundo do pote de vidro.", "Adicione a cenoura e o tomate (itens mais pesados).", "Coloque o frango desfiado.", "Finalize com as folhas por cima para não murchar em contato com o molho.", "Tampe bem e mantenha refrigerado. Agite antes de comer."]
+                ingredients: ["Mix de folhas", "100g de frango desfiado", "Tomate cereja", "Cenoura ralada", "Molho de iogurte"],
+                instructions: ["Comece colocando o molho no fundo do pote.", "Adicione a cenoura e o tomate.", "Coloque o frango.", "Finalize com as folhas."]
             },
             {
                 id: 3,
-                title: "Brigadeiro de Whey",
-                category: "sos-formiga",
-                calories: 120,
-                time: "15 min",
-                image: "https://images.unsplash.com/photo-1541783245831-57d6fb0926d3?auto=format&fit=crop&q=80&w=600",
-                ingredients: ["1 scoop de Whey Protein sabor chocolate", "1 colher (chá) de cacau 100%", "2 colheres (sopa) de leite em pó desnatado", "Água morna (bem pouca)"],
-                instructions: ["Em um bowl pequeno, misture todos os ingredientes secos.", "Vá adicionando água morna bem aos poucos, colher por colher.", "Misture vigorosamente até dar o ponto de brigadeiro de colher.", "Leve à geladeira por 15 minutos para firmar mais."]
+                title: "Overnight Oats",
+                displayCategory: "Café/Lanche",
+                tags: ['cafe', 'lanche', 'vegetariano', 'simples', 'rapido', 'zeroacucar'],
+                calories: 250,
+                time: "5 min",
+                difficulty: "Muito Fácil",
+                yield: "1 pote",
+                description: "Café da manhã pronto para quem acorda na correria.",
+                image: "https://images.unsplash.com/photo-1517519014922-8fc5e6211605?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["30g de aveia em flocos", "100ml de leite vegetal", "1 colher de chia", "Frutas vermelhas"],
+                instructions: ["Misture a aveia, o leite e a chia em um pote.", "Deixe na geladeira durante a noite.", "Na manhã seguinte, adicione as frutas."]
             },
             {
                 id: 4,
-                title: "Pizza de Frigideira Low Carb",
-                category: "fim-de-semana",
-                calories: 280,
-                time: "20 min",
-                image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&q=80&w=600",
-                ingredients: ["1 ovo", "2 colheres de farinha de amêndoas (ou aveia)", "1 colher de queijo ralado", "Molho de tomate caseiro", "Recheio: Queijo, tomate, manjericão"],
-                instructions: ["Misture o ovo, a farinha e o queijo ralado.", "Despeje na frigideira untada e doure dos dois lados (massa).", "Com o fogo baixo, adicione o molho e o recheio por cima.", "Tampe a frigideira para derreter o queijo.", "Sirva imediatamente."]
+                title: "Brigadeiro de Whey",
+                displayCategory: "Doce Fit",
+                tags: ['lanche', 'proteina', 'zeroacucar', 'simples', 'rapido'],
+                calories: 120,
+                time: "15 min",
+                difficulty: "Fácil",
+                yield: "5 bolinhas",
+                description: "Para matar a vontade de doce sem sair da dieta.",
+                image: "https://images.unsplash.com/photo-1541783245831-57d6fb0926d3?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["1 scoop de Whey Protein chocolate", "1 colher de cacau em pó", "Leite em pó desnatado", "Água"],
+                instructions: ["Misture todos os secos.", "Vá adicionando água morna aos poucos até dar ponto.", "Enrole e gele."]
             },
-             {
+            {
                 id: 5,
-                title: "Mousse de Maracujá Fit",
-                category: "sos-formiga",
-                calories: 140,
-                time: "10 min + geladeira",
-                image: "https://images.unsplash.com/photo-1543362906-acfc16c67564?auto=format&fit=crop&q=80&w=600",
-                ingredients: ["1 iogurte natural desnatado", "1/2 pacote de suco em pó zero (sabor maracujá)", "2 colheres de leite em pó desnatado"],
-                instructions: ["Misture o iogurte com o leite em pó até ficar cremoso.", "Adicione o suco em pó aos poucos e misture bem (ele vai engrossar o creme).", "Coloque em taças e leve à geladeira por 30 min.", "Decore com polpa de maracujá natural se desejar."]
+                title: "Panqueca de Banana",
+                displayCategory: "Café da Manhã",
+                tags: ['cafe', 'lanche', 'zeroacucar', 'simples', 'rapido', 'lowfat', 'vegetariano'],
+                calories: 210,
+                time: "10 min",
+                difficulty: "Fácil",
+                yield: "1 porção",
+                description: "Apenas 3 ingredientes para um lanche saudável.",
+                image: "https://images.unsplash.com/photo-1506084868230-bb9d95c24759?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["1 banana madura amassada", "2 ovos", "Canela a gosto"],
+                instructions: ["Misture a banana com os ovos e canela.", "Aqueça a frigideira untada.", "Faça discos e doure dos dois lados."]
             }
         ];
-
-        const infoCardsData = {
-            'logica': {
-                icon: 'fa-chart-pie',
-                color: 'text-blue-500',
-                bg: 'bg-blue-100',
-                title: 'A Lógica do Prato',
-                content: `
-                    <div class="text-center">
-                        <div class="w-20 h-20 mx-auto bg-blue-50 rounded-full flex items-center justify-center mb-4 text-3xl">🍽️</div>
-                        <h3 class="font-bold text-lg mb-2">Como montar seu prato?</h3>
-                        <p class="text-sm text-gray-600 mb-4">Para secar sem neura, siga essa proporção no almoço e jantar:</p>
-                        <ul class="text-left text-sm space-y-3 bg-gray-50 p-4 rounded-xl">
-                            <li class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-green-400"></span> <strong>50% Salada e Legumes:</strong> Fibras e volume!</li>
-                            <li class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-400"></span> <strong>25% Proteína:</strong> Frango, peixe, ovos ou carne magra.</li>
-                            <li class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-yellow-400"></span> <strong>25% Carboidrato:</strong> Arroz, batata, mandioca ou macarrão.</li>
-                        </ul>
-                    </div>
-                `
-            },
-            'kit': {
-                icon: 'fa-box-open',
-                color: 'text-purple-500',
-                bg: 'bg-purple-100',
-                title: 'Kit da Bestie',
-                content: `
-                    <div class="text-center">
-                        <h3 class="font-bold text-lg mb-4">Essenciais para ter em casa</h3>
-                        <div class="grid grid-cols-2 gap-3 text-sm">
-                            <div class="bg-pink-50 p-3 rounded-xl border border-pink-100">
-                                <div class="text-xl mb-1">⚖️</div>
-                                <strong>Balança</strong>
-                                <p class="text-xs text-gray-500">Pese seus alimentos</p>
-                            </div>
-                            <div class="bg-pink-50 p-3 rounded-xl border border-pink-100">
-                                <div class="text-xl mb-1">💧</div>
-                                <strong>Garrafa</strong>
-                                <p class="text-xs text-gray-500">2L por dia no mínimo</p>
-                            </div>
-                            <div class="bg-pink-50 p-3 rounded-xl border border-pink-100">
-                                <div class="text-xl mb-1">🥡</div>
-                                <strong>Potes</strong>
-                                <p class="text-xs text-gray-500">Marmitas da semana</p>
-                            </div>
-                            <div class="bg-pink-50 p-3 rounded-xl border border-pink-100">
-                                <div class="text-xl mb-1">🍳</div>
-                                <strong>Frigideira</strong>
-                                <p class="text-xs text-gray-500">Antiaderente boa</p>
-                            </div>
-                        </div>
-                    </div>
-                `
-            },
-            'dica': {
-                icon: 'fa-lightbulb',
-                color: 'text-yellow-500',
-                bg: 'bg-yellow-100',
-                title: 'Dica de Ouro',
-                content: `
-                    <div class="text-center">
-                         <div class="w-16 h-16 mx-auto bg-yellow-50 rounded-full flex items-center justify-center mb-4 text-yellow-500 text-2xl"><i class="fa-solid fa-star"></i></div>
-                        <h3 class="font-bold text-lg mb-2">Constância > Perfeição</h3>
-                        <p class="text-sm text-gray-600 leading-relaxed">
-                            Não adianta fazer a dieta perfeita por 3 dias e desistir no 4º. O segredo é fazer o básico bem feito todos os dias.
-                            <br><br>
-                            Errou em uma refeição? <strong>Não chute o balde!</strong> Volte ao plano na próxima. Seu corpo não sabe que é fim de semana.
-                        </p>
-                    </div>
-                `
-            },
-            'trocas': {
-                icon: 'fa-right-left',
-                color: 'text-green-500',
-                bg: 'bg-green-100',
-                title: 'Trocas da Bestie',
-                content: `
-                    <h3 class="font-bold text-lg mb-4 text-center">Substituições Inteligentes</h3>
-                    <div class="space-y-3 text-sm">
-                        <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-                            <div class="text-center w-1/3"><span class="line-through text-gray-400">Refrigerante</span></div>
-                            <i class="fa-solid fa-arrow-right text-bestie text-xs"></i>
-                            <div class="text-center w-1/3 font-bold text-green-600">Água com Gás + Limão</div>
-                        </div>
-                        <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-                            <div class="text-center w-1/3"><span class="line-through text-gray-400">Doce de Leite</span></div>
-                            <i class="fa-solid fa-arrow-right text-bestie text-xs"></i>
-                            <div class="text-center w-1/3 font-bold text-green-600">Doce de Leite Zero</div>
-                        </div>
-                        <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-                            <div class="text-center w-1/3"><span class="line-through text-gray-400">Óleo de Soja</span></div>
-                            <i class="fa-solid fa-arrow-right text-bestie text-xs"></i>
-                            <div class="text-center w-1/3 font-bold text-green-600">Azeite de Oliva</div>
-                        </div>
-                    </div>
-                `
-            }
-        };
 
         const views = {
             home: `
                 <div class="fade-in space-y-6">
-                    <div class="bg-gradient-to-br from-bestie to-pink-400 rounded-3xl p-6 text-white shadow-lg shadow-pink-200 relative overflow-hidden">
-                        <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-                        <p class="text-pink-100 text-xs font-medium mb-1 uppercase tracking-wider">Painel Diário</p>
-                        <h2 class="text-2xl font-bold mb-4">Bom dia, Bestie! ✨</h2>
+                    <div class="bg-gradient-to-r from-bestie to-pink-400 rounded-3xl p-6 text-white shadow-lg shadow-pink-200">
+                        <p class="text-pink-100 text-sm font-medium mb-1">Bom dia, Bestie! ✨</p>
+                        <h2 class="text-2xl font-bold mb-4">Vamos secar hoje?</h2>
                         <div class="flex gap-3">
-                            <div class="bg-white/20 backdrop-blur-md rounded-2xl p-3 flex-1 border border-white/10">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <i class="fa-solid fa-glass-water text-pink-200 text-xs"></i>
-                                    <span class="text-xs text-pink-100">Hidratação</span>
-                                </div>
-                                <span class="font-bold text-2xl">1.2<span class="text-sm font-normal text-pink-100">L</span></span>
+                            <div class="bg-white/20 backdrop-blur rounded-xl p-3 flex-1">
+                                <span class="block text-xs text-pink-100">Água</span>
+                                <span class="font-bold text-lg">1.2L</span>
                             </div>
-                            <div class="bg-white/20 backdrop-blur-md rounded-2xl p-3 flex-1 border border-white/10">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <i class="fa-solid fa-bullseye text-pink-200 text-xs"></i>
-                                    <span class="text-xs text-pink-100">Meta</span>
-                                </div>
-                                <span class="font-bold text-2xl">55<span class="text-sm font-normal text-pink-100">kg</span></span>
+                            <div class="bg-white/20 backdrop-blur rounded-xl p-3 flex-1">
+                                <span class="block text-xs text-pink-100">Meta</span>
+                                <span class="font-bold text-lg">55kg</span>
                             </div>
                         </div>
                     </div>
 
                     <div>
-                        <h3 class="font-bold text-lg text-gray-800 mb-4 px-1">Menu da Bestie</h3>
-                        <div class="grid grid-cols-2 gap-3">
-                            <!-- SOS Formiga -->
-                            <button onclick="navigate('recipes', 'sos-formiga')" class="menu-card bg-white p-4 rounded-2xl border border-pink-100 shadow-sm flex flex-col items-center gap-2 hover:border-pink-300">
-                                <div class="w-12 h-12 rounded-2xl bg-pink-100 text-pink-500 flex items-center justify-center text-xl mb-1">
-                                    <i class="fa-solid fa-candy-cane"></i>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-lg text-gray-800">Atalhos</h3>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <button onclick="navigate('recipes')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
+                                <div class="w-12 h-12 rounded-full bg-green-100 text-green-500 flex items-center justify-center group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-leaf"></i>
                                 </div>
-                                <span class="font-bold text-gray-700 text-sm">SOS Formiga</span>
+                                <span class="font-medium text-sm">Receitinhas</span>
                             </button>
-
-                            <!-- Fim de Semana -->
-                            <button onclick="navigate('recipes', 'fim-de-semana')" class="menu-card bg-white p-4 rounded-2xl border border-purple-100 shadow-sm flex flex-col items-center gap-2 hover:border-purple-300">
-                                <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-500 flex items-center justify-center text-xl mb-1">
-                                    <i class="fa-solid fa-champagne-glasses"></i>
+                            <button class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
+                                <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-glass-water"></i>
                                 </div>
-                                <span class="font-bold text-gray-700 text-sm">Fim de Semana</span>
-                            </button>
-
-                            <!-- A Lógica do Prato -->
-                            <button onclick="openInfo('logica')" class="menu-card bg-white p-4 rounded-2xl border border-blue-100 shadow-sm flex flex-col items-center gap-2 hover:border-blue-300">
-                                <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-500 flex items-center justify-center text-xl mb-1">
-                                    <i class="fa-solid fa-chart-pie"></i>
-                                </div>
-                                <span class="font-bold text-gray-700 text-sm">Lógica do Prato</span>
-                            </button>
-
-                             <!-- Trocas da Bestie -->
-                            <button onclick="openInfo('trocas')" class="menu-card bg-white p-4 rounded-2xl border border-green-100 shadow-sm flex flex-col items-center gap-2 hover:border-green-300">
-                                <div class="w-12 h-12 rounded-2xl bg-green-100 text-green-500 flex items-center justify-center text-xl mb-1">
-                                    <i class="fa-solid fa-right-left"></i>
-                                </div>
-                                <span class="font-bold text-gray-700 text-sm">Trocas da Bestie</span>
-                            </button>
-
-                            <!-- Kit da Bestie -->
-                            <button onclick="openInfo('kit')" class="menu-card bg-white p-4 rounded-2xl border border-orange-100 shadow-sm flex flex-col items-center gap-2 hover:border-orange-300">
-                                <div class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-500 flex items-center justify-center text-xl mb-1">
-                                    <i class="fa-solid fa-box-open"></i>
-                                </div>
-                                <span class="font-bold text-gray-700 text-sm">Kit da Bestie</span>
-                            </button>
-
-                            <!-- Dica de Ouro -->
-                            <button onclick="openInfo('dica')" class="menu-card bg-white p-4 rounded-2xl border border-yellow-100 shadow-sm flex flex-col items-center gap-2 hover:border-yellow-300">
-                                <div class="w-12 h-12 rounded-2xl bg-yellow-100 text-yellow-500 flex items-center justify-center text-xl mb-1">
-                                    <i class="fa-regular fa-lightbulb"></i>
-                                </div>
-                                <span class="font-bold text-gray-700 text-sm">Dica de Ouro</span>
+                                <span class="font-medium text-sm">Água</span>
                             </button>
                         </div>
                     </div>
@@ -425,26 +524,40 @@
             `,
             recipes: `
                 <div class="fade-in">
-                    <div class="mb-6 flex justify-between items-end">
-                        <div>
-                            <h2 class="text-2xl font-bold text-gray-800">Receitinhas 🥗</h2>
-                            <p class="text-gray-500 text-xs">Nutritivas e deliciosas</p>
-                        </div>
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">Receitinhas 🥗</h2>
+                        <p class="text-gray-500 text-sm">Filtre pelo seu objetivo ou refeição</p>
                     </div>
 
                     <!-- Search -->
                     <div class="relative mb-6">
                         <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-400 text-sm"></i>
-                        <input type="text" placeholder="Buscar receita..." class="w-full bg-white border border-pink-100 rounded-2xl py-3 pl-10 pr-4 text-sm focus:outline-none focus:border-bestie focus:ring-1 focus:ring-bestie transition placeholder-gray-400 shadow-sm">
+                        <input type="text" placeholder="O que vamos cozinhar?" class="w-full bg-white border border-pink-100 rounded-full py-3 pl-10 pr-4 text-sm focus:outline-none focus:border-bestie focus:ring-1 focus:ring-bestie transition placeholder-gray-400 shadow-sm">
                     </div>
 
-                    <!-- Categories -->
-                    <div class="flex gap-2 overflow-x-auto hide-scrollbar mb-6 pb-2" id="category-scroll">
-                        <button onclick="filterRecipes('all', this)" class="cat-btn active whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold bg-bestie text-white shadow-md shadow-pink-200 transition">Tudo</button>
-                        <button onclick="filterRecipes('sos-formiga', this)" class="cat-btn whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">🍬 SOS Formiga</button>
-                        <button onclick="filterRecipes('fim-de-semana', this)" class="cat-btn whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">🍕 Fds</button>
-                        <button onclick="filterRecipes('cafe', this)" class="cat-btn whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">☕ Café</button>
-                        <button onclick="filterRecipes('almoco', this)" class="cat-btn whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">🥗 Almoço</button>
+                    <!-- Categories / Filters -->
+                    <div class="flex gap-2 overflow-x-auto hide-scrollbar mb-6 pb-2 px-1">
+                        <button onclick="filterRecipes('all', this)" class="cat-btn active flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-bestie text-white shadow-md shadow-pink-200 transition">Tudo</button>
+                        
+                        <!-- Refeições -->
+                        <button onclick="filterRecipes('cafe', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Café da Manhã</button>
+                        <button onclick="filterRecipes('almoco', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Almoço</button>
+                        <button onclick="filterRecipes('jantar', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Jantar</button>
+                        
+                        <!-- Dietas -->
+                        <button onclick="filterRecipes('lowcarb', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Baixo Carboidrato</button>
+                        <button onclick="filterRecipes('proteina', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Rico em Proteínas</button>
+                        <button onclick="filterRecipes('lowcal', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Baixa Caloria</button>
+                        <button onclick="filterRecipes('lowfat', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Baixa Gordura</button>
+                        <button onclick="filterRecipes('zeroacucar', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Sem Açúcar</button>
+                        
+                        <!-- Preferências -->
+                        <button onclick="filterRecipes('vegano', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Vegano</button>
+                        <button onclick="filterRecipes('vegetariano', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Vegetariano</button>
+                        
+                        <!-- Praticidade -->
+                        <button onclick="filterRecipes('simples', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Poucos Ingredientes</button>
+                        <button onclick="filterRecipes('rapido', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Preparo Rápido</button>
                     </div>
 
                     <!-- Recipe Grid -->
@@ -454,38 +567,21 @@
                 </div>
             `,
             calculator: `
-                 <div class="fade-in text-center pt-20 px-6">
-                    <div class="w-20 h-20 bg-pink-100 text-bestie rounded-3xl rotate-3 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-pink-200">
-                        <i class="fa-solid fa-calculator text-3xl"></i>
+                 <div class="fade-in text-center pt-10">
+                    <div class="w-16 h-16 bg-pink-100 text-bestie rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-calculator text-2xl"></i>
                     </div>
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Calculadora</h2>
-                    <p class="text-gray-500 text-sm leading-relaxed">Em breve você poderá calcular seu IMC, Taxa Metabólica Basal e Macros ideais aqui!</p>
-                    <button class="mt-8 px-6 py-3 bg-white border border-pink-200 text-bestie font-bold rounded-xl text-sm hover:bg-pink-50 transition">Avise-me quando lançar</button>
+                    <h2 class="text-xl font-bold text-gray-800">Calculadora Bestie</h2>
+                    <p class="text-gray-500 mt-2">Em breve: Calcule seu IMC e Macros!</p>
                 </div>
             `,
             profile: `
                 <div class="fade-in text-center pt-10">
-                    <div class="relative w-24 h-24 mx-auto mb-4">
-                        <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-lg">
-                             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Bestie&backgroundColor=ffdfbf" alt="Profile" />
-                        </div>
-                        <div class="absolute bottom-0 right-0 w-8 h-8 bg-bestie text-white rounded-full flex items-center justify-center border-2 border-white shadow-sm">
-                            <i class="fa-solid fa-camera text-xs"></i>
-                        </div>
+                    <div class="w-20 h-20 bg-gray-200 rounded-full mx-auto mb-4 overflow-hidden border-4 border-white shadow-md">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Bestie" alt="Profile" />
                     </div>
                     <h2 class="text-xl font-bold text-gray-800">Bestie Fit</h2>
-                    <p class="text-bestie font-medium text-sm bg-pink-50 inline-block px-3 py-1 rounded-full mt-2">Membro Premium 👑</p>
-                    
-                    <div class="mt-8 space-y-2 px-4">
-                        <button class="w-full bg-white p-4 rounded-xl border border-gray-100 flex items-center justify-between shadow-sm hover:border-pink-200 transition">
-                            <span class="text-sm font-medium text-gray-700">Meus Favoritos</span>
-                            <i class="fa-solid fa-chevron-right text-xs text-gray-300"></i>
-                        </button>
-                         <button class="w-full bg-white p-4 rounded-xl border border-gray-100 flex items-center justify-between shadow-sm hover:border-pink-200 transition">
-                            <span class="text-sm font-medium text-gray-700">Configurações</span>
-                            <i class="fa-solid fa-chevron-right text-xs text-gray-300"></i>
-                        </button>
-                    </div>
+                    <p class="text-bestie font-medium">Membro Premium</p>
                 </div>
             `
         };
@@ -493,139 +589,89 @@
         // --- FUNCTIONS ---
 
         function init() {
-            // Start at home
-            navigate('home'); 
+            navigate('recipes'); 
+            renderRecipes('all');
         }
 
-        function navigate(viewName, filter = null) {
-            // Update Content
+        function navigate(viewName) {
             const main = document.getElementById('app-content');
             main.innerHTML = views[viewName];
 
-            // Update Nav State
             document.querySelectorAll('.nav-btn').forEach(btn => {
-                const text = btn.querySelector('span').innerText;
-                const iconContainer = btn.firstElementChild; // The div wrapping the icon in the new structure
-                const icon = btn.querySelector('i');
-                
-                // Reset states
                 btn.classList.remove('text-bestie');
                 btn.classList.add('text-gray-400');
-                
-                // Active state logic
-                let isActive = false;
-                if(viewName === 'home' && text === 'Início') isActive = true;
-                if(viewName === 'recipes' && text === 'Receitas') isActive = true;
-                if(viewName === 'calculator' && text === 'Calc') isActive = true;
-                if(viewName === 'profile' && text === 'Perfil') isActive = true;
-
-                if(isActive) {
-                    btn.classList.add('text-bestie');
-                    btn.classList.remove('text-gray-400');
-                    // Add bounce animation to icon
-                    icon.classList.add('animate-bounce');
-                    setTimeout(() => icon.classList.remove('animate-bounce'), 1000);
-                }
+                if(viewName === 'home' && btn.innerText.includes('Início')) btn.classList.add('text-bestie'), btn.classList.remove('text-gray-400');
+                if(viewName === 'recipes' && btn.innerText.includes('Receitas')) btn.classList.add('text-bestie'), btn.classList.remove('text-gray-400');
+                if(viewName === 'calculator' && btn.innerText.includes('Calc')) btn.classList.add('text-bestie'), btn.classList.remove('text-gray-400');
+                if(viewName === 'profile' && btn.innerText.includes('Perfil')) btn.classList.add('text-bestie'), btn.classList.remove('text-gray-400');
             });
 
             if(viewName === 'recipes') {
-                // Wait for DOM update
-                setTimeout(() => {
-                    if(filter) {
-                        // Find button matching filter and click it essentially
-                         const btns = document.querySelectorAll('.cat-btn');
-                         let targetBtn = btns[0]; // default all
-                         btns.forEach(b => {
-                            if(filter === 'sos-formiga' && b.innerText.includes('SOS')) targetBtn = b;
-                            if(filter === 'fim-de-semana' && b.innerText.includes('Fds')) targetBtn = b;
-                         });
-                         filterRecipes(filter, targetBtn);
-                    } else {
-                        renderRecipes('all');
-                    }
-                }, 0);
+                renderRecipes('all');
             }
         }
 
-        function openInfo(type) {
-            const data = infoCardsData[type];
-            if(!data) return;
-
-            const modal = document.getElementById('info-modal');
-            const content = document.getElementById('info-content');
-
-            content.innerHTML = `
-                <div class="text-center mb-4">
-                    <h2 class="${data.color} text-xl font-bold mb-1">${data.title}</h2>
-                    <div class="h-1 w-12 bg-gray-100 rounded-full mx-auto"></div>
-                </div>
-                ${data.content}
-            `;
-            
-            modal.classList.remove('hidden');
-        }
-
-        function closeInfoModal() {
-            document.getElementById('info-modal').classList.add('hidden');
-        }
-
-        function filterRecipes(category, btnElement) {
-            // Visual Update Buttons
+        function filterRecipes(tag, btnElement) {
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 btn.classList.remove('bg-bestie', 'text-white', 'shadow-md');
-                btn.classList.add('bg-white', 'text-gray-500', 'border');
+                btn.classList.add('bg-white', 'text-gray-500', 'border', 'hover:text-bestie');
             });
-            btnElement.classList.remove('bg-white', 'text-gray-500', 'border');
+            btnElement.classList.remove('bg-white', 'text-gray-500', 'border', 'hover:text-bestie');
             btnElement.classList.add('bg-bestie', 'text-white', 'shadow-md');
 
-            renderRecipes(category);
+            renderRecipes(tag);
         }
 
-        function renderRecipes(category) {
+        function renderRecipes(filterTag) {
             const grid = document.getElementById('recipe-grid');
             if(!grid) return;
 
             grid.innerHTML = '';
             
-            const filtered = category === 'all' ? recipes : recipes.filter(r => r.category === category);
+            // Check if recipe tags array includes the selected filter tag
+            const filtered = filterTag === 'all' 
+                ? recipes 
+                : recipes.filter(r => r.tags && r.tags.includes(filterTag));
 
             if(filtered.length === 0) {
                 grid.innerHTML = `
-                    <div class="text-center py-10">
-                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-300 text-2xl">
-                            <i class="fa-solid fa-cookie-bite"></i>
+                    <div class="text-center py-10 flex flex-col items-center">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3 text-gray-300">
+                            <i class="fa-solid fa-cookie-bite text-2xl"></i>
                         </div>
-                        <p class="text-gray-400 font-medium text-sm">Nenhuma receitinha nessa categoria ainda!</p>
+                        <p class="text-gray-400 font-medium">Nenhuma receitinha nessa categoria :(</p>
+                        <p class="text-gray-300 text-xs mt-1">Tente outro filtro!</p>
                     </div>`;
                 return;
             }
 
-            filtered.forEach((recipe, index) => {
+            filtered.forEach(recipe => {
                 const card = document.createElement('div');
-                card.className = "bg-white rounded-2xl p-3 shadow-sm border border-pink-50 flex gap-4 hover:border-pink-200 transition cursor-pointer fade-in";
-                card.style.animationDelay = `${index * 0.05}s`;
+                card.className = "bg-white rounded-2xl p-3 shadow-sm border border-pink-50 flex gap-4 hover:border-pink-200 transition cursor-pointer";
                 card.onclick = () => openRecipe(recipe.id);
                 
                 card.innerHTML = `
-                    <div class="w-24 h-24 rounded-xl bg-gray-100 flex-shrink-0 overflow-hidden relative group">
-                        <img src="${recipe.image}" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" alt="${recipe.title}">
+                    <div class="w-24 h-24 rounded-xl bg-gray-100 flex-shrink-0 overflow-hidden">
+                        <img src="${recipe.image}" class="w-full h-full object-cover" alt="${recipe.title}">
                     </div>
-                    <div class="flex-1 flex flex-col justify-center py-1">
+                    <div class="flex-1 flex flex-col justify-center">
                         <div class="flex justify-between items-start">
-                            <h3 class="font-bold text-gray-800 leading-tight text-sm mb-1">${recipe.title}</h3>
+                            <h3 class="font-bold text-gray-800 leading-tight line-clamp-2">${recipe.title}</h3>
+                            <i class="fa-regular fa-bookmark text-gray-300"></i>
                         </div>
-                        <div class="flex gap-2 mb-2">
-                             <span class="text-[10px] text-bestie font-bold bg-pink-50 px-2 py-0.5 rounded-md border border-pink-100">${recipe.calories} kcal</span>
+                        <div class="flex flex-wrap gap-1 mt-1.5">
+                            <span class="text-[10px] text-bestie font-bold bg-pink-50 px-2 py-0.5 rounded">${recipe.calories} kcal</span>
+                            <span class="text-[10px] text-gray-500 bg-gray-100 px-2 py-0.5 rounded">${recipe.displayCategory}</span>
                         </div>
-                        <div class="mt-auto flex items-center gap-3 text-[10px] text-gray-400 font-medium">
+                        <div class="mt-auto flex items-center gap-3 text-xs text-gray-400">
                             <span class="flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${recipe.time}</span>
                             <span class="flex items-center gap-1"><i class="fa-solid fa-list-ul"></i> ${recipe.ingredients.length} ingr.</span>
                         </div>
                     </div>
                     <div class="flex items-center justify-center pr-1">
-                        <div class="w-8 h-8 rounded-full bg-gray-50 text-gray-300 group-hover:bg-bestie group-hover:text-white transition flex items-center justify-center">
+                        <button class="w-8 h-8 rounded-full bg-pink-50 text-bestie hover:bg-bestie hover:text-white transition flex items-center justify-center">
                             <i class="fa-solid fa-chevron-right text-xs"></i>
-                        </div>
+                        </button>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -636,37 +682,33 @@
             const recipe = recipes.find(r => r.id === id);
             if(!recipe) return;
 
-            // Fill Data
             document.getElementById('modal-img').src = recipe.image;
-            document.getElementById('modal-tag').innerText = recipe.category === 'sos-formiga' ? 'SOS Formiga' : recipe.category.toUpperCase();
+            document.getElementById('modal-tag').innerText = recipe.displayCategory;
             document.getElementById('modal-title').innerText = recipe.title;
             document.getElementById('modal-cal').innerText = recipe.calories;
             document.getElementById('modal-time').innerText = recipe.time;
+            document.getElementById('modal-difficulty').innerText = recipe.difficulty || "Fácil";
+            document.getElementById('modal-yield').innerText = recipe.yield || "1 porção";
+            document.getElementById('modal-desc').innerText = recipe.description || "";
 
             const ingList = document.getElementById('modal-ingredients');
-            ingList.innerHTML = recipe.ingredients.map(ing => `
-                <li class="flex items-start gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100">
-                    <span class="w-1.5 h-1.5 rounded-full bg-bestie mt-2 flex-shrink-0"></span>
-                    <span class="leading-snug">${ing}</span>
-                </li>`).join('');
+            ingList.innerHTML = recipe.ingredients.map(ing => `<li class="flex items-start gap-2"><span class="w-1.5 h-1.5 rounded-full bg-bestie mt-1.5 flex-shrink-0"></span>${ing}</li>`).join('');
 
             const instList = document.getElementById('modal-instructions');
             instList.innerHTML = recipe.instructions.map((step, idx) => `
-                <div class="flex gap-4 relative">
-                    <div class="absolute -left-[27px] top-0 w-3 h-3 rounded-full bg-pink-200 border-2 border-white ring-1 ring-pink-100"></div>
-                    <p class="leading-relaxed text-gray-600"><span class="font-bold text-bestie mr-1">Passo ${idx + 1}:</span> ${step}</p>
+                <div class="flex gap-3">
+                    <div class="w-6 h-6 rounded-full bg-pink-100 text-bestie text-xs font-bold flex items-center justify-center flex-shrink-0">${idx + 1}</div>
+                    <p class="leading-snug">${step}</p>
                 </div>
             `).join('');
 
-            // Animation
             const modal = document.getElementById('recipe-modal');
             const panel = document.getElementById('modal-panel');
             
             modal.classList.remove('hidden');
-            // Small delay to allow display:block to apply before transform
-            requestAnimationFrame(() => {
+            setTimeout(() => {
                 panel.classList.remove('translate-y-full');
-            });
+            }, 10);
         }
 
         function closeRecipeModal() {
@@ -679,9 +721,7 @@
             }, 300);
         }
 
-        // Init App
         window.addEventListener('DOMContentLoaded', init);
-
     </script>
 </body>
 </html>
