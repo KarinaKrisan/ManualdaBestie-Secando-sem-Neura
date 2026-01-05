@@ -1143,12 +1143,85 @@
                 </div>
             `,
             calculator: `
-                 <div class="fade-in text-center pt-10">
-                    <div class="w-16 h-16 bg-pink-100 text-bestie rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fa-solid fa-calculator text-2xl"></i>
+                 <div class="fade-in pb-20 pt-6">
+                    <div class="mb-6 text-center">
+                        <div class="w-16 h-16 bg-pink-100 text-bestie rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                            <i class="fa-solid fa-wand-magic-sparkles text-2xl"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">Calculadora Mágica ✨</h2>
+                        <p class="text-gray-500 mt-2 text-sm">Descubra suas metas ideais!</p>
                     </div>
-                    <h2 class="text-xl font-bold text-gray-800">Calculadora Bestie</h2>
-                    <p class="text-gray-500 mt-2">Em breve: Calcule seu IMC e Macros!</p>
+
+                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-pink-100 space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Idade</label>
+                                <input type="number" id="calc-age" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition" placeholder="Ex: 25">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Peso (kg)</label>
+                                <input type="number" id="calc-weight" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition" placeholder="Ex: 60">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Altura (cm)</label>
+                            <input type="number" id="calc-height" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition" placeholder="Ex: 165">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Objetivo</label>
+                            <select id="calc-goal" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition text-gray-600">
+                                <option value="perder">Secar (Perder Peso)</option>
+                                <option value="manter">Manter Peso</option>
+                                <option value="ganhar">Ganhar Massa (Hipertrofia)</option>
+                            </select>
+                        </div>
+
+                        <button onclick="generatePlan()" id="plan-btn" class="w-full mt-4 bg-bestie text-white py-3 rounded-xl font-bold shadow-lg shadow-pink-200 hover:scale-[1.02] transition active:scale-95">
+                            Gerar Plano Personalizado ✨
+                        </button>
+                    </div>
+
+                    <div id="plan-result" class="hidden mt-6 space-y-4">
+                        <div class="bg-gradient-to-r from-bestie to-pink-400 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-10 -mt-10"></div>
+                            
+                            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-bullseye"></i> Sua Meta Diária
+                            </h3>
+                            
+                            <div class="text-4xl font-bold mb-1" id="plan-calories">0000</div>
+                            <div class="text-pink-100 text-sm mb-4">kcal / dia</div>
+                            
+                            <div class="flex gap-2 text-center">
+                                <div class="bg-white/20 backdrop-blur rounded-xl p-2 flex-1">
+                                    <span class="block text-xs text-pink-100">Prot</span>
+                                    <span class="font-bold" id="plan-protein">0g</span>
+                                </div>
+                                <div class="bg-white/20 backdrop-blur rounded-xl p-2 flex-1">
+                                    <span class="block text-xs text-pink-100">Carb</span>
+                                    <span class="font-bold" id="plan-carbs">0g</span>
+                                </div>
+                                <div class="bg-white/20 backdrop-blur rounded-xl p-2 flex-1">
+                                    <span class="block text-xs text-pink-100">Gord</span>
+                                    <span class="font-bold" id="plan-fats">0g</span>
+                                </div>
+                            </div>
+                            <div class="mt-4 text-xs text-center text-pink-100 bg-black/10 rounded-lg p-1" id="plan-bmi">IMC: 00.0</div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl p-5 border border-purple-100 shadow-sm">
+                            <h4 class="font-bold text-purple-600 mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-lightbulb"></i> Dica da Bestie
+                            </h4>
+                            <p class="text-sm text-gray-600" id="plan-tip">...</p>
+                        </div>
+
+                        <div class="bg-yellow-50 rounded-2xl p-5 border border-yellow-100 shadow-sm text-center">
+                            <p class="text-sm text-gray-600 italic font-medium" id="plan-quote">"..."</p>
+                        </div>
+                    </div>
                 </div>
             `,
             profile: `
