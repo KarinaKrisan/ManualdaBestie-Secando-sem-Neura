@@ -198,6 +198,16 @@
         // --- GEMINI API SETUP ---
         const apiKey = ""; // Environment will provide key
 
+        // --- USER PROFILE STATE ---
+        // Load from storage or default
+        let userProfile = JSON.parse(localStorage.getItem('bestieProfile')) || {
+            name: 'Bestie',
+            age: '',
+            weight: '',
+            height: '',
+            goal: 'perder'
+        };
+
         async function callGemini(ingredients) {
             const prompt = `Você é a 'Bestie Fit', uma chef especialista em receitas saudáveis, práticas e com poucas calorias para o aplicativo 'Manual da Bestie'. 
             Crie uma receita criativa e saudável (fit/low carb/proteica) usando OBRIGATORIAMENTE estes ingredientes principais: ${ingredients}. Você pode sugerir temperos básicos extras.
@@ -341,7 +351,8 @@
         const waterGoal = 10; // 2.5L approx (10 x 250ml)
 
         const recipes = [
-            // --- NOVAS RECEITAS ADICIONADAS (Lote 2) ---
+            // ... (All recipes from previous code remain unchanged) ...
+             // --- NOVAS RECEITAS ADICIONADAS (Lote 2) ---
             {
                 id: 40,
                 title: "Sanduíche de peru mediterrâneo",
@@ -960,8 +971,6 @@
             }
         ];
 
-        // --- FUNCTIONS ---
-
         const views = {
             home: `
                 <div class="fade-in space-y-6">
@@ -1049,7 +1058,7 @@
                         <button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition">
                             <i class="fa-solid fa-arrow-left"></i>
                         </button>
-                        <h2 class="text-2xl font-bold text-gray-800">Fim de Semana 🍕</h2>
+                        <h2 class="text-2xl font-bold text-gray-800">Fim de Semana (Sábado e Domingo) 🍕</h2>
                     </div>
                     <div class="bg-white rounded-3xl p-6 shadow-sm border border-pink-100 space-y-4">
                         <div class="bg-purple-50 rounded-xl p-4 border border-purple-100">
@@ -1427,19 +1436,69 @@
                 </div>
             `,
             profile: `
-                <div class="fade-in text-center pt-10">
-                    <div class="w-20 h-20 bg-gray-200 rounded-full mx-auto mb-4 overflow-hidden border-4 border-white shadow-md">
-                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Bestie" alt="Profile" />
+                <div class="fade-in pb-20 pt-6">
+                    <div class="mb-6 text-center">
+                        <div class="w-20 h-20 bg-pink-100 rounded-full mx-auto mb-4 border-4 border-white shadow-md overflow-hidden">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Bestie" id="profile-avatar" alt="Profile" />
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">Seu Perfil 💖</h2>
                     </div>
-                    <h2 class="text-xl font-bold text-gray-800">Bestie Fit</h2>
-                    <p class="text-bestie font-medium">Membro Premium</p>
+                    
+                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-pink-100 space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Nome / Apelido</label>
+                            <input type="text" id="profile-name" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Idade</label>
+                                <input type="number" id="profile-age" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Peso (kg)</label>
+                                <input type="number" id="profile-weight" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Altura (cm)</label>
+                            <input type="number" id="profile-height" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Objetivo Principal</label>
+                            <select id="profile-goal" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition text-gray-600">
+                                <option value="perder">Secar (Perder Peso)</option>
+                                <option value="manter">Manter Peso</option>
+                                <option value="ganhar">Ganhar Massa (Hipertrofia)</option>
+                            </select>
+                        </div>
+
+                        <button onclick="saveProfile()" class="w-full mt-4 bg-bestie text-white py-3 rounded-xl font-bold shadow-lg shadow-pink-200 hover:scale-[1.02] transition active:scale-95">
+                            Salvar Dados
+                        </button>
+                    </div>
                 </div>
             `
         };
 
         function init() {
-            navigate('recipes'); 
-            renderRecipes('all');
+            navigate('home'); // Starts at home
+            // We don't render recipes immediately since we are not on recipes page
+        }
+
+        function saveProfile() {
+            const name = document.getElementById('profile-name').value;
+            const age = document.getElementById('profile-age').value;
+            const weight = document.getElementById('profile-weight').value;
+            const height = document.getElementById('profile-height').value;
+            const goal = document.getElementById('profile-goal').value;
+
+            userProfile = { name, age, weight, height, goal };
+            localStorage.setItem('bestieProfile', JSON.stringify(userProfile));
+            
+            // Update Avatar
+            document.getElementById('profile-avatar').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`;
+            
+            alert('Perfil salvo com sucesso! 💖');
         }
 
         function navigate(viewName) {
@@ -1450,6 +1509,28 @@
             } else {
                 console.error(`View "${viewName}" not found!`);
                 return;
+            }
+
+            // View Specific Logic
+            if(viewName === 'profile') {
+                setTimeout(() => {
+                    document.getElementById('profile-name').value = userProfile.name || '';
+                    document.getElementById('profile-age').value = userProfile.age || '';
+                    document.getElementById('profile-weight').value = userProfile.weight || '';
+                    document.getElementById('profile-height').value = userProfile.height || '';
+                    document.getElementById('profile-goal').value = userProfile.goal || 'perder';
+                    document.getElementById('profile-avatar').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${userProfile.name || 'Bestie'}`;
+                }, 0);
+            }
+            
+            if(viewName === 'calculator') {
+                 setTimeout(() => {
+                    // Pre-fill calculator if profile data exists
+                    if(userProfile.age) document.getElementById('calc-age').value = userProfile.age;
+                    if(userProfile.weight) document.getElementById('calc-weight').value = userProfile.weight;
+                    if(userProfile.height) document.getElementById('calc-height').value = userProfile.height;
+                    if(userProfile.goal) document.getElementById('calc-goal').value = userProfile.goal;
+                }, 0);
             }
 
             // Update Nav State
@@ -1702,6 +1783,66 @@
 
             btn.disabled = false;
             btn.innerHTML = `<span>Gerar Treino Agora</span> <i class="fa-solid fa-fire"></i>`;
+        }
+
+        async function generateAIRecipe() {
+            const input = document.getElementById('ai-ingredients');
+            const btn = document.getElementById('generate-btn');
+            const resultDiv = document.getElementById('ai-result');
+            const cardDiv = document.getElementById('ai-recipe-card');
+
+            if (!input.value.trim()) return;
+
+            // Loading State
+            btn.disabled = true;
+            btn.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div> Criando...`;
+            resultDiv.classList.add('hidden');
+
+            const recipeData = await callGemini(input.value);
+
+            if (recipeData) {
+                // Assign a temporary random ID
+                recipeData.id = 999; 
+
+                // Render Card (similar to renderRecipes but customized)
+                cardDiv.innerHTML = `
+                    <div class="bg-white rounded-3xl p-5 shadow-lg border border-pink-100 overflow-hidden relative">
+                        <div class="absolute top-0 right-0 bg-bestie text-white text-xs font-bold px-3 py-1 rounded-bl-xl">
+                            IA ✨
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">${recipeData.title}</h3>
+                        <p class="text-sm text-gray-500 italic mb-4">"${recipeData.description}"</p>
+                        
+                        <div class="flex gap-4 text-xs text-gray-500 mb-4 bg-pink-50 p-3 rounded-xl">
+                            <span class="flex items-center gap-1"><i class="fa-solid fa-fire text-bestie"></i> ${recipeData.calories} kcal</span>
+                            <span class="flex items-center gap-1"><i class="fa-regular fa-clock text-bestie"></i> ${recipeData.time}</span>
+                            <span class="flex items-center gap-1"><i class="fa-solid fa-utensils text-bestie"></i> ${recipeData.difficulty}</span>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="font-bold text-gray-800 mb-2 text-sm flex items-center gap-2"><i class="fa-solid fa-basket-shopping text-bestie"></i> Ingredientes</h4>
+                            <ul class="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                                ${recipeData.ingredients.map(i => `<li>${i}</li>`).join('')}
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold text-gray-800 mb-2 text-sm flex items-center gap-2"><i class="fa-solid fa-spoon text-bestie"></i> Modo de Preparo</h4>
+                            <ol class="text-sm text-gray-600 space-y-2 list-decimal pl-4">
+                                ${recipeData.instructions.map(i => `<li>${i}</li>`).join('')}
+                            </ol>
+                        </div>
+                    </div>
+                `;
+                resultDiv.classList.remove('hidden');
+                resultDiv.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                alert("Ops! Ocorreu um erro ao criar a receita. Tente novamente!");
+            }
+
+            // Reset Button
+            btn.disabled = false;
+            btn.innerHTML = `<span>Criar Outra Receita</span> <i class="fa-solid fa-wand-magic-sparkles"></i>`;
         }
 
         window.addEventListener('DOMContentLoaded', init);
