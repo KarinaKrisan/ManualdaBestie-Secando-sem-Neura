@@ -51,6 +51,23 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        
+        /* Loading Animation Styles */
+        .typing-indicator span {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: #fb7185;
+            border-radius: 50%;
+            animation: typing 1s infinite;
+            margin: 0 2px;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
     </style>
 </head>
 <body class="text-gray-700 pb-20">
@@ -175,10 +192,272 @@
     </nav>
 
     <script>
+        // --- GEMINI API SETUP ---
+        const apiKey = ""; // Environment will provide key
+
+        async function callGemini(ingredients) {
+            const prompt = `Você é a 'Bestie Fit', uma chef especialista em receitas saudáveis, práticas e com poucas calorias para o aplicativo 'Manual da Bestie'. 
+            Crie uma receita criativa e saudável (fit/low carb/proteica) usando OBRIGATORIAMENTE estes ingredientes principais: ${ingredients}. Você pode sugerir temperos básicos extras.
+            
+            IMPORTANTE: Responda APENAS com um objeto JSON válido (sem markdown, sem \`\`\`json) seguindo exatamente esta estrutura:
+            {
+                "title": "Nome Criativo da Receita",
+                "calories": 000 (apenas numero),
+                "time": "00 min",
+                "difficulty": "Fácil",
+                "yield": "1 ou 2 porções",
+                "description": "Uma descrição curta, animada e motivadora estilo 'bestie'",
+                "ingredients": ["ingrediente 1", "ingrediente 2"],
+                "instructions": ["passo 1", "passo 2", "passo 3"],
+                "category": "almoco" (escolha entre: cafe, almoco, jantar, lanche, doces)
+            }`;
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseMimeType: "application/json"
+                }
+            };
+
+            try {
+                // Retry logic (simple version)
+                let response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error('Erro na API');
+
+                const data = await response.json();
+                const text = data.candidates[0].content.parts[0].text;
+                return JSON.parse(text);
+
+            } catch (error) {
+                console.error("Erro Gemini:", error);
+                return null;
+            }
+        }
+
         // --- DATA ---
         // Tags: 'cafe', 'almoco', 'jantar', 'lanche', 'vegano', 'vegetariano', 'proteina', 'lowcarb', 'lowfat', 'zeroacucar', 'lowcal', 'simples', 'rapido'
         
         const recipes = [
+            // --- NOVAS RECEITAS DE CAFÉ DA MANHÃ ---
+            {
+                id: 30,
+                title: "Muffins de proteína (Salgados)",
+                displayCategory: "Café Proteico",
+                tags: ['cafe', 'lanche', 'proteina', 'lowcal', 'lowcarb', 'simples'],
+                calories: 41,
+                time: "35 min",
+                difficulty: "Fácil",
+                yield: "9 porções",
+                description: "Precisando de uma injeção de proteína? Estes muffins salgados são perfeitos para começar o dia bem. Apenas 41 cal por unidade!",
+                image: "https://images.unsplash.com/photo-1623428187969-5da2dcea5ebf?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["1½ tomates", "2 cebolinhas verdes", "Manjericão fresco", "3 ovos", "2 claras de ovo", "Sal e pimenta"],
+                instructions: ["Pique tomates, cebolinha e manjericão.", "Misture ovos e claras, tempere.", "Distribua em formas, adicione os vegetais e asse a 175°C por 25 min."]
+            },
+            {
+                id: 29,
+                title: "Muffin de banana e chocolate",
+                displayCategory: "Doce Fit",
+                tags: ['cafe', 'lanche', 'doces', 'vegetariano', 'simples', 'lowcal'],
+                calories: 152,
+                time: "25 min",
+                difficulty: "Fácil",
+                yield: "9 porções",
+                description: "Energia da banana com a alegria do chocolate. Perfeito para um café da manhã sem culpa.",
+                image: "https://images.unsplash.com/photo-1607958996333-41aef7caefaa?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["Mel (20g)", "1 ovo", "Farinha integral (165g)", "Fermento", "Chocolate meio amargo (20g)", "4 bananas maduras"],
+                instructions: ["Esmague bananas, bata com ovo e mel.", "Junte farinha e fermento.", "Coloque nas formas, salpique chocolate e asse a 180°C por 20 min."]
+            },
+            {
+                id: 28,
+                title: "Ovos mexidos com espinafre e feta",
+                displayCategory: "Café Low Carb",
+                tags: ['cafe', 'almoco', 'vegetariano', 'proteina', 'lowcarb', 'simples', 'rapido'],
+                calories: 546,
+                time: "10 min",
+                difficulty: "Fácil",
+                yield: "1 porção",
+                description: "Simples, gostoso e saudável. Uma versão apetitosa dos ovos mexidos tradicionais.",
+                image: "https://images.unsplash.com/photo-1510629918615-10775139900e?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["1 tomate", "Espinafre fresco (40g)", "Óleo de coco", "3 ovos", "Queijo feta light (100g)"],
+                instructions: ["Refogue tomate e espinafre no óleo de coco.", "Adicione ovos batidos e temperados.", "Quando firmar, esmigalhe o feta por cima."]
+            },
+            {
+                id: 27,
+                title: "Triguilho com framboesas",
+                displayCategory: "Café Energia",
+                tags: ['cafe', 'vegetariano', 'simples', 'rapido'],
+                calories: 467,
+                time: "10 min",
+                difficulty: "Fácil",
+                yield: "1 porção",
+                description: "Comece o dia com plena saciedade. Pode guardar para o dia seguinte e ganhar minutos de sono!",
+                image: "https://images.unsplash.com/photo-1517673132405-a56a62b18caf?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["Iogurte grego (190g)", "Café espresso em pó", "Adoçante", "Triguilho (40g)", "Amêndoas (15g)", "Framboesas"],
+                instructions: ["Prepare o triguilho conforme embalagem.", "Pique amêndoas.", "Misture tudo, exceto framboesas. Use-as para decorar."]
+            },
+            {
+                id: 26,
+                title: "Rabanada de morango",
+                displayCategory: "Café Especial",
+                tags: ['cafe', 'vegetariano', 'doces', 'simples', 'rapido'],
+                calories: 260,
+                time: "10 min",
+                difficulty: "Fácil",
+                yield: "2 porções",
+                description: "Um clássico! Com morangos frescos e canela, fica ainda mais gostosa e saudável.",
+                image: "https://images.unsplash.com/photo-1484723091739-30a097e8f929?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["2 ovos", "Canela", "Pão integral (4 fatias)", "Morango (100g)", "Leite desnatado (80mL)"],
+                instructions: ["Bata ovos, leite e canela.", "Passe o pão na mistura e toste na frigideira.", "Cubra com morangos esmagados."]
+            },
+            {
+                id: 25,
+                title: "Sanduíche de tomate e ovos",
+                displayCategory: "Café Prático",
+                tags: ['cafe', 'almoco', 'vegetariano', 'proteina', 'normal'],
+                calories: 240,
+                time: "15 min",
+                difficulty: "Normal",
+                yield: "2 porções",
+                description: "Perfeito para levar. Proporciona saciedade e mantém as calorias sob controle.",
+                image: "https://images.unsplash.com/photo-1525351484163-7529414395d8?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["1 ovo", "Alcaparra", "2 tomates", "Iogurte grego (100g)", "Pão integral (4 fatias)", "Alface e manjericão"],
+                instructions: ["Cozinhe os ovos, pique e misture com iogurte e alcaparras.", "Toste o pão.", "Monte com a pasta de ovos e salada."]
+            },
+
+            // --- RECEITAS ANTERIORES ---
+            {
+                id: 16,
+                title: "Mingau de aveia chocolate e morango",
+                displayCategory: "Café Vegano",
+                tags: ['cafe', 'vegano', 'vegetariano', 'doces', 'simples'],
+                calories: 389,
+                time: "10 min",
+                difficulty: "Fácil",
+                yield: "1 porção",
+                description: "Café da manhã perfeito para quem adora um doce! A aveia dá saciedade e a banana adoça naturalmente.",
+                image: "https://images.unsplash.com/photo-1517093157656-b9ecdb90eb11?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["Banana média (150 g)", "Aveia (40 g)", "Leite de amêndoa sem açúcar (120 mL)", "Cacau em pó (15 g)", "Morango (60 g)"],
+                instructions: ["Esmague a banana e aqueça com a aveia, leite e cacau.", "Cozinhe por 3 min mexendo sempre.", "Sirva com morangos picados."]
+            },
+            {
+                id: 17,
+                title: "Cereal crocante de canela",
+                displayCategory: "Café/Lanche",
+                tags: ['cafe', 'lanche', 'vegano', 'vegetariano', 'lowcarb'],
+                calories: 455,
+                time: "85 min",
+                difficulty: "Normal",
+                yield: "4 porções",
+                description: "Não quer abrir mão do cereal crocante? Essa versão caseira é cheia de fibra e promove saciedade.",
+                image: "https://images.unsplash.com/photo-1514733670139-4d87a1941d55?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["Óleo de coco (90 mL)", "Amêndoa triturada (150 g)", "Farinha de linhaça (28 g)", "Canela (3 colheres de chá)", "Adoçante e sal a gosto"],
+                instructions: ["Misture o óleo derretido com ingredientes secos formando uma massa. Gele por 1h.", "Abra a massa, corte, pincele óleo e asse a 150°C por 20 min.", "Espere esfriar para ficar crocante."]
+            },
+            {
+                id: 18,
+                title: "Overnight de amêndoa e framboesa",
+                displayCategory: "Café Prático",
+                tags: ['cafe', 'vegano', 'vegetariano', 'simples', 'zeroacucar'],
+                calories: 286,
+                time: "3h+",
+                difficulty: "Fácil",
+                yield: "1 porção",
+                description: "Prepare na noite anterior! Aveia deixada de molho fica cremosa e deliciosa.",
+                image: "https://images.unsplash.com/photo-1509722747041-616f39b57569?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["Aveia (40 g)", "Amêndoa triturada (10 g)", "Canela e cardamomo", "Leite de amêndoa (100 mL)", "Framboesa (50 g)"],
+                instructions: ["Misture os secos no copo.", "Adicione leite e parte das framboesas.", "Decore com o resto. Deixe na geladeira por no mínimo 3h."]
+            },
+            {
+                id: 19,
+                title: "Mingau de aveia banana e morango",
+                displayCategory: "Café Rápido",
+                tags: ['cafe', 'vegano', 'vegetariano', 'rapido', 'simples', 'lowcal'],
+                calories: 373,
+                time: "8 min",
+                difficulty: "Fácil",
+                yield: "1 porção",
+                description: "Receita de microondas! Doçura natural da banana, sem açúcar extra.",
+                image: "https://images.unsplash.com/photo-1518843875459-f738682238a6?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["Banana média (150 g)", "Aveia (40 g)", "Leite de amêndoa (80 mL)", "Água (60 mL)", "Canela, morango e chia"],
+                instructions: ["Esmague a banana, misture com aveia e líquidos.", "Microondas por 2 min, mexa, mais 30s.", "Sirva com frutas e chia."]
+            },
+            {
+                id: 20,
+                title: "Smoothie verde de espinafre",
+                displayCategory: "Detox",
+                tags: ['lanche', 'vegano', 'vegetariano', 'lowcal', 'rapido', 'simples'],
+                calories: 273,
+                time: "5 min",
+                difficulty: "Fácil",
+                yield: "1 porção",
+                description: "Surpreendentemente gostoso! A combinação de laranja e banana mascara o sabor do espinafre.",
+                image: "https://images.unsplash.com/photo-1610970881699-44a5587cabec?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["Espinafre fresco (50 g)", "Hortelã", "1 banana", "2 laranjas", "Leite de amêndoa (100 mL)"],
+                instructions: ["Lave o espinafre.", "Esprema as laranjas.", "Bata tudo no liquidificador por 2 minutos."]
+            },
+            {
+                id: 21,
+                title: "Cereal crocante de trigo-vermelho",
+                displayCategory: "Café Caseiro",
+                tags: ['cafe', 'vegano', 'vegetariano', 'simples'],
+                calories: 413,
+                time: "15 min",
+                difficulty: "Normal",
+                yield: "1 porção",
+                description: "Faça seu próprio cereal em casa assando flocos de trigo com banana.",
+                image: "https://images.unsplash.com/photo-1595981267035-7b04ca84a82d?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["½ banana", "Óleo de coco", "Leite de amêndoa", "Cranberry", "Xarope de agave", "Flocos de trigo-vermelho (60 g)"],
+                instructions: ["Faça uma pasta com a banana, óleo, agave e trigo.", "Asse a 175°C por 10 min.", "Quebre em pedaços e sirva com leite."]
+            },
+            {
+                id: 22,
+                title: "Bruschetta de avocado",
+                displayCategory: "Lanche Salgado",
+                tags: ['lanche', 'jantar', 'vegano', 'vegetariano', 'simples'],
+                calories: 427,
+                time: "15 min",
+                difficulty: "Fácil",
+                yield: "2 porções",
+                description: "Muito mais que um antepasto! Excelente refeição leve ou entrada refinada.",
+                image: "https://images.unsplash.com/photo-1572656631137-7935297eff55?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["Baguete integral (125 g)", "Azeite", "2 tomates", "Alho e cebola", "1 avocado", "Limão, coentro e temperos"],
+                instructions: ["Asse as fatias de pão com azeite.", "Misture tomate picado, alho, cebola e azeite.", "Misture avocado picado com limão.", "Junte tudo, tempere e cubra os pães."]
+            },
+            {
+                id: 23,
+                title: "Misto quente de batata-doce",
+                displayCategory: "Pré-Treino",
+                tags: ['lanche', 'cafe', 'vegano', 'vegetariano', 'simples'],
+                calories: 303,
+                time: "28 min",
+                difficulty: "Fácil",
+                yield: "3 porções",
+                description: "Use fatias de batata-doce como 'pão'! Recheio energético de pasta de amendoim e banana.",
+                image: "https://images.unsplash.com/photo-1596241772656-e918c5e69317?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["1 batata-doce (150 g)", "1½ bananas", "Pasta de amendoim (80 g)", "Farinha de linhaça"],
+                instructions: ["Corte a batata em fatias e asse por 20 min a 200°C (ou use torradeira).", "Cubra com pasta de amendoim e rodelas de banana.", "Salpique linhaça."]
+            },
+            {
+                id: 24,
+                title: "Geleia de morango com chia",
+                displayCategory: "Doce Fit",
+                tags: ['doces', 'vegano', 'vegetariano', 'lowcal', 'zeroacucar', 'simples'],
+                calories: 12,
+                time: "15 min",
+                difficulty: "Fácil",
+                yield: "20 porções",
+                description: "Sem açúcar refinado e cheia de sabor! A chia ajuda a dar a consistência de geleia.",
+                image: "https://images.unsplash.com/photo-1589114672621-c276378e9f50?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["Morango (400 g)", "Hortelã fresca", "Adoçante a gosto", "Chia (20 g)"],
+                instructions: ["Cozinhe os morangos com hortelã e adoçante.", "Bata com mixer.", "Adicione chia e cozinhe por mais 5 min até engrossar."]
+            },
             {
                 id: 15,
                 title: "Shake de proteína de chocolate",
@@ -524,9 +803,14 @@
             `,
             recipes: `
                 <div class="fade-in">
-                    <div class="mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">Receitinhas 🥗</h2>
-                        <p class="text-gray-500 text-sm">Filtre pelo seu objetivo ou refeição</p>
+                    <div class="mb-6 flex justify-between items-end">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800">Receitinhas 🥗</h2>
+                            <p class="text-gray-500 text-sm">Coma bem sem culpa!</p>
+                        </div>
+                        <button onclick="navigate('chefBestie')" class="bg-gradient-to-r from-bestie to-pink-400 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg shadow-pink-200 hover:scale-105 transition flex items-center gap-2 animate-pulse">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Chef Bestie
+                        </button>
                     </div>
 
                     <!-- Search -->
@@ -566,6 +850,40 @@
                     </div>
                 </div>
             `,
+            chefBestie: `
+                <div class="fade-in pb-20">
+                    <div class="mb-6 flex items-center gap-3">
+                        <button onclick="navigate('recipes')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                        <h2 class="text-2xl font-bold text-gray-800">Chef Bestie ✨</h2>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 border border-pink-100 rounded-3xl p-6 shadow-sm mb-6">
+                        <p class="text-gray-600 text-sm mb-4">Me conte o que você tem na geladeira e eu crio uma receitinha mágica pra você!</p>
+                        
+                        <div class="relative">
+                            <textarea id="ai-ingredients" rows="3" placeholder="Ex: frango, batata doce, brócolis..." class="w-full bg-white border border-pink-200 rounded-2xl p-4 text-sm focus:outline-none focus:border-bestie focus:ring-1 focus:ring-bestie transition placeholder-gray-400 resize-none"></textarea>
+                            <div class="absolute bottom-3 right-3 text-xs text-gray-400">
+                                <i class="fa-solid fa-carrot"></i>
+                            </div>
+                        </div>
+
+                        <button onclick="generateAIRecipe()" id="generate-btn" class="w-full mt-4 bg-gradient-to-r from-bestie to-pink-400 text-white py-3 rounded-xl font-bold shadow-lg shadow-pink-200 hover:scale-[1.02] transition active:scale-95 flex items-center justify-center gap-2">
+                            <span>Criar Receita Mágica</span>
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </button>
+                    </div>
+
+                    <div id="ai-result" class="hidden space-y-4">
+                        <div class="flex items-center gap-2 text-sm text-gray-400 uppercase font-bold tracking-wider mb-2">
+                            <i class="fa-solid fa-star text-yellow-400"></i> Resultado
+                        </div>
+                        <!-- Recipe Card Container -->
+                        <div id="ai-recipe-card"></div>
+                    </div>
+                </div>
+            `,
             calculator: `
                  <div class="fade-in text-center pt-10">
                     <div class="w-16 h-16 bg-pink-100 text-bestie rounded-full flex items-center justify-center mx-auto mb-4">
@@ -601,7 +919,11 @@
                 btn.classList.remove('text-bestie');
                 btn.classList.add('text-gray-400');
                 if(viewName === 'home' && btn.innerText.includes('Início')) btn.classList.add('text-bestie'), btn.classList.remove('text-gray-400');
-                if(viewName === 'recipes' && btn.innerText.includes('Receitas')) btn.classList.add('text-bestie'), btn.classList.remove('text-gray-400');
+                // Highlight Recipes icon for both recipes and chefBestie view
+                if((viewName === 'recipes' || viewName === 'chefBestie') && btn.innerText.includes('Receitas')) {
+                    btn.classList.add('text-bestie');
+                    btn.classList.remove('text-gray-400');
+                }
                 if(viewName === 'calculator' && btn.innerText.includes('Calc')) btn.classList.add('text-bestie'), btn.classList.remove('text-gray-400');
                 if(viewName === 'profile' && btn.innerText.includes('Perfil')) btn.classList.add('text-bestie'), btn.classList.remove('text-gray-400');
             });
@@ -611,6 +933,68 @@
             }
         }
 
+        async function generateAIRecipe() {
+            const input = document.getElementById('ai-ingredients');
+            const btn = document.getElementById('generate-btn');
+            const resultDiv = document.getElementById('ai-result');
+            const cardDiv = document.getElementById('ai-recipe-card');
+
+            if (!input.value.trim()) return;
+
+            // Loading State
+            btn.disabled = true;
+            btn.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div> Criando...`;
+            resultDiv.classList.add('hidden');
+
+            const recipeData = await callGemini(input.value);
+
+            if (recipeData) {
+                // Assign a temporary random ID
+                recipeData.id = 999; 
+                recipeData.image = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600"; // Placeholder generic healthy food
+
+                // Render Card (similar to renderRecipes but customized)
+                cardDiv.innerHTML = `
+                    <div class="bg-white rounded-3xl p-5 shadow-lg border border-pink-100 overflow-hidden relative">
+                        <div class="absolute top-0 right-0 bg-bestie text-white text-xs font-bold px-3 py-1 rounded-bl-xl">
+                            IA ✨
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">${recipeData.title}</h3>
+                        <p class="text-sm text-gray-500 italic mb-4">"${recipeData.description}"</p>
+                        
+                        <div class="flex gap-4 text-xs text-gray-500 mb-4 bg-pink-50 p-3 rounded-xl">
+                            <span class="flex items-center gap-1"><i class="fa-solid fa-fire text-bestie"></i> ${recipeData.calories} kcal</span>
+                            <span class="flex items-center gap-1"><i class="fa-regular fa-clock text-bestie"></i> ${recipeData.time}</span>
+                            <span class="flex items-center gap-1"><i class="fa-solid fa-utensils text-bestie"></i> ${recipeData.difficulty}</span>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="font-bold text-gray-800 mb-2 text-sm flex items-center gap-2"><i class="fa-solid fa-basket-shopping text-bestie"></i> Ingredientes</h4>
+                            <ul class="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                                ${recipeData.ingredients.map(i => `<li>${i}</li>`).join('')}
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold text-gray-800 mb-2 text-sm flex items-center gap-2"><i class="fa-solid fa-spoon text-bestie"></i> Modo de Preparo</h4>
+                            <ol class="text-sm text-gray-600 space-y-2 list-decimal pl-4">
+                                ${recipeData.instructions.map(i => `<li>${i}</li>`).join('')}
+                            </ol>
+                        </div>
+                    </div>
+                `;
+                resultDiv.classList.remove('hidden');
+                resultDiv.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                alert("Ops! Ocorreu um erro ao criar a receita. Tente novamente!");
+            }
+
+            // Reset Button
+            btn.disabled = false;
+            btn.innerHTML = `<span>Criar Outra Receita</span> <i class="fa-solid fa-wand-magic-sparkles"></i>`;
+        }
+
+        // ... existing functions ...
         function filterRecipes(tag, btnElement) {
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 btn.classList.remove('bg-bestie', 'text-white', 'shadow-md');
