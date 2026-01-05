@@ -291,6 +291,51 @@
             }
         }
 
+        async function callGeminiWorkout(data) {
+            const prompt = `Você é a 'Bestie Fit', uma personal trainer animada e motivadora. Crie um treino rápido e eficiente com estas características:
+            - Tempo: ${data.time} minutos
+            - Foco: ${data.focus}
+            - Equipamento: ${data.equipment}
+
+            IMPORTANTE: Responda APENAS com um objeto JSON válido (sem markdown) com esta estrutura:
+            {
+                "title": "Nome Criativo do Treino",
+                "warmup": "Uma frase rápida de aquecimento (Ex: 1 min polichinelos)",
+                "exercises": [
+                    { "name": "Nome do Exercício", "reps": "Ex: 3x 12", "tips": "Dica rápida de execução" },
+                    { "name": "Nome do Exercício 2", "reps": "Ex: 3x 15", "tips": "Dica rápida" }
+                ],
+                "motivation": "Frase final de motivação curta e divertida"
+            }`;
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseMimeType: "application/json"
+                }
+            };
+
+            try {
+                let response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error('Erro na API');
+
+                const data = await response.json();
+                const text = data.candidates[0].content.parts[0].text;
+                return JSON.parse(text);
+
+            } catch (error) {
+                console.error("Erro Gemini Workout:", error);
+                return null;
+            }
+        }
+
         // --- DATA ---
         let waterIntake = 0; // State for water tracking
         const waterGoal = 10; // 2.5L approx (10 x 250ml)
@@ -986,6 +1031,14 @@
                                 </div>
                                 <span class="font-medium text-sm">Economia</span>
                             </button>
+
+                            <!-- Treino -->
+                            <button onclick="navigate('workout')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
+                                <div class="w-12 h-12 rounded-full bg-red-100 text-red-500 flex items-center justify-center group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-dumbbell"></i>
+                                </div>
+                                <span class="font-medium text-sm">Treino</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1318,6 +1371,61 @@
                     </div>
                 </div>
             `,
+            workout: `
+                <div class="fade-in pb-20">
+                    <div class="mb-6 flex items-center gap-3">
+                        <button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                        <h2 class="text-2xl font-bold text-gray-800">Treino da Bestie 🏋️‍♀️</h2>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-red-50 to-pink-50 border border-red-100 rounded-3xl p-6 shadow-sm mb-6">
+                        <p class="text-gray-600 text-sm mb-4">Escolha como você quer treinar hoje e eu monto tudo!</p>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Tempo Disponível</label>
+                                <select id="workout-time" class="w-full bg-white border border-pink-200 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition text-gray-600">
+                                    <option value="15">15 minutos (Rápido)</option>
+                                    <option value="30">30 minutos (Médio)</option>
+                                    <option value="45">45 minutos (Completo)</option>
+                                    <option value="60">60 minutos (Intenso)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Foco do Treino</label>
+                                <select id="workout-focus" class="w-full bg-white border border-pink-200 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition text-gray-600">
+                                    <option value="Full Body">Corpo Todo (Full Body)</option>
+                                    <option value="Legs & Glutes">Pernas e Glúteos</option>
+                                    <option value="Upper Body">Superiores (Braços/Costas)</option>
+                                    <option value="Abs & Cardio">Abdômen e Cardio</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Equipamento</label>
+                                <select id="workout-equip" class="w-full bg-white border border-pink-200 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition text-gray-600">
+                                    <option value="Bodyweight">Só o peso do corpo</option>
+                                    <option value="Dumbbells">Pesos Livres / Halteres</option>
+                                    <option value="Resistance Bands">Elásticos</option>
+                                    <option value="Gym Machine">Máquinas de Academia</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button onclick="generateWorkout()" id="workout-btn" class="w-full mt-6 bg-gradient-to-r from-red-400 to-pink-500 text-white py-3 rounded-xl font-bold shadow-lg shadow-red-200 hover:scale-[1.02] transition active:scale-95 flex items-center justify-center gap-2">
+                            <span>Gerar Treino Agora</span>
+                            <i class="fa-solid fa-fire"></i>
+                        </button>
+                    </div>
+
+                    <div id="workout-result" class="hidden space-y-4">
+                        <div id="workout-card"></div>
+                    </div>
+                </div>
+            `,
             profile: `
                 <div class="fade-in text-center pt-10">
                     <div class="w-20 h-20 bg-gray-200 rounded-full mx-auto mb-4 overflow-hidden border-4 border-white shadow-md">
@@ -1536,6 +1644,64 @@
 
             btn.disabled = false;
             btn.innerHTML = `Gerar Plano Personalizado ✨`;
+        }
+
+        async function generateWorkout() {
+            const time = document.getElementById('workout-time').value;
+            const focus = document.getElementById('workout-focus').value;
+            const equip = document.getElementById('workout-equip').value;
+            
+            const resultContainer = document.getElementById('workout-result');
+            const cardDiv = document.getElementById('workout-card');
+            const btn = document.getElementById('workout-btn');
+
+            btn.disabled = true;
+            btn.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div> Montando Treino...`;
+            resultContainer.classList.add('hidden');
+
+            const workoutData = await callGeminiWorkout({time, focus, equipment: equip});
+
+            if(workoutData) {
+                cardDiv.innerHTML = `
+                    <div class="bg-white rounded-3xl p-5 shadow-lg border border-red-100 overflow-hidden relative">
+                        <div class="absolute top-0 right-0 bg-red-400 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">
+                            Treino IA 🔥
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">${workoutData.title}</h3>
+                        
+                        <div class="bg-red-50 p-3 rounded-xl mb-4 border border-red-100">
+                            <span class="text-xs font-bold text-red-500 uppercase tracking-wider block mb-1">Aquecimento</span>
+                            <p class="text-sm text-gray-700">${workoutData.warmup}</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="font-bold text-gray-800 mb-3 text-sm flex items-center gap-2"><i class="fa-solid fa-dumbbell text-red-400"></i> Exercícios</h4>
+                            <ul class="space-y-3">
+                                ${workoutData.exercises.map(ex => `
+                                    <li class="bg-gray-50 p-3 rounded-xl border border-gray-100">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="font-bold text-gray-700 text-sm">${ex.name}</span>
+                                            <span class="text-xs font-bold bg-white px-2 py-1 rounded text-red-500 border border-red-100">${ex.reps}</span>
+                                        </div>
+                                        <p class="text-xs text-gray-500 italic">${ex.tips}</p>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+
+                        <div class="bg-yellow-50 rounded-xl p-4 text-center border border-yellow-100">
+                            <p class="text-sm text-gray-600 italic font-medium">"${workoutData.motivation}"</p>
+                        </div>
+                    </div>
+                `;
+                resultContainer.classList.remove('hidden');
+                resultContainer.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                alert("Erro ao gerar treino. Tente novamente!");
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = `<span>Gerar Treino Agora</span> <i class="fa-solid fa-fire"></i>`;
         }
 
         window.addEventListener('DOMContentLoaded', init);
