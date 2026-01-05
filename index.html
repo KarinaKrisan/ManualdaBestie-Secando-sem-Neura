@@ -244,7 +244,11 @@
                 if (!response.ok) throw new Error('Erro na API');
 
                 const data = await response.json();
-                const text = data.candidates[0].content.parts[0].text;
+                let text = data.candidates[0].content.parts[0].text;
+                
+                // Clean potential markdown
+                text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                
                 return JSON.parse(text);
 
             } catch (error) {
@@ -292,7 +296,11 @@
                 if (!response.ok) throw new Error('Erro na API');
 
                 const data = await response.json();
-                const text = data.candidates[0].content.parts[0].text;
+                let text = data.candidates[0].content.parts[0].text;
+                
+                // Clean potential markdown
+                text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                
                 return JSON.parse(text);
 
             } catch (error) {
@@ -337,7 +345,11 @@
                 if (!response.ok) throw new Error('Erro na API');
 
                 const data = await response.json();
-                const text = data.candidates[0].content.parts[0].text;
+                let text = data.candidates[0].content.parts[0].text;
+                
+                // Clean potential markdown
+                text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+
                 return JSON.parse(text);
 
             } catch (error) {
@@ -351,8 +363,7 @@
         const waterGoal = 10; // 2.5L approx (10 x 250ml)
 
         const recipes = [
-            // ... (All recipes from previous code remain unchanged) ...
-             // --- NOVAS RECEITAS ADICIONADAS (Lote 2) ---
+            // --- NOVAS RECEITAS ADICIONADAS (Lote 2) ---
             {
                 id: 40,
                 title: "Sanduíche de peru mediterrâneo",
@@ -970,6 +981,8 @@
                 instructions: ["Misture a banana com os ovos e canela.", "Aqueça a frigideira untada.", "Faça discos e doure dos dois lados."]
             }
         ];
+
+        // --- FUNCTIONS ---
 
         const views = {
             home: `
