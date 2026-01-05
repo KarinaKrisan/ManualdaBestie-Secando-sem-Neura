@@ -292,7 +292,9 @@
         }
 
         // --- DATA ---
-        
+        let waterIntake = 0; // State for water tracking
+        const waterGoal = 10; // 2.5L approx (10 x 250ml)
+
         const recipes = [
             // --- NOVAS RECEITAS ADICIONADAS (Lote 2) ---
             {
@@ -945,8 +947,8 @@
                                 </div>
                                 <span class="font-medium text-sm">Receitinhas</span>
                             </button>
-                            <!-- Existing Water (Visual) -->
-                            <button class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
+                            <!-- Water (Visual) -->
+                            <button onclick="navigate('water')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
                                 <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center group-hover:scale-110 transition">
                                     <i class="fa-solid fa-glass-water"></i>
                                 </div>
@@ -976,6 +978,14 @@
                                 </div>
                                 <span class="font-medium text-sm">Trocas</span>
                             </button>
+
+                            <!-- Economia -->
+                            <button onclick="navigate('savings')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
+                                <div class="w-12 h-12 rounded-full bg-yellow-100 text-yellow-500 flex items-center justify-center group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-piggy-bank"></i>
+                                </div>
+                                <span class="font-medium text-sm">Economia</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -991,7 +1001,7 @@
                     <div class="bg-white rounded-3xl p-6 shadow-sm border border-pink-100 space-y-4">
                         <div class="bg-purple-50 rounded-xl p-4 border border-purple-100">
                             <h3 class="font-bold text-purple-700 mb-2">Regra de Ouro</h3>
-                            <p class="text-sm text-gray-600">Escolha <strong>1 refeição livre</strong> no fim de semana (Sábado ou Domingo) para comer o que tem vontade!</p>
+                            <p class="text-sm text-gray-600">Escolha <strong>2 refeições livres</strong> no fim de semana (Sábado ou Domingo) para comer o que tem vontade!</p>
                         </div>
                         <ul class="space-y-3 text-sm text-gray-600">
                             <li class="flex items-start gap-3">
@@ -1007,6 +1017,79 @@
                                 <span>Coma devagar e aproveite cada mordida!</span>
                             </li>
                         </ul>
+                    </div>
+                </div>
+            `,
+            water: `
+                <div class="fade-in pb-20 pt-6">
+                    <div class="mb-6 flex items-center gap-3">
+                        <button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                        <h2 class="text-2xl font-bold text-gray-800">Hidratação 💧</h2>
+                    </div>
+                    
+                    <div class="text-center mb-8">
+                        <div class="relative w-40 h-40 mx-auto mb-4 bg-blue-50 rounded-full flex items-center justify-center border-4 border-white shadow-lg overflow-hidden">
+                            <div id="water-level" class="absolute bottom-0 left-0 w-full bg-blue-400 transition-all duration-500 ease-out" style="height: 0%"></div>
+                            <span id="water-count" class="relative text-3xl font-bold text-blue-600 z-10">0</span>
+                            <span class="relative text-xs text-blue-400 mt-8 -ml-4 z-10">/10</span>
+                        </div>
+                        <p class="text-gray-500 text-sm">Copos de 250ml</p>
+                    </div>
+
+                    <div class="flex justify-center gap-6">
+                        <button onclick="updateWater(-1)" class="w-14 h-14 rounded-full bg-white border border-gray-200 text-gray-400 flex items-center justify-center text-xl shadow-sm hover:scale-105 transition">
+                            <i class="fa-solid fa-minus"></i>
+                        </button>
+                        <button onclick="updateWater(1)" class="w-14 h-14 rounded-full bg-blue-500 text-white flex items-center justify-center text-xl shadow-lg shadow-blue-200 hover:scale-105 transition">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+
+                    <div class="mt-8 bg-blue-50 rounded-2xl p-5 border border-blue-100 mx-4">
+                        <h3 class="font-bold text-blue-800 text-sm mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-circle-info"></i> Por que beber água?
+                        </h3>
+                        <p class="text-xs text-blue-700 leading-relaxed">
+                            A água ajuda a controlar o apetite, melhora a pele e aumenta o metabolismo. Tente beber pelo menos 2.5L por dia!
+                        </p>
+                    </div>
+                </div>
+            `,
+            savings: `
+                <div class="fade-in pb-20">
+                    <div class="mb-6 flex items-center gap-3">
+                        <button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                        <h2 class="text-2xl font-bold text-gray-800">Economia 💰</h2>
+                    </div>
+                    
+                    <div class="bg-yellow-50 border border-yellow-100 rounded-3xl p-6 shadow-sm mb-6">
+                        <h3 class="font-bold text-yellow-700 text-lg mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-star"></i> Dica de Ouro
+                        </h3>
+                        <p class="text-sm text-yellow-800 leading-relaxed">
+                            Para economizar de verdade, compre suplementos em <strong>sites de atacado</strong> ou procure por <strong>cupons de influencers</strong>. 
+                            <br><br>
+                            Para alimentos frescos, vá à <strong>feira local no final do dia</strong> (a "xepa") onde os preços despencam!
+                        </p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="bg-white p-4 rounded-2xl border border-pink-50 flex items-center justify-between">
+                            <span class="text-sm font-medium text-gray-600">Granel</span>
+                            <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-lg">Mais Barato</span>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-pink-50 flex items-center justify-between">
+                            <span class="text-sm font-medium text-gray-600">Marcas de Supermercado</span>
+                            <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-lg">Custo-Benefício</span>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-pink-50 flex items-center justify-between">
+                            <span class="text-sm font-medium text-gray-600">Congelados</span>
+                            <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-lg">Duram Mais</span>
+                        </div>
                     </div>
                 </div>
             `,
@@ -1276,6 +1359,22 @@
 
             if(viewName === 'recipes') {
                 renderRecipes('all');
+            } else if (viewName === 'water') {
+                updateWater(0); // Initialize water display
+            }
+        }
+
+        function updateWater(change) {
+            waterIntake += change;
+            if(waterIntake < 0) waterIntake = 0;
+            if(waterIntake > 10) waterIntake = 10; // Cap at 10 for demo
+
+            const countEl = document.getElementById('water-count');
+            const fillEl = document.getElementById('water-level');
+            
+            if(countEl && fillEl) {
+                countEl.innerText = waterIntake;
+                fillEl.style.height = `${(waterIntake / 10) * 100}%`;
             }
         }
 
@@ -1398,6 +1497,45 @@
             setTimeout(() => {
                 modal.classList.add('hidden');
             }, 300);
+        }
+
+        async function generatePlan() {
+            const age = document.getElementById('calc-age').value;
+            const weight = document.getElementById('calc-weight').value;
+            const height = document.getElementById('calc-height').value;
+            const goal = document.getElementById('calc-goal').value;
+            
+            const resultContainer = document.getElementById('plan-result');
+            const btn = document.getElementById('plan-btn');
+
+            if(!age || !weight || !height) {
+                alert("Preencha todos os campos, bestie!");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div> Calculando...`;
+            resultContainer.classList.add('hidden');
+
+            const planData = await callGeminiPlan({age, weight, height, goal});
+
+            if(planData) {
+                document.getElementById('plan-calories').innerText = planData.calories_target;
+                document.getElementById('plan-protein').innerText = planData.macros.protein;
+                document.getElementById('plan-carbs').innerText = planData.macros.carbs;
+                document.getElementById('plan-fats').innerText = planData.macros.fats;
+                document.getElementById('plan-tip').innerText = planData.tip;
+                document.getElementById('plan-quote').innerText = `"${planData.motivational_quote}"`;
+                document.getElementById('plan-bmi').innerText = `IMC: ${planData.bmi}`;
+
+                resultContainer.classList.remove('hidden');
+                resultContainer.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                alert("Erro ao gerar plano. Tente novamente!");
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = `Gerar Plano Personalizado ✨`;
         }
 
         window.addEventListener('DOMContentLoaded', init);
