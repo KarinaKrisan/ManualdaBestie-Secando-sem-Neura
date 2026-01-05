@@ -95,71 +95,74 @@
     <!-- Recipe Details Modal (Hidden by default) -->
     <div id="recipe-modal" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeRecipeModal()"></div>
-        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl h-[85vh] overflow-y-auto transform transition-transform duration-300 translate-y-full md:max-w-md md:mx-auto md:inset-x-0" id="modal-panel">
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl h-[80vh] overflow-y-auto transform transition-transform duration-300 translate-y-full md:max-w-md md:mx-auto md:inset-x-0" id="modal-panel">
             <!-- Modal Content -->
-            <div class="relative">
-                <div id="modal-image-container" class="h-56 bg-gray-200 relative">
-                    <img id="modal-img" src="" alt="Recipe" class="w-full h-full object-cover rounded-t-3xl">
-                    <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/60 to-transparent"></div>
-                    <button onclick="closeRecipeModal()" class="absolute top-4 right-4 w-8 h-8 bg-white/20 backdrop-blur text-white rounded-full flex items-center justify-center">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
+            <div class="relative p-6">
+                <!-- Close Button -->
+                <button onclick="closeRecipeModal()" class="absolute top-4 right-4 w-8 h-8 bg-gray-100 text-gray-500 rounded-full flex items-center justify-center hover:bg-gray-200 transition z-10">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+                <div class="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-6"></div>
+                
+                <div class="flex justify-between items-start mb-4">
+                    <div class="pr-8">
+                        <span id="modal-tag" class="text-xs font-semibold text-bestie uppercase tracking-wider bg-pink-50 px-2 py-1 rounded-md">Categoria</span>
+                        <h2 id="modal-title" class="text-2xl font-bold text-gray-800 mt-2 leading-tight">Nome da Receita</h2>
+                    </div>
+                    <div class="flex flex-col items-end flex-shrink-0">
+                        <span class="text-lg font-bold text-bestie-dark whitespace-nowrap"><span id="modal-cal">0</span> kcal</span>
+                    </div>
                 </div>
                 
-                <div class="p-6 -mt-6 bg-white rounded-t-3xl relative">
-                    <div class="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-6"></div>
-                    
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <span id="modal-tag" class="text-xs font-semibold text-bestie uppercase tracking-wider bg-pink-50 px-2 py-1 rounded-md">Categoria</span>
-                            <h2 id="modal-title" class="text-2xl font-bold text-gray-800 mt-1 leading-tight">Nome da Receita</h2>
-                        </div>
-                        <div class="flex flex-col items-end">
-                            <span class="text-lg font-bold text-bestie-dark whitespace-nowrap"><span id="modal-cal">0</span> kcal</span>
-                        </div>
-                    </div>
-                    
-                    <p id="modal-desc" class="text-sm text-gray-500 mb-4 italic leading-relaxed">
-                        <!-- Description injected here -->
-                    </p>
+                <p id="modal-desc" class="text-sm text-gray-500 mb-6 italic leading-relaxed">
+                    <!-- Description injected here -->
+                </p>
 
-                    <div class="flex items-center gap-4 text-sm text-gray-500 mb-6 border-y border-pink-50 py-3 justify-between px-2">
-                        <div class="flex items-center gap-1">
-                            <i class="fa-regular fa-clock text-bestie"></i>
-                            <span id="modal-time">0 min</span>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <i class="fa-solid fa-fire text-bestie"></i>
-                            <span id="modal-difficulty">Fácil</span>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <i class="fa-solid fa-user-group text-bestie"></i>
-                            <span id="modal-yield">2 porções</span>
-                        </div>
-                    </div>
-
-                    <div class="mb-6">
-                        <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
-                            <i class="fa-solid fa-basket-shopping text-bestie"></i> Ingredientes
-                        </h3>
-                        <ul id="modal-ingredients" class="space-y-2 text-sm text-gray-600 pl-2">
-                            <!-- JS Inject -->
-                        </ul>
-                    </div>
-
-                    <div class="mb-8">
-                        <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
-                            <i class="fa-solid fa-spoon text-bestie"></i> Modo de Preparo
-                        </h3>
-                        <div id="modal-instructions" class="space-y-4 text-sm text-gray-600">
-                            <!-- JS Inject -->
-                        </div>
-                    </div>
-                    
-                    <button class="w-full py-3 bg-bestie text-white font-semibold rounded-xl shadow-lg shadow-pink-200 hover:bg-bestie-dark transition active:scale-95">
-                        <i class="fa-regular fa-heart mr-2"></i> Salvar nos Favoritos
-                    </button>
+                <!-- Dica de Ouro Container -->
+                <div id="modal-tip-container" class="hidden mb-6 bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                    <h4 class="text-yellow-700 font-bold text-sm mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-star"></i> Dica de Ouro
+                    </h4>
+                    <p id="modal-tip-text" class="text-xs text-yellow-800"></p>
                 </div>
+
+                <div class="flex items-center gap-4 text-sm text-gray-500 mb-6 border-y border-pink-50 py-4 justify-between px-2">
+                    <div class="flex items-center gap-1.5">
+                        <i class="fa-regular fa-clock text-bestie"></i>
+                        <span id="modal-time">0 min</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <i class="fa-solid fa-fire text-bestie"></i>
+                        <span id="modal-difficulty">Fácil</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <i class="fa-solid fa-user-group text-bestie"></i>
+                        <span id="modal-yield">2 porções</span>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-basket-shopping text-bestie"></i> Ingredientes
+                    </h3>
+                    <ul id="modal-ingredients" class="space-y-3 text-sm text-gray-600 pl-2">
+                        <!-- JS Inject -->
+                    </ul>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-spoon text-bestie"></i> Modo de Preparo
+                    </h3>
+                    <div id="modal-instructions" class="space-y-4 text-sm text-gray-600">
+                        <!-- JS Inject -->
+                    </div>
+                </div>
+                
+                <button class="w-full py-3 bg-bestie text-white font-semibold rounded-xl shadow-lg shadow-pink-200 hover:bg-bestie-dark transition active:scale-95 mb-safe">
+                    <i class="fa-regular fa-heart mr-2"></i> Salvar nos Favoritos
+                </button>
             </div>
         </div>
     </div>
@@ -206,7 +209,7 @@
                 "time": "00 min",
                 "difficulty": "Fácil",
                 "yield": "1 ou 2 porções",
-                "description": "Uma descrição curta, animada e motivadora estilo 'bestie'",
+                "description": "Uma descrição curta, animada e motivadora estilo 'bestie'. Se houver uma dica especial, comece com 'Dica:'",
                 "ingredients": ["ingrediente 1", "ingrediente 2"],
                 "instructions": ["passo 1", "passo 2", "passo 3"],
                 "category": "almoco" (escolha entre: cafe, almoco, jantar, lanche, doces)
@@ -240,6 +243,54 @@
             }
         }
 
+        async function callGeminiPlan(userData) {
+            const prompt = `Você é a 'Bestie Fit', uma nutricionista e coach motivacional. Crie um mini plano personalizado com base nestes dados:
+            - Idade: ${userData.age}
+            - Peso: ${userData.weight}kg
+            - Altura: ${userData.height}cm
+            - Objetivo: ${userData.goal}
+
+            IMPORTANTE: Responda APENAS com um objeto JSON válido (sem markdown) com esta estrutura:
+            {
+                "calories_target": "Ex: 1500-1600",
+                "bmi": "Ex: 22.5 (Normal)",
+                "macros": {
+                    "protein": "Ex: 120g",
+                    "carbs": "Ex: 150g",
+                    "fats": "Ex: 50g"
+                },
+                "motivational_quote": "Uma frase curta e inspiradora estilo 'bestie' para motivar.",
+                "tip": "Uma dica de ouro específica para o objetivo selecionado."
+            }`;
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseMimeType: "application/json"
+                }
+            };
+
+            try {
+                let response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error('Erro na API');
+
+                const data = await response.json();
+                const text = data.candidates[0].content.parts[0].text;
+                return JSON.parse(text);
+
+            } catch (error) {
+                console.error("Erro Gemini Plan:", error);
+                return null;
+            }
+        }
+
         // --- DATA ---
         
         const recipes = [
@@ -253,8 +304,7 @@
                 time: "15 min",
                 difficulty: "Normal",
                 yield: "4 porções",
-                description: "Excelente para levar de lanche. Com avocado, peito de peru e molho especial, promove saciedade.",
-                image: "https://images.unsplash.com/photo-1554433607-66b5efe9d304?auto=format&fit=crop&q=80&w=600",
+                description: "Excelente para levar de lanche. Com avocado, peito de peru e molho especial, promove saciedade. Dica: se quiser algo mais crocante, pode colocar as fatias de pão na torradeira.",
                 ingredients: ["Maionese light (25g)", "Extrato de tomate (4 colheres)", "Pão integral (8 fatias)", "Peito de peru (200g)", "Pepino", "Pimentão", "Avocado"],
                 instructions: ["Misture maionese e extrato.", "Passe no pão, adicione peru.", "Adicione vegetais fatiados e avocado.", "Feche e corte ao meio."]
             },
@@ -268,7 +318,6 @@
                 difficulty: "Normal",
                 yield: "2 porções",
                 description: "Energia de alta qualidade para o treino! Ovos mexidos com vegetais refogados e tiras de salmão.",
-                image: "https://images.unsplash.com/photo-1510629918615-10775139900e?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["6 ovos", "1 pimentão", "2 cebolinhas", "Azeite", "Salmão defumado (150g)", "Sal e pimenta"],
                 instructions: ["Refogue pimentão e cebolinha.", "Adicione ovos batidos.", "Quando firmar, misture o salmão em tiras.", "Sirva com cebolinha."]
             },
@@ -281,8 +330,7 @@
                 time: "75 min",
                 difficulty: "Normal",
                 yield: "10 fatias",
-                description: "Diga adeus aos carboidratos com este pão de farinha de amêndoa. Delicioso e sem glúten!",
-                image: "https://images.unsplash.com/photo-1584386161273-0fb6690499b9?auto=format&fit=crop&q=80&w=600",
+                description: "Diga adeus aos carboidratos com este pão de farinha de amêndoa. Delicioso e sem glúten! Dica: usando ervas italianas, você dá ao pão um sabor especial.",
                 ingredients: ["Iogurte integral (50g)", "2 ovos", "Semente de girassol e gergelim", "Azeite", "Chia", "Farinha de amêndoa (200g)", "Ervas"],
                 instructions: ["Misture chia e iogurte.", "Adicione ovos, farinha, sementes e azeite.", "Asse em forma de pão a 170°C por 1 hora."]
             },
@@ -295,8 +343,7 @@
                 time: "12 min",
                 difficulty: "Fácil",
                 yield: "2 porções",
-                description: "Todo mundo adora receitas fáceis! Um rolo de omelete versátil e perfeito para servir.",
-                image: "https://images.unsplash.com/photo-1553531087-b25a0b9a68ab?auto=format&fit=crop&q=80&w=600",
+                description: "Todo mundo adora receitas fáceis! Um rolo de omelete versátil e perfeito para servir. Dica: O rolo de omelete é um ótimo prato para um buffet!",
                 ingredients: ["1 cenoura ralada", "1 cebolinha", "5 ovos", "Sal", "Óleo de gergelim"],
                 instructions: ["Bata ovos com vegetais.", "Cozinhe em frigideira larga.", "Enrole o omelete ainda úmido com espátula.", "Corte em fatias grossas."]
             },
@@ -310,7 +357,6 @@
                 difficulty: "Fácil",
                 yield: "2 porções",
                 description: "Um wrap com toque especial! Apenas 5 ingredientes para um lanche frio e refinado.",
-                image: "https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["1 pimentão", "Cream cheese light (200g)", "Peito de peru (100g)", "Alface romana", "2 tortilhas"],
                 instructions: ["Faça um molho batendo metade do cream cheese com metade do pimentão.", "Monte o wrap com peru, molho e vegetais.", "Enrole e corte em rolinhos."]
             },
@@ -326,7 +372,6 @@
                 difficulty: "Fácil",
                 yield: "2 porções",
                 description: "Quer impressionar no café da manhã? Wraps de morango práticos e deliciosos com um toque refrescante de hortelã.",
-                image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["Morango (125 g)", "Cream cheese light (90 g)", "Aveia (4 colheres)", "Mel (2 colheres)", "Hortelã a gosto", "2 tortilhas/wraps"],
                 instructions: ["Corte os morangos em fatias.", "Espalhe o cream cheese nas tortilhas.", "Adicione morangos, aveia, mel e hortelã.", "Enrole e aproveite!"]
             },
@@ -340,7 +385,6 @@
                 difficulty: "Normal",
                 yield: "4 porções",
                 description: "Totalmente Low Carb! O omelete substitui a massa, recheado com creme de ervilha, cream cheese e salmão defumado.",
-                image: "https://images.unsplash.com/photo-1529006557810-274b9b2eb785?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["Ervilha congelada (50g)", "6 ovos", "Azeite", "Cream cheese light (150g)", "Rúcula", "Salmão defumado (200g)", "Limão"],
                 instructions: ["Frite omeletes finos.", "Amasse ervilhas descongeladas com cream cheese e limão.", "Passe a pasta no omelete, adicione salmão e rúcula.", "Enrole com cuidado."]
             },
@@ -354,7 +398,6 @@
                 difficulty: "Fácil",
                 yield: "3 porções",
                 description: "Pode ser consumido frio ou quente. Prepare na noite anterior para ganhar tempo! Uma delícia leve e proteica.",
-                image: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["Iogurte grego (500g)", "2 ovos", "Pó para pudim (38g)", "Mirtilo (75g)", "Adoçante", "Leite semidesnatado (250mL)"],
                 instructions: ["Bata iogurte, ovos, pó de pudim e leite.", "Misture mirtilos delicadamente.", "Asse a 160°C por 60 min."]
             },
@@ -368,7 +411,6 @@
                 difficulty: "Fácil",
                 yield: "2 porções",
                 description: "Ovos mexidos macios, presunto e espinafre fresco. A refeição perfeita, não só para o brunch de domingo.",
-                image: "https://images.unsplash.com/photo-1556740714-a8395b3bf3ea?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["3 ovos", "Sal e pimenta", "Azeite", "Espinafre baby (25g)", "Presunto (25g)", "Leite integral (1 colher)", "Noz-moscada"],
                 instructions: ["Bata ovos com leite e temperos.", "Refogue o presunto no azeite.", "Adicione os ovos e deixe firmar.", "Junte o espinafre no final."]
             },
@@ -382,7 +424,6 @@
                 difficulty: "Fácil",
                 yield: "2 porções",
                 description: "Ovos mexidos junto com panqueca? Combinação perfeita rica em proteína que promove plena saciedade!",
-                image: "https://images.unsplash.com/photo-1612182062633-99a4632a0531?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["4 ovos", "Aveia (40g)", "Queijo cottage (40g)", "Óleo de coco", "Presunto (40g)", "Ricota (150g)"],
                 instructions: ["Faça massa com aveia, cottage e claras. Frite as panquecas.", "Faça ovos mexidos com as gemas.", "Monte: panqueca, presunto, ricota e ovos."]
             },
@@ -398,7 +439,6 @@
                 difficulty: "Fácil",
                 yield: "9 porções",
                 description: "Precisando de uma injeção de proteína? Estes muffins salgados são perfeitos para começar o dia bem. Apenas 41 cal por unidade!",
-                image: "https://images.unsplash.com/photo-1623428187969-5da2dcea5ebf?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["1½ tomates", "2 cebolinhas verdes", "Manjericão fresco", "3 ovos", "2 claras de ovo", "Sal e pimenta"],
                 instructions: ["Pique tomates, cebolinha e manjericão.", "Misture ovos e claras, tempere.", "Distribua em formas, adicione os vegetais e asse a 175°C por 25 min."]
             },
@@ -412,7 +452,6 @@
                 difficulty: "Fácil",
                 yield: "9 porções",
                 description: "Energia da banana com a alegria do chocolate. Perfeito para um café da manhã sem culpa.",
-                image: "https://images.unsplash.com/photo-1607958996333-41aef7caefaa?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["Mel (20g)", "1 ovo", "Farinha integral (165g)", "Fermento", "Chocolate meio amargo (20g)", "4 bananas maduras"],
                 instructions: ["Esmague bananas, bata com ovo e mel.", "Junte farinha e fermento.", "Coloque nas formas, salpique chocolate e asse a 180°C por 20 min."]
             },
@@ -426,7 +465,6 @@
                 difficulty: "Fácil",
                 yield: "1 porção",
                 description: "Simples, gostoso e saudável. Uma versão apetitosa dos ovos mexidos tradicionais.",
-                image: "https://images.unsplash.com/photo-1510629918615-10775139900e?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["1 tomate", "Espinafre fresco (40g)", "Óleo de coco", "3 ovos", "Queijo feta light (100g)"],
                 instructions: ["Refogue tomate e espinafre no óleo de coco.", "Adicione ovos batidos e temperados.", "Quando firmar, esmigalhe o feta por cima."]
             },
@@ -440,7 +478,6 @@
                 difficulty: "Fácil",
                 yield: "1 porção",
                 description: "Comece o dia com plena saciedade. Pode guardar para o dia seguinte e ganhar minutos de sono!",
-                image: "https://images.unsplash.com/photo-1517673132405-a56a62b18caf?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["Iogurte grego (190g)", "Café espresso em pó", "Adoçante", "Triguilho (40g)", "Amêndoas (15g)", "Framboesas"],
                 instructions: ["Prepare o triguilho conforme embalagem.", "Pique amêndoas.", "Misture tudo, exceto framboesas. Use-as para decorar."]
             },
@@ -453,8 +490,7 @@
                 time: "10 min",
                 difficulty: "Fácil",
                 yield: "2 porções",
-                description: "Um clássico! Com morangos frescos e canela, fica ainda mais gostosa e saudável.",
-                image: "https://images.unsplash.com/photo-1484723091739-30a097e8f929?auto=format&fit=crop&q=80&w=600",
+                description: "Um clássico! Com morangos frescos e canela, fica ainda mais gostosa e saudável. Dica: se não for época de morango, você pode usar outras frutas da sua preferência!",
                 ingredients: ["2 ovos", "Canela", "Pão integral (4 fatias)", "Morango (100g)", "Leite desnatado (80mL)"],
                 instructions: ["Bata ovos, leite e canela.", "Passe o pão na mistura e toste na frigideira.", "Cubra com morangos esmagados."]
             },
@@ -468,7 +504,6 @@
                 difficulty: "Normal",
                 yield: "2 porções",
                 description: "Perfeito para levar. Proporciona saciedade e mantém as calorias sob controle.",
-                image: "https://images.unsplash.com/photo-1525351484163-7529414395d8?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["1 ovo", "Alcaparra", "2 tomates", "Iogurte grego (100g)", "Pão integral (4 fatias)", "Alface e manjericão"],
                 instructions: ["Cozinhe os ovos, pique e misture com iogurte e alcaparras.", "Toste o pão.", "Monte com a pasta de ovos e salada."]
             },
@@ -482,7 +517,6 @@
                 difficulty: "Fácil",
                 yield: "1 porção",
                 description: "Café da manhã perfeito para quem adora um doce! A aveia dá saciedade e a banana adoça naturalmente.",
-                image: "https://images.unsplash.com/photo-1517093157656-b9ecdb90eb11?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["Banana média (150 g)", "Aveia (40 g)", "Leite de amêndoa sem açúcar (120 mL)", "Cacau em pó (15 g)", "Morango (60 g)"],
                 instructions: ["Esmague a banana e aqueça com a aveia, leite e cacau.", "Cozinhe por 3 min mexendo sempre.", "Sirva com morangos picados."]
             },
@@ -496,7 +530,6 @@
                 difficulty: "Normal",
                 yield: "4 porções",
                 description: "Não quer abrir mão do cereal crocante? Essa versão caseira é cheia de fibra e promove saciedade.",
-                image: "https://images.unsplash.com/photo-1514733670139-4d87a1941d55?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["Óleo de coco (90 mL)", "Amêndoa triturada (150 g)", "Farinha de linhaça (28 g)", "Canela (3 colheres de chá)", "Adoçante e sal a gosto"],
                 instructions: ["Misture o óleo derretido com ingredientes secos formando uma massa. Gele por 1h.", "Abra a massa, corte, pincele óleo e asse a 150°C por 20 min.", "Espere esfriar para ficar crocante."]
             },
@@ -510,7 +543,6 @@
                 difficulty: "Fácil",
                 yield: "1 porção",
                 description: "Prepare na noite anterior! Aveia deixada de molho fica cremosa e deliciosa.",
-                image: "https://images.unsplash.com/photo-1509722747041-616f39b57569?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["Aveia (40 g)", "Amêndoa triturada (10 g)", "Canela e cardamomo", "Leite de amêndoa (100 mL)", "Framboesa (50 g)"],
                 instructions: ["Misture os secos no copo.", "Adicione leite e parte das framboesas.", "Decore com o resto. Deixe na geladeira por no mínimo 3h."]
             },
@@ -524,7 +556,6 @@
                 difficulty: "Fácil",
                 yield: "1 porção",
                 description: "Receita de microondas! Doçura natural da banana, sem açúcar extra.",
-                image: "https://images.unsplash.com/photo-1518843875459-f738682238a6?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["Banana média (150 g)", "Aveia (40 g)", "Leite de amêndoa (80 mL)", "Água (60 mL)", "Canela, morango e chia"],
                 instructions: ["Esmague a banana, misture com aveia e líquidos.", "Microondas por 2 min, mexa, mais 30s.", "Sirva com frutas e chia."]
             },
@@ -538,7 +569,6 @@
                 difficulty: "Fácil",
                 yield: "1 porção",
                 description: "Surpreendentemente gostoso! A combinação de laranja e banana mascara o sabor do espinafre.",
-                image: "https://images.unsplash.com/photo-1610970881699-44a5587cabec?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["Espinafre fresco (50 g)", "Hortelã", "1 banana", "2 laranjas", "Leite de amêndoa (100 mL)"],
                 instructions: ["Lave o espinafre.", "Esprema as laranjas.", "Bata tudo no liquidificador por 2 minutos."]
             },
@@ -551,8 +581,7 @@
                 time: "15 min",
                 difficulty: "Normal",
                 yield: "1 porção",
-                description: "Faça seu próprio cereal em casa assando flocos de trigo com banana.",
-                image: "https://images.unsplash.com/photo-1595981267035-7b04ca84a82d?auto=format&fit=crop&q=80&w=600",
+                description: "Faça seu próprio cereal em casa assando flocos de trigo com banana. Dica: já que você está fazendo seu próprio cereal, aproveite para usar a imaginação e usar flocos de coco ou nozes para dar um sabor especial.",
                 ingredients: ["½ banana", "Óleo de coco", "Leite de amêndoa", "Cranberry", "Xarope de agave", "Flocos de trigo-vermelho (60 g)"],
                 instructions: ["Faça uma pasta com a banana, óleo, agave e trigo.", "Asse a 175°C por 10 min.", "Quebre em pedaços e sirva com leite."]
             },
@@ -566,7 +595,6 @@
                 difficulty: "Fácil",
                 yield: "2 porções",
                 description: "Muito mais que um antepasto! Excelente refeição leve ou entrada refinada.",
-                image: "https://images.unsplash.com/photo-1572656631137-7935297eff55?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["Baguete integral (125 g)", "Azeite", "2 tomates", "Alho e cebola", "1 avocado", "Limão, coentro e temperos"],
                 instructions: ["Asse as fatias de pão com azeite.", "Misture tomate picado, alho, cebola e azeite.", "Misture avocado picado com limão.", "Junte tudo, tempere e cubra os pães."]
             },
@@ -579,8 +607,7 @@
                 time: "28 min",
                 difficulty: "Fácil",
                 yield: "3 porções",
-                description: "Use fatias de batata-doce como 'pão'! Recheio energético de pasta de amendoim e banana.",
-                image: "https://images.unsplash.com/photo-1596241772656-e918c5e69317?auto=format&fit=crop&q=80&w=600",
+                description: "Use fatias de batata-doce como 'pão'! Recheio energético de pasta de amendoim e banana. Dica: Em vez de preparar a batata-doce no forno, você pode fazê-la em um torradeira.",
                 ingredients: ["1 batata-doce (150 g)", "1½ bananas", "Pasta de amendoim (80 g)", "Farinha de linhaça"],
                 instructions: ["Corte a batata em fatias e asse por 20 min a 200°C (ou use torradeira).", "Cubra com pasta de amendoim e rodelas de banana.", "Salpique linhaça."]
             },
@@ -593,8 +620,7 @@
                 time: "15 min",
                 difficulty: "Fácil",
                 yield: "20 porções",
-                description: "Sem açúcar refinado e cheia de sabor! A chia ajuda a dar a consistência de geleia.",
-                image: "https://images.unsplash.com/photo-1589114672621-c276378e9f50?auto=format&fit=crop&q=80&w=600",
+                description: "Sem açúcar refinado e cheia de sabor! A chia ajuda a dar a consistência de geleia. Dica: Que tal uma geleia de morango com manga, por exemplo?",
                 ingredients: ["Morango (400 g)", "Hortelã fresca", "Adoçante a gosto", "Chia (20 g)"],
                 instructions: ["Cozinhe os morangos com hortelã e adoçante.", "Bata com mixer.", "Adicione chia e cozinhe por mais 5 min até engrossar."]
             },
@@ -608,7 +634,6 @@
                 difficulty: "Fácil",
                 yield: "2 porções",
                 description: "Shake rápido e delicioso! O cacau em pó dá o sabor e a proteína promove saciedade. Ótima opção pré-treino.",
-                image: "https://images.unsplash.com/photo-1620916297397-a4a5402a3c6c?auto=format&fit=crop&q=80&w=600",
                 ingredients: [
                     "1 banana madura (150 g)",
                     "Água (300 mL)",
@@ -634,7 +659,6 @@
                 difficulty: "Fácil",
                 yield: "1 porção",
                 description: "Leve e proteico, feito com claras pasteurizadas e iogurte. Perfeito para recuperação muscular com baixas calorias.",
-                image: "https://images.unsplash.com/photo-1599458316239-015848c08192?auto=format&fit=crop&q=80&w=600",
                 ingredients: [
                     "Linhaça (5 g)",
                     "Água (1 colher de sopa, 15 mL)",
@@ -661,7 +685,6 @@
                 difficulty: "Fácil",
                 yield: "1 porção",
                 description: "Alternativa saudável aos shakes industrializados. O ingrediente principal é o iogurte grego, garantindo proteínas de qualidade sem aditivos artificiais.",
-                image: "https://images.unsplash.com/photo-1620916297397-a4a5402a3c6c?auto=format&fit=crop&q=80&w=600",
                 ingredients: [
                     "Iogurte grego natural, sem gordura (300 g)",
                     "Mirtilo (125 g)",
@@ -684,7 +707,6 @@
                 difficulty: "Fácil",
                 yield: "2 porções",
                 description: "Delicioso e refrescante, dispensa adoçantes graças às tâmaras. Dica: Deixe as tâmaras de molho no leite durante a noite se tiver pressa pela manhã.",
-                image: "https://images.unsplash.com/photo-1596450522030-9b45663673c2?auto=format&fit=crop&q=80&w=600",
                 ingredients: [
                     "Tâmara, sem caroço (90 g)",
                     "Leite de amêndoa (350 mL)",
@@ -709,7 +731,6 @@
                 difficulty: "Fácil",
                 yield: "1 porção",
                 description: "Pasta de amendoim é um dos lanches preferidos dos atletas. Servida em um shake, é uma fonte de proteínas excelente e deliciosa.",
-                image: "https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&q=80&w=600",
                 ingredients: [
                     "Leite de amêndoa, sem açúcar (150 mL)",
                     "Pasta de amendoim (1 colher de sopa, 20 g)",
@@ -731,8 +752,7 @@
                 time: "5 min",
                 difficulty: "Fácil",
                 yield: "1 porção",
-                description: "Nosso shake poderoso com banana, nozes e mel funciona muito bem para estimular seu metabolismo. Ideal pós-treino ou ao acordar.",
-                image: "https://images.unsplash.com/photo-1593094406256-4299b90c1f6b?auto=format&fit=crop&q=80&w=600",
+                description: "Nosso shake poderoso com banana, nozes e mel funciona muito bem para estimular seu metabolismo. Ideal pós-treino ou ao acordar. Dica: para quem não curte nozes, elas podem ser substituídas por amêndoas ou avelãs.",
                 ingredients: [
                     "Iogurte grego natural, sem gordura (150 g)",
                     "Leite de amêndoa, sem açúcar (300 mL)",
@@ -756,7 +776,6 @@
                 difficulty: "Fácil",
                 yield: "2 porções",
                 description: "Smoothies podem ser preparados rapidamente e são cheios de frutas frescas. A banana garante a doçura desta receita. Uma delícia refrescante!",
-                image: "https://images.unsplash.com/photo-1626078298288-06795f590b5d?auto=format&fit=crop&q=80&w=600",
                 ingredients: [
                     "Morango (200 g)",
                     "1 Banana (150 g)",
@@ -779,8 +798,7 @@
                 time: "3 min",
                 difficulty: "Fácil",
                 yield: "2 porções",
-                description: "Nosso shake de chocolate com um toque de hortelã é ótimo para o café da manhã ou para um lanche. A doçura natural da banana e os ácidos graxos saudáveis do avocado promoverão saciedade.",
-                image: "https://images.unsplash.com/photo-1577805947697-89e18249d767?auto=format&fit=crop&q=80&w=600",
+                description: "Nosso shake de chocolate com um toque de hortelã é ótimo para o café da manhã ou para um lanche. A doçura natural da banana e os ácidos graxos saudáveis do avocado promoverão saciedade. Dica: se você quiser seu shake ainda mais doce, use uma banana bem madura.",
                 ingredients: [
                     "Cacau em pó (2 colheres de sopa, 30 g)",
                     "Hortelã fresca (10 g)",
@@ -804,7 +822,6 @@
                 difficulty: "Muito Fácil",
                 yield: "2 porções",
                 description: "Este shake de manga é uma bebida de beleza. A manga contém betacaroteno, que protege as células. Dica: Use cubos de gelo para deixar bem refrescante!",
-                image: "https://images.unsplash.com/photo-1623065422902-30a2d299bbe4?auto=format&fit=crop&q=80&w=600",
                 ingredients: [
                     "Manga em cubos, congelada (300 g)", 
                     "Iogurte light (300 g)", 
@@ -826,7 +843,6 @@
                 difficulty: "Normal",
                 yield: "2 porções",
                 description: "Este prato de brócolis e couve-flor é muito saboroso. Graças ao molho cremoso de queijo, você vai ficar saciado(a) por um bom tempo.",
-                image: "https://images.unsplash.com/photo-1612158652932-55dd1d713c23?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["Couve-flor (200 g)", "Brócolis (200 g)", "Queijo alpino ralado (100 g)", "Creme azedo (45 g)", "Azeite e temperos"],
                 instructions: ["Lave a couve-flor e o brócolis e corte-os. Cozinhe por 7 minutos.", "Misture o queijo com o creme azedo e temperos.", "Coloque os vegetais na assadeira, cubra com molho.", "Asse a 160°C por 15 minutos."]
             },
@@ -840,7 +856,6 @@
                 difficulty: "Fácil",
                 yield: "1 porção",
                 description: "A queridinha das dietas! Prática, rápida e versátil para começar o dia.",
-                image: "https://images.unsplash.com/photo-1513442542250-854d436a73f2?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["1 ovo", "2 colheres (sopa) de goma de tapioca", "1 colher (sopa) de requeijão light", "Sal a gosto"],
                 instructions: ["Bata o ovo com a tapioca e o requeijão.", "Tempere com sal.", "Despeje em uma frigideira antiaderente untada.", "Doure dos dois lados e sirva recheado a gosto."]
             },
@@ -854,7 +869,6 @@
                 difficulty: "Fácil",
                 yield: "1 pote",
                 description: "Perfeita para levar para o trabalho. O segredo está na ordem dos ingredientes!",
-                image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["Mix de folhas", "100g de frango desfiado", "Tomate cereja", "Cenoura ralada", "Molho de iogurte"],
                 instructions: ["Comece colocando o molho no fundo do pote.", "Adicione a cenoura e o tomate.", "Coloque o frango.", "Finalize com as folhas."]
             },
@@ -868,7 +882,6 @@
                 difficulty: "Muito Fácil",
                 yield: "1 pote",
                 description: "Café da manhã pronto para quem acorda na correria.",
-                image: "https://images.unsplash.com/photo-1517519014922-8fc5e6211605?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["30g de aveia em flocos", "100ml de leite vegetal", "1 colher de chia", "Frutas vermelhas"],
                 instructions: ["Misture a aveia, o leite e a chia em um pote.", "Deixe na geladeira durante a noite.", "Na manhã seguinte, adicione as frutas."]
             },
@@ -882,7 +895,6 @@
                 difficulty: "Fácil",
                 yield: "5 bolinhas",
                 description: "Para matar a vontade de doce sem sair da dieta.",
-                image: "https://images.unsplash.com/photo-1541783245831-57d6fb0926d3?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["1 scoop de Whey Protein chocolate", "1 colher de cacau em pó", "Leite em pó desnatado", "Água"],
                 instructions: ["Misture todos os secos.", "Vá adicionando água morna aos poucos até dar ponto.", "Enrole e gele."]
             },
@@ -896,7 +908,6 @@
                 difficulty: "Fácil",
                 yield: "1 porção",
                 description: "Apenas 3 ingredientes para um lanche saudável.",
-                image: "https://images.unsplash.com/photo-1506084868230-bb9d95c24759?auto=format&fit=crop&q=80&w=600",
                 ingredients: ["1 banana madura amassada", "2 ovos", "Canela a gosto"],
                 instructions: ["Misture a banana com os ovos e canela.", "Aqueça a frigideira untada.", "Faça discos e doure dos dois lados."]
             }
@@ -1308,9 +1319,6 @@
                 card.onclick = () => openRecipe(recipe.id);
                 
                 card.innerHTML = `
-                    <div class="w-24 h-24 rounded-xl bg-gray-100 flex-shrink-0 overflow-hidden">
-                        <img src="${recipe.image}" class="w-full h-full object-cover" alt="${recipe.title}">
-                    </div>
                     <div class="flex-1 flex flex-col justify-center">
                         <div class="flex justify-between items-start">
                             <h3 class="font-bold text-gray-800 leading-tight line-clamp-2">${recipe.title}</h3>
@@ -1339,7 +1347,6 @@
             const recipe = recipes.find(r => r.id === id);
             if(!recipe) return;
 
-            document.getElementById('modal-img').src = recipe.image;
             document.getElementById('modal-tag').innerText = recipe.displayCategory;
             document.getElementById('modal-title').innerText = recipe.title;
             document.getElementById('modal-cal').innerText = recipe.calories;
@@ -1347,6 +1354,21 @@
             document.getElementById('modal-difficulty').innerText = recipe.difficulty || "Fácil";
             document.getElementById('modal-yield').innerText = recipe.yield || "1 porção";
             document.getElementById('modal-desc').innerText = recipe.description || "";
+
+            // Handle "Dica de Ouro" extraction
+            const desc = recipe.description || "";
+            const tipContainer = document.getElementById('modal-tip-container');
+            const tipText = document.getElementById('modal-tip-text');
+            
+            if (desc.includes("Dica:")) {
+                const parts = desc.split("Dica:");
+                document.getElementById('modal-desc').innerText = parts[0].trim();
+                tipText.innerText = parts[1].trim();
+                tipContainer.classList.remove('hidden');
+            } else {
+                document.getElementById('modal-desc').innerText = desc;
+                tipContainer.classList.add('hidden');
+            }
 
             const ingList = document.getElementById('modal-ingredients');
             ingList.innerHTML = recipe.ingredients.map(ing => `<li class="flex items-start gap-2"><span class="w-1.5 h-1.5 rounded-full bg-bestie mt-1.5 flex-shrink-0"></span>${ing}</li>`).join('');
