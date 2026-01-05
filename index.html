@@ -222,7 +222,6 @@
             };
 
             try {
-                // Retry logic (simple version)
                 let response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -242,10 +241,153 @@
         }
 
         // --- DATA ---
-        // Tags: 'cafe', 'almoco', 'jantar', 'lanche', 'vegano', 'vegetariano', 'proteina', 'lowcarb', 'lowfat', 'zeroacucar', 'lowcal', 'simples', 'rapido'
         
         const recipes = [
-            // --- NOVAS RECEITAS DE CAFÉ DA MANHÃ ---
+            // --- NOVAS RECEITAS ADICIONADAS (Lote 2) ---
+            {
+                id: 40,
+                title: "Sanduíche de peru mediterrâneo",
+                displayCategory: "Lanche Prático",
+                tags: ['lanche', 'jantar', 'proteina', 'rapido', 'normal'],
+                calories: 313,
+                time: "15 min",
+                difficulty: "Normal",
+                yield: "4 porções",
+                description: "Excelente para levar de lanche. Com avocado, peito de peru e molho especial, promove saciedade.",
+                image: "https://images.unsplash.com/photo-1554433607-66b5efe9d304?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["Maionese light (25g)", "Extrato de tomate (4 colheres)", "Pão integral (8 fatias)", "Peito de peru (200g)", "Pepino", "Pimentão", "Avocado"],
+                instructions: ["Misture maionese e extrato.", "Passe no pão, adicione peru.", "Adicione vegetais fatiados e avocado.", "Feche e corte ao meio."]
+            },
+            {
+                id: 39,
+                title: "Ovos mexidos com salmão",
+                displayCategory: "Café Proteico",
+                tags: ['cafe', 'almoco', 'proteina', 'lowcarb', 'rapido'],
+                calories: 500,
+                time: "15 min",
+                difficulty: "Normal",
+                yield: "2 porções",
+                description: "Energia de alta qualidade para o treino! Ovos mexidos com vegetais refogados e tiras de salmão.",
+                image: "https://images.unsplash.com/photo-1510629918615-10775139900e?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["6 ovos", "1 pimentão", "2 cebolinhas", "Azeite", "Salmão defumado (150g)", "Sal e pimenta"],
+                instructions: ["Refogue pimentão e cebolinha.", "Adicione ovos batidos.", "Quando firmar, misture o salmão em tiras.", "Sirva com cebolinha."]
+            },
+            {
+                id: 38,
+                title: "Pão Low Carb sem glúten",
+                displayCategory: "Café/Lanche",
+                tags: ['cafe', 'lanche', 'lowcarb', 'proteina', 'simples'],
+                calories: 165,
+                time: "75 min",
+                difficulty: "Normal",
+                yield: "10 fatias",
+                description: "Diga adeus aos carboidratos com este pão de farinha de amêndoa. Delicioso e sem glúten!",
+                image: "https://images.unsplash.com/photo-1584386161273-0fb6690499b9?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["Iogurte integral (50g)", "2 ovos", "Semente de girassol e gergelim", "Azeite", "Chia", "Farinha de amêndoa (200g)", "Ervas"],
+                instructions: ["Misture chia e iogurte.", "Adicione ovos, farinha, sementes e azeite.", "Asse em forma de pão a 170°C por 1 hora."]
+            },
+            {
+                id: 37,
+                title: "Gyeran Mari (Omelete coreano)",
+                displayCategory: "Café/Almoço",
+                tags: ['cafe', 'almoco', 'proteina', 'lowcarb', 'rapido'],
+                calories: 303,
+                time: "12 min",
+                difficulty: "Fácil",
+                yield: "2 porções",
+                description: "Todo mundo adora receitas fáceis! Um rolo de omelete versátil e perfeito para servir.",
+                image: "https://images.unsplash.com/photo-1553531087-b25a0b9a68ab?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["1 cenoura ralada", "1 cebolinha", "5 ovos", "Sal", "Óleo de gergelim"],
+                instructions: ["Bata ovos com vegetais.", "Cozinhe em frigideira larga.", "Enrole o omelete ainda úmido com espátula.", "Corte em fatias grossas."]
+            },
+            {
+                id: 36,
+                title: "Rolinhos de pimentão e cream cheese",
+                displayCategory: "Lanche Leve",
+                tags: ['lanche', 'jantar', 'lowcal', 'rapido', 'simples'],
+                calories: 353,
+                time: "10 min",
+                difficulty: "Fácil",
+                yield: "2 porções",
+                description: "Um wrap com toque especial! Apenas 5 ingredientes para um lanche frio e refinado.",
+                image: "https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["1 pimentão", "Cream cheese light (200g)", "Peito de peru (100g)", "Alface romana", "2 tortilhas"],
+                instructions: ["Faça um molho batendo metade do cream cheese com metade do pimentão.", "Monte o wrap com peru, molho e vegetais.", "Enrole e corte em rolinhos."]
+            },
+
+            // --- RECEITAS ANTERIORES (Lote 1) ---
+            {
+                id: 35,
+                title: "Wraps de morango pro café",
+                displayCategory: "Doce Fit",
+                tags: ['cafe', 'lanche', 'vegetariano', 'doces', 'rapido', 'simples'],
+                calories: 297,
+                time: "10 min",
+                difficulty: "Fácil",
+                yield: "2 porções",
+                description: "Quer impressionar no café da manhã? Wraps de morango práticos e deliciosos com um toque refrescante de hortelã.",
+                image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["Morango (125 g)", "Cream cheese light (90 g)", "Aveia (4 colheres)", "Mel (2 colheres)", "Hortelã a gosto", "2 tortilhas/wraps"],
+                instructions: ["Corte os morangos em fatias.", "Espalhe o cream cheese nas tortilhas.", "Adicione morangos, aveia, mel e hortelã.", "Enrole e aproveite!"]
+            },
+            {
+                id: 34,
+                title: "Wrap de omelete e salmão",
+                displayCategory: "Almoço/Jantar",
+                tags: ['almoco', 'jantar', 'proteina', 'lowcarb', 'salgado'],
+                calories: 352,
+                time: "20 min",
+                difficulty: "Normal",
+                yield: "4 porções",
+                description: "Totalmente Low Carb! O omelete substitui a massa, recheado com creme de ervilha, cream cheese e salmão defumado.",
+                image: "https://images.unsplash.com/photo-1529006557810-274b9b2eb785?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["Ervilha congelada (50g)", "6 ovos", "Azeite", "Cream cheese light (150g)", "Rúcula", "Salmão defumado (200g)", "Limão"],
+                instructions: ["Frite omeletes finos.", "Amasse ervilhas descongeladas com cream cheese e limão.", "Passe a pasta no omelete, adicione salmão e rúcula.", "Enrole com cuidado."]
+            },
+            {
+                id: 33,
+                title: "Suflê de mirtilo e iogurte",
+                displayCategory: "Café/Lanche",
+                tags: ['cafe', 'lanche', 'doces', 'proteina', 'vegetariano'],
+                calories: 300,
+                time: "65 min",
+                difficulty: "Fácil",
+                yield: "3 porções",
+                description: "Pode ser consumido frio ou quente. Prepare na noite anterior para ganhar tempo! Uma delícia leve e proteica.",
+                image: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["Iogurte grego (500g)", "2 ovos", "Pó para pudim (38g)", "Mirtilo (75g)", "Adoçante", "Leite semidesnatado (250mL)"],
+                instructions: ["Bata iogurte, ovos, pó de pudim e leite.", "Misture mirtilos delicadamente.", "Asse a 160°C por 60 min."]
+            },
+            {
+                id: 32,
+                title: "Ovos mexidos de espinafre e presunto",
+                displayCategory: "Café Salgado",
+                tags: ['cafe', 'almoco', 'lowcarb', 'proteina', 'salgado', 'rapido'],
+                calories: 230,
+                time: "25 min",
+                difficulty: "Fácil",
+                yield: "2 porções",
+                description: "Ovos mexidos macios, presunto e espinafre fresco. A refeição perfeita, não só para o brunch de domingo.",
+                image: "https://images.unsplash.com/photo-1556740714-a8395b3bf3ea?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["3 ovos", "Sal e pimenta", "Azeite", "Espinafre baby (25g)", "Presunto (25g)", "Leite integral (1 colher)", "Noz-moscada"],
+                instructions: ["Bata ovos com leite e temperos.", "Refogue o presunto no azeite.", "Adicione os ovos e deixe firmar.", "Junte o espinafre no final."]
+            },
+            {
+                id: 31,
+                title: "Panquecas de presunto e ricota",
+                displayCategory: "Café Proteico",
+                tags: ['cafe', 'almoco', 'proteina', 'salgado', 'rapido'],
+                calories: 476,
+                time: "15 min",
+                difficulty: "Fácil",
+                yield: "2 porções",
+                description: "Ovos mexidos junto com panqueca? Combinação perfeita rica em proteína que promove plena saciedade!",
+                image: "https://images.unsplash.com/photo-1612182062633-99a4632a0531?auto=format&fit=crop&q=80&w=600",
+                ingredients: ["4 ovos", "Aveia (40g)", "Queijo cottage (40g)", "Óleo de coco", "Presunto (40g)", "Ricota (150g)"],
+                instructions: ["Faça massa com aveia, cottage e claras. Frite as panquecas.", "Faça ovos mexidos com as gemas.", "Monte: panqueca, presunto, ricota e ovos."]
+            },
+
+            // --- RECEITAS ANTERIORES ---
             {
                 id: 30,
                 title: "Muffins de proteína (Salgados)",
@@ -330,8 +472,6 @@
                 ingredients: ["1 ovo", "Alcaparra", "2 tomates", "Iogurte grego (100g)", "Pão integral (4 fatias)", "Alface e manjericão"],
                 instructions: ["Cozinhe os ovos, pique e misture com iogurte e alcaparras.", "Toste o pão.", "Monte com a pasta de ovos e salada."]
             },
-
-            // --- RECEITAS ANTERIORES ---
             {
                 id: 16,
                 title: "Mingau de aveia chocolate e morango",
@@ -762,6 +902,8 @@
             }
         ];
 
+        // --- FUNCTIONS ---
+
         const views = {
             home: `
                 <div class="fade-in space-y-6">
@@ -785,19 +927,135 @@
                             <h3 class="font-bold text-lg text-gray-800">Atalhos</h3>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
+                            <!-- Existing Recipes -->
                             <button onclick="navigate('recipes')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
                                 <div class="w-12 h-12 rounded-full bg-green-100 text-green-500 flex items-center justify-center group-hover:scale-110 transition">
                                     <i class="fa-solid fa-leaf"></i>
                                 </div>
                                 <span class="font-medium text-sm">Receitinhas</span>
                             </button>
+                            <!-- Existing Water (Visual) -->
                             <button class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
                                 <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center group-hover:scale-110 transition">
                                     <i class="fa-solid fa-glass-water"></i>
                                 </div>
                                 <span class="font-medium text-sm">Água</span>
                             </button>
+                            
+                            <!-- Fim de Semana -->
+                            <button onclick="navigate('weekend')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
+                                <div class="w-12 h-12 rounded-full bg-purple-100 text-purple-500 flex items-center justify-center group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-calendar-check"></i>
+                                </div>
+                                <span class="font-medium text-sm">Fim de Semana</span>
+                            </button>
+
+                            <!-- Kit da Bestie -->
+                            <button onclick="navigate('kit')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
+                                <div class="w-12 h-12 rounded-full bg-teal-100 text-teal-500 flex items-center justify-center group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-kit-medical"></i>
+                                </div>
+                                <span class="font-medium text-sm">Kit da Bestie</span>
+                            </button>
+
+                            <!-- Trocas -->
+                            <button onclick="navigate('swaps')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
+                                <div class="w-12 h-12 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-repeat"></i>
+                                </div>
+                                <span class="font-medium text-sm">Trocas</span>
+                            </button>
                         </div>
+                    </div>
+                </div>
+            `,
+            weekend: `
+                <div class="fade-in pb-20">
+                    <div class="mb-6 flex items-center gap-3">
+                        <button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                        <h2 class="text-2xl font-bold text-gray-800">Fim de Semana 🍕</h2>
+                    </div>
+                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-pink-100 space-y-4">
+                        <div class="bg-purple-50 rounded-xl p-4 border border-purple-100">
+                            <h3 class="font-bold text-purple-700 mb-2">Regra de Ouro</h3>
+                            <p class="text-sm text-gray-600">Escolha <strong>1 refeição livre</strong> no fim de semana (Sábado ou Domingo) para comer o que tem vontade!</p>
+                        </div>
+                        <ul class="space-y-3 text-sm text-gray-600">
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-check text-green-500 mt-1"></i>
+                                <span>Volte para o plano na próxima refeição.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-check text-green-500 mt-1"></i>
+                                <span>Beba bastante água antes e depois.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-check text-green-500 mt-1"></i>
+                                <span>Coma devagar e aproveite cada mordida!</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            `,
+            kit: `
+                <div class="fade-in pb-20">
+                    <div class="mb-6 flex items-center gap-3">
+                        <button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                        <h2 class="text-2xl font-bold text-gray-800">Kit da Bestie 💊</h2>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-pink-50 flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-xl">💪</div>
+                            <div>
+                                <h3 class="font-bold text-gray-800">Whey Protein</h3>
+                                <p class="text-xs text-gray-500">Pós-treino ou lanches rápidos.</p>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-pink-50 flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-green-50 text-green-500 flex items-center justify-center text-xl">⚡</div>
+                            <div>
+                                <h3 class="font-bold text-gray-800">Creatina</h3>
+                                <p class="text-xs text-gray-500">3g a 5g todo dia (sem falhar!).</p>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-pink-50 flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-yellow-50 text-yellow-500 flex items-center justify-center text-xl">🌞</div>
+                            <div>
+                                <h3 class="font-bold text-gray-800">Multivitamínico</h3>
+                                <p class="text-xs text-gray-500">Pela manhã, junto com o café.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `,
+            swaps: `
+                <div class="fade-in pb-20">
+                    <div class="mb-6 flex items-center gap-3">
+                        <button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                        <h2 class="text-2xl font-bold text-gray-800">Trocas Inteligentes 🔄</h2>
+                    </div>
+                    <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-pink-100">
+                        <table class="w-full text-sm text-left text-gray-600">
+                            <thead class="bg-pink-50 text-bestie uppercase text-xs">
+                                <tr>
+                                    <th class="px-4 py-3">Troque Isso</th>
+                                    <th class="px-4 py-3">Por Isso</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-pink-50">
+                                <tr><td class="px-4 py-3">Açúcar</td><td class="px-4 py-3 font-medium text-green-600">Adoçante (Stevia/Xilitol)</td></tr>
+                                <tr><td class="px-4 py-3">Óleo de Soja</td><td class="px-4 py-3 font-medium text-green-600">Azeite de Oliva</td></tr>
+                                <tr><td class="px-4 py-3">Refrigerante</td><td class="px-4 py-3 font-medium text-green-600">Água com Gás e Limão</td></tr>
+                                <tr><td class="px-4 py-3">Pão Branco</td><td class="px-4 py-3 font-medium text-green-600">Pão Integral / Tapioca</td></tr>
+                                <tr><td class="px-4 py-3">Creme de Leite</td><td class="px-4 py-3 font-medium text-green-600">Iogurte Grego / Creme de Ricota</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             `,
@@ -904,22 +1162,26 @@
             `
         };
 
-        // --- FUNCTIONS ---
-
         function init() {
             navigate('recipes'); 
             renderRecipes('all');
         }
 
         function navigate(viewName) {
+            // Update Content
             const main = document.getElementById('app-content');
-            main.innerHTML = views[viewName];
+            if (views[viewName]) {
+                main.innerHTML = views[viewName];
+            } else {
+                console.error(`View "${viewName}" not found!`);
+                return;
+            }
 
+            // Update Nav State
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('text-bestie');
                 btn.classList.add('text-gray-400');
                 if(viewName === 'home' && btn.innerText.includes('Início')) btn.classList.add('text-bestie'), btn.classList.remove('text-gray-400');
-                // Highlight Recipes icon for both recipes and chefBestie view
                 if((viewName === 'recipes' || viewName === 'chefBestie') && btn.innerText.includes('Receitas')) {
                     btn.classList.add('text-bestie');
                     btn.classList.remove('text-gray-400');
@@ -933,68 +1195,6 @@
             }
         }
 
-        async function generateAIRecipe() {
-            const input = document.getElementById('ai-ingredients');
-            const btn = document.getElementById('generate-btn');
-            const resultDiv = document.getElementById('ai-result');
-            const cardDiv = document.getElementById('ai-recipe-card');
-
-            if (!input.value.trim()) return;
-
-            // Loading State
-            btn.disabled = true;
-            btn.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div> Criando...`;
-            resultDiv.classList.add('hidden');
-
-            const recipeData = await callGemini(input.value);
-
-            if (recipeData) {
-                // Assign a temporary random ID
-                recipeData.id = 999; 
-                recipeData.image = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600"; // Placeholder generic healthy food
-
-                // Render Card (similar to renderRecipes but customized)
-                cardDiv.innerHTML = `
-                    <div class="bg-white rounded-3xl p-5 shadow-lg border border-pink-100 overflow-hidden relative">
-                        <div class="absolute top-0 right-0 bg-bestie text-white text-xs font-bold px-3 py-1 rounded-bl-xl">
-                            IA ✨
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">${recipeData.title}</h3>
-                        <p class="text-sm text-gray-500 italic mb-4">"${recipeData.description}"</p>
-                        
-                        <div class="flex gap-4 text-xs text-gray-500 mb-4 bg-pink-50 p-3 rounded-xl">
-                            <span class="flex items-center gap-1"><i class="fa-solid fa-fire text-bestie"></i> ${recipeData.calories} kcal</span>
-                            <span class="flex items-center gap-1"><i class="fa-regular fa-clock text-bestie"></i> ${recipeData.time}</span>
-                            <span class="flex items-center gap-1"><i class="fa-solid fa-utensils text-bestie"></i> ${recipeData.difficulty}</span>
-                        </div>
-
-                        <div class="mb-4">
-                            <h4 class="font-bold text-gray-800 mb-2 text-sm flex items-center gap-2"><i class="fa-solid fa-basket-shopping text-bestie"></i> Ingredientes</h4>
-                            <ul class="text-sm text-gray-600 space-y-1 list-disc pl-4">
-                                ${recipeData.ingredients.map(i => `<li>${i}</li>`).join('')}
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4 class="font-bold text-gray-800 mb-2 text-sm flex items-center gap-2"><i class="fa-solid fa-spoon text-bestie"></i> Modo de Preparo</h4>
-                            <ol class="text-sm text-gray-600 space-y-2 list-decimal pl-4">
-                                ${recipeData.instructions.map(i => `<li>${i}</li>`).join('')}
-                            </ol>
-                        </div>
-                    </div>
-                `;
-                resultDiv.classList.remove('hidden');
-                resultDiv.scrollIntoView({ behavior: 'smooth' });
-            } else {
-                alert("Ops! Ocorreu um erro ao criar a receita. Tente novamente!");
-            }
-
-            // Reset Button
-            btn.disabled = false;
-            btn.innerHTML = `<span>Criar Outra Receita</span> <i class="fa-solid fa-wand-magic-sparkles"></i>`;
-        }
-
-        // ... existing functions ...
         function filterRecipes(tag, btnElement) {
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 btn.classList.remove('bg-bestie', 'text-white', 'shadow-md');
