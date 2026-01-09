@@ -199,790 +199,62 @@
         const apiKey = ""; // Environment will provide key
 
         // --- USER PROFILE STATE ---
-        // Load from storage or default
         let userProfile = JSON.parse(localStorage.getItem('bestieProfile')) || {
             name: 'Bestie',
             age: '',
             weight: '',
+            targetWeight: '',
             height: '',
             goal: 'perder'
         };
 
-        async function callGemini(ingredients) {
-            const prompt = `Você é a 'Bestie Fit', uma chef especialista em receitas saudáveis, práticas e com poucas calorias para o aplicativo 'Manual da Bestie'. 
-            Crie uma receita criativa e saudável (fit/low carb/proteica) usando OBRIGATORIAMENTE estes ingredientes principais: ${ingredients}. Você pode sugerir temperos básicos extras.
-            
-            IMPORTANTE: Responda APENAS com um objeto JSON válido (sem markdown, sem \`\`\`json) seguindo exatamente esta estrutura:
-            {
-                "title": "Nome Criativo da Receita",
-                "calories": 000 (apenas numero),
-                "time": "00 min",
-                "difficulty": "Fácil",
-                "yield": "1 ou 2 porções",
-                "description": "Uma descrição curta, animada e motivadora estilo 'bestie'. Se houver uma dica especial, comece com 'Dica:'",
-                "ingredients": ["ingrediente 1", "ingrediente 2"],
-                "instructions": ["passo 1", "passo 2", "passo 3"],
-                "category": "almoco" (escolha entre: cafe, almoco, jantar, lanche, doces)
-            }`;
-
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: {
-                    responseMimeType: "application/json"
-                }
-            };
-
-            try {
-                let response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) throw new Error('Erro na API');
-
-                const data = await response.json();
-                let text = data.candidates[0].content.parts[0].text;
-                
-                // Clean potential markdown
-                text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-                
-                return JSON.parse(text);
-
-            } catch (error) {
-                console.error("Erro Gemini:", error);
-                return null;
-            }
-        }
-
-        async function callGeminiPlan(userData) {
-            const prompt = `Você é a 'Bestie Fit', uma nutricionista e coach motivacional. Crie um mini plano personalizado com base nestes dados:
-            - Idade: ${userData.age}
-            - Peso: ${userData.weight}kg
-            - Altura: ${userData.height}cm
-            - Objetivo: ${userData.goal}
-
-            IMPORTANTE: Responda APENAS com um objeto JSON válido (sem markdown) com esta estrutura:
-            {
-                "calories_target": "Ex: 1500-1600",
-                "bmi": "Ex: 22.5 (Normal)",
-                "macros": {
-                    "protein": "Ex: 120g",
-                    "carbs": "Ex: 150g",
-                    "fats": "Ex: 50g"
-                },
-                "motivational_quote": "Uma frase curta e inspiradora estilo 'bestie' para motivar.",
-                "tip": "Uma dica de ouro específica para o objetivo selecionado."
-            }`;
-
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: {
-                    responseMimeType: "application/json"
-                }
-            };
-
-            try {
-                let response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) throw new Error('Erro na API');
-
-                const data = await response.json();
-                let text = data.candidates[0].content.parts[0].text;
-                
-                // Clean potential markdown
-                text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-                
-                return JSON.parse(text);
-
-            } catch (error) {
-                console.error("Erro Gemini Plan:", error);
-                return null;
-            }
-        }
-
-        async function callGeminiWorkout(data) {
-            const prompt = `Você é a 'Bestie Fit', uma personal trainer animada e motivadora. Crie um treino rápido e eficiente com estas características:
-            - Tempo: ${data.time} minutos
-            - Foco: ${data.focus}
-            - Equipamento: ${data.equipment}
-
-            IMPORTANTE: Responda APENAS com um objeto JSON válido (sem markdown) com esta estrutura:
-            {
-                "title": "Nome Criativo do Treino",
-                "warmup": "Uma frase rápida de aquecimento (Ex: 1 min polichinelos)",
-                "exercises": [
-                    { "name": "Nome do Exercício", "reps": "Ex: 3x 12", "tips": "Dica rápida de execução" },
-                    { "name": "Nome do Exercício 2", "reps": "Ex: 3x 15", "tips": "Dica rápida" }
-                ],
-                "motivation": "Frase final de motivação curta e divertida"
-            }`;
-
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: {
-                    responseMimeType: "application/json"
-                }
-            };
-
-            try {
-                let response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) throw new Error('Erro na API');
-
-                const data = await response.json();
-                let text = data.candidates[0].content.parts[0].text;
-                
-                // Clean potential markdown
-                text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-
-                return JSON.parse(text);
-
-            } catch (error) {
-                console.error("Erro Gemini Workout:", error);
-                return null;
-            }
-        }
-
         // --- DATA ---
-        let waterIntake = 0; // State for water tracking
-        const waterGoal = 10; // 2.5L approx (10 x 250ml)
+        let waterIntake = 0;
+        let waterGoalLiters = 2.5;
+        let waterGoalCups = 10;
 
         const recipes = [
-            // --- NOVAS RECEITAS ADICIONADAS (Lote 2) ---
-            {
-                id: 40,
-                title: "Sanduíche de peru mediterrâneo",
-                displayCategory: "Lanche Prático",
-                tags: ['lanche', 'jantar', 'proteina', 'rapido', 'normal'],
-                calories: 313,
-                time: "15 min",
-                difficulty: "Normal",
-                yield: "4 porções",
-                description: "Excelente para levar de lanche. Com avocado, peito de peru e molho especial, promove saciedade. Dica: se quiser algo mais crocante, pode colocar as fatias de pão na torradeira.",
-                ingredients: ["Maionese light (25g)", "Extrato de tomate (4 colheres)", "Pão integral (8 fatias)", "Peito de peru (200g)", "Pepino", "Pimentão", "Avocado"],
-                instructions: ["Misture maionese e extrato.", "Passe no pão, adicione peru.", "Adicione vegetais fatiados e avocado.", "Feche e corte ao meio."]
-            },
-            {
-                id: 39,
-                title: "Ovos mexidos com salmão",
-                displayCategory: "Café Proteico",
-                tags: ['cafe', 'almoco', 'proteina', 'lowcarb', 'rapido'],
-                calories: 500,
-                time: "15 min",
-                difficulty: "Normal",
-                yield: "2 porções",
-                description: "Energia de alta qualidade para o treino! Ovos mexidos com vegetais refogados e tiras de salmão.",
-                ingredients: ["6 ovos", "1 pimentão", "2 cebolinhas", "Azeite", "Salmão defumado (150g)", "Sal e pimenta"],
-                instructions: ["Refogue pimentão e cebolinha.", "Adicione ovos batidos.", "Quando firmar, misture o salmão em tiras.", "Sirva com cebolinha."]
-            },
-            {
-                id: 38,
-                title: "Pão Low Carb sem glúten",
-                displayCategory: "Café/Lanche",
-                tags: ['cafe', 'lanche', 'lowcarb', 'proteina', 'simples'],
-                calories: 165,
-                time: "75 min",
-                difficulty: "Normal",
-                yield: "10 fatias",
-                description: "Diga adeus aos carboidratos com este pão de farinha de amêndoa. Delicioso e sem glúten! Dica: usando ervas italianas, você dá ao pão um sabor especial.",
-                ingredients: ["Iogurte integral (50g)", "2 ovos", "Semente de girassol e gergelim", "Azeite", "Chia", "Farinha de amêndoa (200g)", "Ervas"],
-                instructions: ["Misture chia e iogurte.", "Adicione ovos, farinha, sementes e azeite.", "Asse em forma de pão a 170°C por 1 hora."]
-            },
-            {
-                id: 37,
-                title: "Gyeran Mari (Omelete coreano)",
-                displayCategory: "Café/Almoço",
-                tags: ['cafe', 'almoco', 'proteina', 'lowcarb', 'rapido'],
-                calories: 303,
-                time: "12 min",
-                difficulty: "Fácil",
-                yield: "2 porções",
-                description: "Todo mundo adora receitas fáceis! Um rolo de omelete versátil e perfeito para servir. Dica: O rolo de omelete é um ótimo prato para um buffet!",
-                ingredients: ["1 cenoura ralada", "1 cebolinha", "5 ovos", "Sal", "Óleo de gergelim"],
-                instructions: ["Bata ovos com vegetais.", "Cozinhe em frigideira larga.", "Enrole o omelete ainda úmido com espátula.", "Corte em fatias grossas."]
-            },
-            {
-                id: 36,
-                title: "Rolinhos de pimentão e cream cheese",
-                displayCategory: "Lanche Leve",
-                tags: ['lanche', 'jantar', 'lowcal', 'rapido', 'simples'],
-                calories: 353,
-                time: "10 min",
-                difficulty: "Fácil",
-                yield: "2 porções",
-                description: "Um wrap com toque especial! Apenas 5 ingredientes para um lanche frio e refinado.",
-                ingredients: ["1 pimentão", "Cream cheese light (200g)", "Peito de peru (100g)", "Alface romana", "2 tortilhas"],
-                instructions: ["Faça um molho batendo metade do cream cheese com metade do pimentão.", "Monte o wrap com peru, molho e vegetais.", "Enrole e corte em rolinhos."]
-            },
-
-            // --- RECEITAS ANTERIORES (Lote 1) ---
-            {
-                id: 35,
-                title: "Wraps de morango pro café",
-                displayCategory: "Doce Fit",
-                tags: ['cafe', 'lanche', 'vegetariano', 'doces', 'rapido', 'simples'],
-                calories: 297,
-                time: "10 min",
-                difficulty: "Fácil",
-                yield: "2 porções",
-                description: "Quer impressionar no café da manhã? Wraps de morango práticos e deliciosos com um toque refrescante de hortelã.",
-                ingredients: ["Morango (125 g)", "Cream cheese light (90 g)", "Aveia (4 colheres)", "Mel (2 colheres)", "Hortelã a gosto", "2 tortilhas/wraps"],
-                instructions: ["Corte os morangos em fatias.", "Espalhe o cream cheese nas tortilhas.", "Adicione morangos, aveia, mel e hortelã.", "Enrole e aproveite!"]
-            },
-            {
-                id: 34,
-                title: "Wrap de omelete e salmão",
-                displayCategory: "Almoço/Jantar",
-                tags: ['almoco', 'jantar', 'proteina', 'lowcarb', 'salgado'],
-                calories: 352,
-                time: "20 min",
-                difficulty: "Normal",
-                yield: "4 porções",
-                description: "Totalmente Low Carb! O omelete substitui a massa, recheado com creme de ervilha, cream cheese e salmão defumado.",
-                ingredients: ["Ervilha congelada (50g)", "6 ovos", "Azeite", "Cream cheese light (150g)", "Rúcula", "Salmão defumado (200g)", "Limão"],
-                instructions: ["Frite omeletes finos.", "Amasse ervilhas descongeladas com cream cheese e limão.", "Passe a pasta no omelete, adicione salmão e rúcula.", "Enrole com cuidado."]
-            },
-            {
-                id: 33,
-                title: "Suflê de mirtilo e iogurte",
-                displayCategory: "Café/Lanche",
-                tags: ['cafe', 'lanche', 'doces', 'proteina', 'vegetariano'],
-                calories: 300,
-                time: "65 min",
-                difficulty: "Fácil",
-                yield: "3 porções",
-                description: "Pode ser consumido frio ou quente. Prepare na noite anterior para ganhar tempo! Uma delícia leve e proteica.",
-                ingredients: ["Iogurte grego (500g)", "2 ovos", "Pó para pudim (38g)", "Mirtilo (75g)", "Adoçante", "Leite semidesnatado (250mL)"],
-                instructions: ["Bata iogurte, ovos, pó de pudim e leite.", "Misture mirtilos delicadamente.", "Asse a 160°C por 60 min."]
-            },
-            {
-                id: 32,
-                title: "Ovos mexidos de espinafre e presunto",
-                displayCategory: "Café Salgado",
-                tags: ['cafe', 'almoco', 'lowcarb', 'proteina', 'salgado', 'rapido'],
-                calories: 230,
-                time: "25 min",
-                difficulty: "Fácil",
-                yield: "2 porções",
-                description: "Ovos mexidos macios, presunto e espinafre fresco. A refeição perfeita, não só para o brunch de domingo.",
-                ingredients: ["3 ovos", "Sal e pimenta", "Azeite", "Espinafre baby (25g)", "Presunto (25g)", "Leite integral (1 colher)", "Noz-moscada"],
-                instructions: ["Bata ovos com leite e temperos.", "Refogue o presunto no azeite.", "Adicione os ovos e deixe firmar.", "Junte o espinafre no final."]
-            },
-            {
-                id: 31,
-                title: "Panquecas de presunto e ricota",
-                displayCategory: "Café Proteico",
-                tags: ['cafe', 'almoco', 'proteina', 'salgado', 'rapido'],
-                calories: 476,
-                time: "15 min",
-                difficulty: "Fácil",
-                yield: "2 porções",
-                description: "Ovos mexidos junto com panqueca? Combinação perfeita rica em proteína que promove plena saciedade!",
-                ingredients: ["4 ovos", "Aveia (40g)", "Queijo cottage (40g)", "Óleo de coco", "Presunto (40g)", "Ricota (150g)"],
-                instructions: ["Faça massa com aveia, cottage e claras. Frite as panquecas.", "Faça ovos mexidos com as gemas.", "Monte: panqueca, presunto, ricota e ovos."]
-            },
-
-            // --- RECEITAS ANTERIORES ---
-            {
-                id: 30,
-                title: "Muffins de proteína (Salgados)",
-                displayCategory: "Café Proteico",
-                tags: ['cafe', 'lanche', 'proteina', 'lowcal', 'lowcarb', 'simples'],
-                calories: 41,
-                time: "35 min",
-                difficulty: "Fácil",
-                yield: "9 porções",
-                description: "Precisando de uma injeção de proteína? Estes muffins salgados são perfeitos para começar o dia bem. Apenas 41 cal por unidade!",
-                ingredients: ["1½ tomates", "2 cebolinhas verdes", "Manjericão fresco", "3 ovos", "2 claras de ovo", "Sal e pimenta"],
-                instructions: ["Pique tomates, cebolinha e manjericão.", "Misture ovos e claras, tempere.", "Distribua em formas, adicione os vegetais e asse a 175°C por 25 min."]
-            },
-            {
-                id: 29,
-                title: "Muffin de banana e chocolate",
-                displayCategory: "Doce Fit",
-                tags: ['cafe', 'lanche', 'doces', 'vegetariano', 'simples', 'lowcal'],
-                calories: 152,
-                time: "25 min",
-                difficulty: "Fácil",
-                yield: "9 porções",
-                description: "Energia da banana com a alegria do chocolate. Perfeito para um café da manhã sem culpa.",
-                ingredients: ["Mel (20g)", "1 ovo", "Farinha integral (165g)", "Fermento", "Chocolate meio amargo (20g)", "4 bananas maduras"],
-                instructions: ["Esmague bananas, bata com ovo e mel.", "Junte farinha e fermento.", "Coloque nas formas, salpique chocolate e asse a 180°C por 20 min."]
-            },
-            {
-                id: 28,
-                title: "Ovos mexidos com espinafre e feta",
-                displayCategory: "Café Low Carb",
-                tags: ['cafe', 'almoco', 'vegetariano', 'proteina', 'lowcarb', 'simples', 'rapido'],
-                calories: 546,
-                time: "10 min",
-                difficulty: "Fácil",
-                yield: "1 porção",
-                description: "Simples, gostoso e saudável. Uma versão apetitosa dos ovos mexidos tradicionais.",
-                ingredients: ["1 tomate", "Espinafre fresco (40g)", "Óleo de coco", "3 ovos", "Queijo feta light (100g)"],
-                instructions: ["Refogue tomate e espinafre no óleo de coco.", "Adicione ovos batidos e temperados.", "Quando firmar, esmigalhe o feta por cima."]
-            },
-            {
-                id: 27,
-                title: "Triguilho com framboesas",
-                displayCategory: "Café Energia",
-                tags: ['cafe', 'vegetariano', 'simples', 'rapido'],
-                calories: 467,
-                time: "10 min",
-                difficulty: "Fácil",
-                yield: "1 porção",
-                description: "Comece o dia com plena saciedade. Pode guardar para o dia seguinte e ganhar minutos de sono!",
-                ingredients: ["Iogurte grego (190g)", "Café espresso em pó", "Adoçante", "Triguilho (40g)", "Amêndoas (15g)", "Framboesas"],
-                instructions: ["Prepare o triguilho conforme embalagem.", "Pique amêndoas.", "Misture tudo, exceto framboesas. Use-as para decorar."]
-            },
-            {
-                id: 26,
-                title: "Rabanada de morango",
-                displayCategory: "Café Especial",
-                tags: ['cafe', 'vegetariano', 'doces', 'simples', 'rapido'],
-                calories: 260,
-                time: "10 min",
-                difficulty: "Fácil",
-                yield: "2 porções",
-                description: "Um clássico! Com morangos frescos e canela, fica ainda mais gostosa e saudável. Dica: se não for época de morango, você pode usar outras frutas da sua preferência!",
-                ingredients: ["2 ovos", "Canela", "Pão integral (4 fatias)", "Morango (100g)", "Leite desnatado (80mL)"],
-                instructions: ["Bata ovos, leite e canela.", "Passe o pão na mistura e toste na frigideira.", "Cubra com morangos esmagados."]
-            },
-            {
-                id: 25,
-                title: "Sanduíche de tomate e ovos",
-                displayCategory: "Café Prático",
-                tags: ['cafe', 'almoco', 'vegetariano', 'proteina', 'normal'],
-                calories: 240,
-                time: "15 min",
-                difficulty: "Normal",
-                yield: "2 porções",
-                description: "Perfeito para levar. Proporciona saciedade e mantém as calorias sob controle.",
-                ingredients: ["1 ovo", "Alcaparra", "2 tomates", "Iogurte grego (100g)", "Pão integral (4 fatias)", "Alface e manjericão"],
-                instructions: ["Cozinhe os ovos, pique e misture com iogurte e alcaparras.", "Toste o pão.", "Monte com a pasta de ovos e salada."]
-            },
-            {
-                id: 16,
-                title: "Mingau de aveia chocolate e morango",
-                displayCategory: "Café Vegano",
-                tags: ['cafe', 'vegano', 'vegetariano', 'doces', 'simples'],
-                calories: 389,
-                time: "10 min",
-                difficulty: "Fácil",
-                yield: "1 porção",
-                description: "Café da manhã perfeito para quem adora um doce! A aveia dá saciedade e a banana adoça naturalmente.",
-                ingredients: ["Banana média (150 g)", "Aveia (40 g)", "Leite de amêndoa sem açúcar (120 mL)", "Cacau em pó (15 g)", "Morango (60 g)"],
-                instructions: ["Esmague a banana e aqueça com a aveia, leite e cacau.", "Cozinhe por 3 min mexendo sempre.", "Sirva com morangos picados."]
-            },
-            {
-                id: 17,
-                title: "Cereal crocante de canela",
-                displayCategory: "Café/Lanche",
-                tags: ['cafe', 'lanche', 'vegano', 'vegetariano', 'lowcarb'],
-                calories: 455,
-                time: "85 min",
-                difficulty: "Normal",
-                yield: "4 porções",
-                description: "Não quer abrir mão do cereal crocante? Essa versão caseira é cheia de fibra e promove saciedade.",
-                ingredients: ["Óleo de coco (90 mL)", "Amêndoa triturada (150 g)", "Farinha de linhaça (28 g)", "Canela (3 colheres de chá)", "Adoçante e sal a gosto"],
-                instructions: ["Misture o óleo derretido com ingredientes secos formando uma massa. Gele por 1h.", "Abra a massa, corte, pincele óleo e asse a 150°C por 20 min.", "Espere esfriar para ficar crocante."]
-            },
-            {
-                id: 18,
-                title: "Overnight de amêndoa e framboesa",
-                displayCategory: "Café Prático",
-                tags: ['cafe', 'vegano', 'vegetariano', 'simples', 'zeroacucar'],
-                calories: 286,
-                time: "3h+",
-                difficulty: "Fácil",
-                yield: "1 porção",
-                description: "Prepare na noite anterior! Aveia deixada de molho fica cremosa e deliciosa.",
-                ingredients: ["Aveia (40 g)", "Amêndoa triturada (10 g)", "Canela e cardamomo", "Leite de amêndoa (100 mL)", "Framboesa (50 g)"],
-                instructions: ["Misture os secos no copo.", "Adicione leite e parte das framboesas.", "Decore com o resto. Deixe na geladeira por no mínimo 3h."]
-            },
-            {
-                id: 19,
-                title: "Mingau de aveia banana e morango",
-                displayCategory: "Café Rápido",
-                tags: ['cafe', 'vegano', 'vegetariano', 'rapido', 'simples', 'lowcal'],
-                calories: 373,
-                time: "8 min",
-                difficulty: "Fácil",
-                yield: "1 porção",
-                description: "Receita de microondas! Doçura natural da banana, sem açúcar extra.",
-                ingredients: ["Banana média (150 g)", "Aveia (40 g)", "Leite de amêndoa (80 mL)", "Água (60 mL)", "Canela, morango e chia"],
-                instructions: ["Esmague a banana, misture com aveia e líquidos.", "Microondas por 2 min, mexa, mais 30s.", "Sirva com frutas e chia."]
-            },
-            {
-                id: 20,
-                title: "Smoothie verde de espinafre",
-                displayCategory: "Detox",
-                tags: ['lanche', 'vegano', 'vegetariano', 'lowcal', 'rapido', 'simples'],
-                calories: 273,
-                time: "5 min",
-                difficulty: "Fácil",
-                yield: "1 porção",
-                description: "Surpreendentemente gostoso! A combinação de laranja e banana mascara o sabor do espinafre.",
-                ingredients: ["Espinafre fresco (50 g)", "Hortelã", "1 banana", "2 laranjas", "Leite de amêndoa (100 mL)"],
-                instructions: ["Lave o espinafre.", "Esprema as laranjas.", "Bata tudo no liquidificador por 2 minutos."]
-            },
-            {
-                id: 21,
-                title: "Cereal crocante de trigo-vermelho",
-                displayCategory: "Café Caseiro",
-                tags: ['cafe', 'vegano', 'vegetariano', 'simples'],
-                calories: 413,
-                time: "15 min",
-                difficulty: "Normal",
-                yield: "1 porção",
-                description: "Faça seu próprio cereal em casa assando flocos de trigo com banana. Dica: já que você está fazendo seu próprio cereal, aproveite para usar a imaginação e usar flocos de coco ou nozes para dar um sabor especial.",
-                ingredients: ["½ banana", "Óleo de coco", "Leite de amêndoa", "Cranberry", "Xarope de agave", "Flocos de trigo-vermelho (60 g)"],
-                instructions: ["Faça uma pasta com a banana, óleo, agave e trigo.", "Asse a 175°C por 10 min.", "Quebre em pedaços e sirva com leite."]
-            },
-            {
-                id: 22,
-                title: "Bruschetta de avocado",
-                displayCategory: "Lanche Salgado",
-                tags: ['lanche', 'jantar', 'vegano', 'vegetariano', 'simples'],
-                calories: 427,
-                time: "15 min",
-                difficulty: "Fácil",
-                yield: "2 porções",
-                description: "Muito mais que um antepasto! Excelente refeição leve ou entrada refinada.",
-                ingredients: ["Baguete integral (125 g)", "Azeite", "2 tomates", "Alho e cebola", "1 avocado", "Limão, coentro e temperos"],
-                instructions: ["Asse as fatias de pão com azeite.", "Misture tomate picado, alho, cebola e azeite.", "Misture avocado picado com limão.", "Junte tudo, tempere e cubra os pães."]
-            },
-            {
-                id: 23,
-                title: "Misto quente de batata-doce",
-                displayCategory: "Pré-Treino",
-                tags: ['lanche', 'cafe', 'vegano', 'vegetariano', 'simples'],
-                calories: 303,
-                time: "28 min",
-                difficulty: "Fácil",
-                yield: "3 porções",
-                description: "Use fatias de batata-doce como 'pão'! Recheio energético de pasta de amendoim e banana. Dica: Em vez de preparar a batata-doce no forno, você pode fazê-la em um torradeira.",
-                ingredients: ["1 batata-doce (150 g)", "1½ bananas", "Pasta de amendoim (80 g)", "Farinha de linhaça"],
-                instructions: ["Corte a batata em fatias e asse por 20 min a 200°C (ou use torradeira).", "Cubra com pasta de amendoim e rodelas de banana.", "Salpique linhaça."]
-            },
-            {
-                id: 24,
-                title: "Geleia de morango com chia",
-                displayCategory: "Doce Fit",
-                tags: ['doces', 'vegano', 'vegetariano', 'lowcal', 'zeroacucar', 'simples'],
-                calories: 12,
-                time: "15 min",
-                difficulty: "Fácil",
-                yield: "20 porções",
-                description: "Sem açúcar refinado e cheia de sabor! A chia ajuda a dar a consistência de geleia. Dica: Que tal uma geleia de morango com manga, por exemplo?",
-                ingredients: ["Morango (400 g)", "Hortelã fresca", "Adoçante a gosto", "Chia (20 g)"],
-                instructions: ["Cozinhe os morangos com hortelã e adoçante.", "Bata com mixer.", "Adicione chia e cozinhe por mais 5 min até engrossar."]
-            },
-            {
-                id: 15,
-                title: "Shake de proteína de chocolate",
-                displayCategory: "Pré-Treino/Lanche",
-                tags: ['lanche', 'proteina', 'rapido', 'simples', 'zeroacucar'],
-                calories: 284,
-                time: "5 min",
-                difficulty: "Fácil",
-                yield: "2 porções",
-                description: "Shake rápido e delicioso! O cacau em pó dá o sabor e a proteína promove saciedade. Ótima opção pré-treino.",
-                ingredients: [
-                    "1 banana madura (150 g)",
-                    "Água (300 mL)",
-                    "Farinha de linhaça (2 colheres de sopa, 20 g)",
-                    "Aveia (3 colheres de sopa, 24 g)",
-                    "Proteína em pó (2 colheres de sopa, 24 g)",
-                    "Cacau em pó (10 g)",
-                    "Pasta de amendoim (1 colher de sopa, 20 g)"
-                ],
-                instructions: [
-                    "Descasque a banana.",
-                    "Coloque-a no liquidificador junto com os outros ingredientes e bata até obter um creme.",
-                    "Aproveite!"
-                ]
-            },
-            {
-                id: 14,
-                title: "Shake proteico de frutas vermelhas",
-                displayCategory: "Pós-Treino",
-                tags: ['lanche', 'proteina', 'lowcal', 'lowfat', 'rapido', 'zeroacucar'],
-                calories: 163,
-                time: "9 min",
-                difficulty: "Fácil",
-                yield: "1 porção",
-                description: "Leve e proteico, feito com claras pasteurizadas e iogurte. Perfeito para recuperação muscular com baixas calorias.",
-                ingredients: [
-                    "Linhaça (5 g)",
-                    "Água (1 colher de sopa, 15 mL)",
-                    "3 claras de ovo (105 g)",
-                    "Iogurte natural sem gordura (100 g)",
-                    "Frutas vermelhas congeladas (100 g)",
-                    "Extrato de baunilha em pó (1 g)",
-                    "Eritritol em pó (1 colher de sopa, 7 g)"
-                ],
-                instructions: [
-                    "Deixe a linhaça de molho na água por cerca de 5 minutos.",
-                    "Em um liquidificador, bata as claras com o iogurte e a linhaça.",
-                    "Adicione o eritritol, as frutas vermelhas e a baunilha e bata mais uma vez, até obter um smoothie cremoso.",
-                    "Transfira para um copo e beba imediatamente."
-                ]
-            },
-            {
-                id: 13,
-                title: "Shake de mirtilo e coco",
-                displayCategory: "Proteico Caseiro",
-                tags: ['lanche', 'proteina', 'rapido', 'simples', 'cafe'],
-                calories: 358,
-                time: "5 min",
-                difficulty: "Fácil",
-                yield: "1 porção",
-                description: "Alternativa saudável aos shakes industrializados. O ingrediente principal é o iogurte grego, garantindo proteínas de qualidade sem aditivos artificiais.",
-                ingredients: [
-                    "Iogurte grego natural, sem gordura (300 g)",
-                    "Mirtilo (125 g)",
-                    "Flocos de coco (1 colher de sopa, 5 g)",
-                    "Leite semidesnatado (100 mL)"
-                ],
-                instructions: [
-                    "Coloque o iogurte, o leite, o mirtilo e os flocos de coco em um liquidificador e bata em alta velocidade até que a mistura fique homogênea.",
-                    "Sirva com alguns flocos de coco por cima.",
-                    "Aproveite!"
-                ]
-            },
-            {
-                id: 12,
-                title: "Smoothie de banana e tâmara",
-                displayCategory: "Café/Lanche",
-                tags: ['cafe', 'lanche', 'vegano', 'vegetariano', 'zeroacucar', 'simples'],
-                calories: 237,
-                time: "15 min",
-                difficulty: "Fácil",
-                yield: "2 porções",
-                description: "Delicioso e refrescante, dispensa adoçantes graças às tâmaras. Dica: Deixe as tâmaras de molho no leite durante a noite se tiver pressa pela manhã.",
-                ingredients: [
-                    "Tâmara, sem caroço (90 g)",
-                    "Leite de amêndoa (350 mL)",
-                    "1 banana pequena (75 g)",
-                    "Manteiga de amêndoa (2 colheres de chá, 8 g)",
-                    "5 cubos de gelo (110 g)"
-                ],
-                instructions: [
-                    "Para começar, coloque as tâmaras de molho em água fervente por 10 minutos para amolecer.",
-                    "Escoe a água das tâmaras.",
-                    "Adicione todos os ingredientes em um liquidificador e bata até obter uma consistência cremosa.",
-                    "Aproveite!"
-                ]
-            },
-            {
-                id: 11,
-                title: "Shake de proteína com pasta de amendoim",
-                displayCategory: "Proteico",
-                tags: ['lanche', 'proteina', 'rapido', 'simples', 'zeroacucar'],
-                calories: 402,
-                time: "5 min",
-                difficulty: "Fácil",
-                yield: "1 porção",
-                description: "Pasta de amendoim é um dos lanches preferidos dos atletas. Servida em um shake, é uma fonte de proteínas excelente e deliciosa.",
-                ingredients: [
-                    "Leite de amêndoa, sem açúcar (150 mL)",
-                    "Pasta de amendoim (1 colher de sopa, 20 g)",
-                    "1 banana madura (150 g)",
-                    "Canela (a gosto)",
-                    "Proteína em pó, sabor chocolate (30 g)"
-                ],
-                instructions: [
-                    "Coloque todos os ingredientes no liquidificador e misture até obter uma mistura homogênea.",
-                    "Consuma imediatamente."
-                ]
-            },
-            {
-                id: 10,
-                title: "Shake de banana e nozes",
-                displayCategory: "Pós-Treino/Café",
-                tags: ['cafe', 'lanche', 'proteina', 'rapido', 'simples'],
-                calories: 434,
-                time: "5 min",
-                difficulty: "Fácil",
-                yield: "1 porção",
-                description: "Nosso shake poderoso com banana, nozes e mel funciona muito bem para estimular seu metabolismo. Ideal pós-treino ou ao acordar. Dica: para quem não curte nozes, elas podem ser substituídas por amêndoas ou avelãs.",
-                ingredients: [
-                    "Iogurte grego natural, sem gordura (150 g)",
-                    "Leite de amêndoa, sem açúcar (300 mL)",
-                    "Mel (1 colher de chá, 10 g)",
-                    "½ banana (75 g)",
-                    "Nozes, picadas (24 g)"
-                ],
-                instructions: [
-                    "Coloque todos os ingredientes, exceto 2 ou 3 nozes, no liquidificador e bata.",
-                    "Coloque o shake em um copo e decore com as nozes restantes.",
-                    "Aproveite!"
-                ]
-            },
-            {
-                id: 9,
-                title: "Smoothie de Morango e Banana",
-                displayCategory: "Café/Lanche",
-                tags: ['cafe', 'lanche', 'vegetariano', 'rapido', 'simples', 'lowcal'],
-                calories: 150,
-                time: "5 min",
-                difficulty: "Fácil",
-                yield: "2 porções",
-                description: "Smoothies podem ser preparados rapidamente e são cheios de frutas frescas. A banana garante a doçura desta receita. Uma delícia refrescante!",
-                ingredients: [
-                    "Morango (200 g)",
-                    "1 Banana (150 g)",
-                    "Iogurte light (180 g)",
-                    "Cubos de gelo (50 g)"
-                ],
-                instructions: [
-                    "Lave os morangos e coloque-os em um liquidificador.",
-                    "Corte a banana em pedaços e adicione ao liquidificador com o resto dos ingredientes.",
-                    "Bata até obter uma mistura lisa.",
-                    "Aproveite!"
-                ]
-            },
-            {
-                id: 8,
-                title: "Shake de Chocolate e Hortelã",
-                displayCategory: "Café/Lanche",
-                tags: ['cafe', 'lanche', 'vegano', 'vegetariano', 'zeroacucar', 'simples', 'rapido'],
-                calories: 232,
-                time: "3 min",
-                difficulty: "Fácil",
-                yield: "2 porções",
-                description: "Nosso shake de chocolate com um toque de hortelã é ótimo para o café da manhã ou para um lanche. A doçura natural da banana e os ácidos graxos saudáveis do avocado promoverão saciedade. Dica: se você quiser seu shake ainda mais doce, use uma banana bem madura.",
-                ingredients: [
-                    "Cacau em pó (2 colheres de sopa, 30 g)",
-                    "Hortelã fresca (10 g)",
-                    "½ avocado (110 g)",
-                    "1 banana madura (150 g)",
-                    "Leite de amêndoas não adoçado (300 mL)"
-                ],
-                instructions: [
-                    "Corte o avocado e a banana em pedaços pequenos. Misture com os outros ingredientes e bata tudo em um liquidificador.",
-                    "Distribua o shake em dois copos e decore com folha de hortelã.",
-                    "Aproveite!"
-                ]
-            },
-            {
-                id: 7,
-                title: "Lassi de Manga",
-                displayCategory: "Café da Manhã",
-                tags: ['cafe', 'lanche', 'vegetariano', 'simples', 'rapido', 'lowcal', 'lowfat'],
-                calories: 211,
-                time: "3 min",
-                difficulty: "Muito Fácil",
-                yield: "2 porções",
-                description: "Este shake de manga é uma bebida de beleza. A manga contém betacaroteno, que protege as células. Dica: Use cubos de gelo para deixar bem refrescante!",
-                ingredients: [
-                    "Manga em cubos, congelada (300 g)", 
-                    "Iogurte light (300 g)", 
-                    "Mel (1 colher de sopa, 20 g)", 
-                    "Cardamomo em pó (5 g)"
-                ],
-                instructions: [
-                    "Bata todos os ingredientes no liquidificador.", 
-                    "Sirva bem gelado e aproveite!"
-                ]
-            },
-            {
-                id: 6,
-                title: "Brócolis e couve-flor ao forno",
-                displayCategory: "Almoço/Jantar",
-                tags: ['almoco', 'jantar', 'vegetariano', 'lowcarb', 'lowcal', 'lowfat'],
-                calories: 356,
-                time: "25 min",
-                difficulty: "Normal",
-                yield: "2 porções",
-                description: "Este prato de brócolis e couve-flor é muito saboroso. Graças ao molho cremoso de queijo, você vai ficar saciado(a) por um bom tempo.",
-                ingredients: ["Couve-flor (200 g)", "Brócolis (200 g)", "Queijo alpino ralado (100 g)", "Creme azedo (45 g)", "Azeite e temperos"],
-                instructions: ["Lave a couve-flor e o brócolis e corte-os. Cozinhe por 7 minutos.", "Misture o queijo com o creme azedo e temperos.", "Coloque os vegetais na assadeira, cubra com molho.", "Asse a 160°C por 15 minutos."]
-            },
-            {
-                id: 1,
-                title: "Crepioca Fit",
-                displayCategory: "Café da Manhã",
-                tags: ['cafe', 'proteina', 'zeroacucar', 'simples', 'rapido', 'lowcal'],
-                calories: 180,
-                time: "10 min",
-                difficulty: "Fácil",
-                yield: "1 porção",
-                description: "A queridinha das dietas! Prática, rápida e versátil para começar o dia.",
-                ingredients: ["1 ovo", "2 colheres (sopa) de goma de tapioca", "1 colher (sopa) de requeijão light", "Sal a gosto"],
-                instructions: ["Bata o ovo com a tapioca e o requeijão.", "Tempere com sal.", "Despeje em uma frigideira antiaderente untada.", "Doure dos dois lados e sirva recheado a gosto."]
-            },
-            {
-                id: 2,
-                title: "Salada de Pote",
-                displayCategory: "Almoço Prático",
-                tags: ['almoco', 'jantar', 'lowcal', 'lowcarb', 'proteina', 'rapido', 'simples'],
-                calories: 320,
-                time: "15 min",
-                difficulty: "Fácil",
-                yield: "1 pote",
-                description: "Perfeita para levar para o trabalho. O segredo está na ordem dos ingredientes!",
-                ingredients: ["Mix de folhas", "100g de frango desfiado", "Tomate cereja", "Cenoura ralada", "Molho de iogurte"],
-                instructions: ["Comece colocando o molho no fundo do pote.", "Adicione a cenoura e o tomate.", "Coloque o frango.", "Finalize com as folhas."]
-            },
-            {
-                id: 3,
-                title: "Overnight Oats",
-                displayCategory: "Café/Lanche",
-                tags: ['cafe', 'lanche', 'vegetariano', 'simples', 'rapido', 'zeroacucar'],
-                calories: 250,
-                time: "5 min",
-                difficulty: "Muito Fácil",
-                yield: "1 pote",
-                description: "Café da manhã pronto para quem acorda na correria.",
-                ingredients: ["30g de aveia em flocos", "100ml de leite vegetal", "1 colher de chia", "Frutas vermelhas"],
-                instructions: ["Misture a aveia, o leite e a chia em um pote.", "Deixe na geladeira durante a noite.", "Na manhã seguinte, adicione as frutas."]
-            },
-            {
-                id: 4,
-                title: "Brigadeiro de Whey",
-                displayCategory: "Doce Fit",
-                tags: ['lanche', 'proteina', 'zeroacucar', 'simples', 'rapido'],
-                calories: 120,
-                time: "15 min",
-                difficulty: "Fácil",
-                yield: "5 bolinhas",
-                description: "Para matar a vontade de doce sem sair da dieta.",
-                ingredients: ["1 scoop de Whey Protein chocolate", "1 colher de cacau em pó", "Leite em pó desnatado", "Água"],
-                instructions: ["Misture todos os secos.", "Vá adicionando água morna aos poucos até dar ponto.", "Enrole e gele."]
-            },
-            {
-                id: 5,
-                title: "Panqueca de Banana",
-                displayCategory: "Café da Manhã",
-                tags: ['cafe', 'lanche', 'zeroacucar', 'simples', 'rapido', 'lowfat', 'vegetariano'],
-                calories: 210,
-                time: "10 min",
-                difficulty: "Fácil",
-                yield: "1 porção",
-                description: "Apenas 3 ingredientes para um lanche saudável.",
-                ingredients: ["1 banana madura amassada", "2 ovos", "Canela a gosto"],
-                instructions: ["Misture a banana com os ovos e canela.", "Aqueça a frigideira untada.", "Faça discos e doure dos dois lados."]
-            }
+            { id: 1, title: "Crepioca Fit", displayCategory: "Café da Manhã", tags: ['cafe', 'proteina', 'zeroacucar', 'simples', 'rapido', 'lowcal'], calories: 180, time: "10 min", difficulty: "Fácil", yield: "1 porção", description: "A queridinha das dietas! Prática, rápida e versátil para começar o dia.", ingredients: ["1 ovo", "2 colheres goma tapioca", "1 colher requeijão light", "Sal a gosto"], instructions: ["Bata o ovo com a tapioca.", "Tempere.", "Frite em frigideira untada."] },
+            { id: 2, title: "Salada de Pote", displayCategory: "Almoço Prático", tags: ['almoco', 'jantar', 'lowcal', 'lowcarb', 'proteina', 'rapido', 'simples'], calories: 320, time: "15 min", difficulty: "Fácil", yield: "1 pote", description: "Perfeita para levar para o trabalho. O segredo está na ordem dos ingredientes!", ingredients: ["Folhas", "100g frango desfiado", "Tomate cereja", "Cenoura", "Molho iogurte"], instructions: ["Molho no fundo.", "Legumes duros.", "Frango.", "Folhas por cima."] },
+            { id: 3, title: "Overnight Oats", displayCategory: "Café/Lanche", tags: ['cafe', 'lanche', 'vegetariano', 'simples', 'rapido', 'zeroacucar'], calories: 250, time: "5 min", difficulty: "Muito Fácil", yield: "1 pote", description: "Café da manhã pronto para quem acorda na correria.", ingredients: ["30g aveia", "100ml leite vegetal", "Chia", "Frutas"], instructions: ["Misture tudo.", "Deixe na geladeira a noite toda."] },
+            { id: 4, title: "Brigadeiro de Whey", displayCategory: "Doce Fit", tags: ['lanche', 'proteina', 'zeroacucar', 'simples', 'rapido'], calories: 120, time: "15 min", difficulty: "Fácil", yield: "5 bolinhas", description: "Para matar a vontade de doce sem sair da dieta.", ingredients: ["1 scoop Whey Chocolate", "Cacau em pó", "Leite em pó desnatado", "Água"], instructions: ["Misture secos.", "Adicione água aos poucos até dar ponto."] },
+            { id: 5, title: "Panqueca de Banana", displayCategory: "Café da Manhã", tags: ['cafe', 'lanche', 'zeroacucar', 'simples', 'rapido', 'lowfat', 'vegetariano'], calories: 210, time: "10 min", difficulty: "Fácil", yield: "1 porção", description: "Apenas 3 ingredientes para um lanche saudável.", ingredients: ["1 banana madura", "2 ovos", "Canela"], instructions: ["Amasse a banana.", "Misture ovos e canela.", "Frite discos."] },
+            { id: 6, title: "Brócolis e couve-flor ao forno", displayCategory: "Almoço/Jantar", tags: ['almoco', 'jantar', 'vegetariano', 'lowcarb', 'lowcal', 'lowfat'], calories: 356, time: "25 min", difficulty: "Normal", yield: "2 porções", description: "Este prato de brócolis e couve-flor é muito saboroso com molho de queijo.", ingredients: ["Couve-flor", "Brócolis", "Queijo alpino", "Creme azedo", "Azeite"], instructions: ["Cozinhe vegetais.", "Faça molho de queijo.", "Gratine no forno."] },
+            { id: 7, title: "Lassi de Manga", displayCategory: "Café da Manhã", tags: ['cafe', 'lanche', 'vegetariano', 'simples', 'rapido', 'lowcal', 'lowfat'], calories: 211, time: "3 min", difficulty: "Muito Fácil", yield: "2 porções", description: "Bebida refrescante com iogurte e manga. Dica: Use cubos de gelo!", ingredients: ["Manga congelada", "Iogurte light", "Mel", "Cardamomo"], instructions: ["Bata tudo no liquidificador."] },
+            { id: 8, title: "Shake de Chocolate e Hortelã", displayCategory: "Café/Lanche", tags: ['cafe', 'lanche', 'vegano', 'vegetariano', 'zeroacucar', 'simples', 'rapido'], calories: 232, time: "3 min", difficulty: "Fácil", yield: "2 porções", description: "Doçura natural da banana e frescor da hortelã.", ingredients: ["Cacau em pó", "Hortelã", "Avocado", "Banana", "Leite amêndoas"], instructions: ["Bata tudo no liquidificador."] },
+            { id: 9, title: "Smoothie de Morango e Banana", displayCategory: "Café/Lanche", tags: ['cafe', 'lanche', 'vegetariano', 'rapido', 'simples', 'lowcal'], calories: 150, time: "5 min", difficulty: "Fácil", yield: "2 porções", description: "Clássico refrescante e pouco calórico.", ingredients: ["Morango", "Banana", "Iogurte light", "Gelo"], instructions: ["Bata tudo no liquidificador."] },
+            { id: 10, title: "Shake de banana e nozes", displayCategory: "Pós-Treino/Café", tags: ['cafe', 'lanche', 'proteina', 'rapido', 'simples'], calories: 434, time: "5 min", difficulty: "Fácil", yield: "1 porção", description: "Energia pura para começar o dia.", ingredients: ["Iogurte grego", "Leite amêndoa", "Mel", "Banana", "Nozes"], instructions: ["Bata tudo.", "Decore com nozes."] },
+            { id: 11, title: "Shake de proteína com pasta de amendoim", displayCategory: "Proteico", tags: ['lanche', 'proteina', 'rapido', 'simples', 'zeroacucar'], calories: 402, time: "5 min", difficulty: "Fácil", yield: "1 porção", description: "Favorito dos atletas para ganho de massa.", ingredients: ["Leite amêndoa", "Pasta amendoim", "Banana", "Proteína chocolate"], instructions: ["Bata tudo no liquidificador."] },
+            { id: 12, title: "Smoothie de banana e tâmara", displayCategory: "Café/Lanche", tags: ['cafe', 'lanche', 'vegano', 'vegetariano', 'zeroacucar', 'simples'], calories: 237, time: "15 min", difficulty: "Fácil", yield: "2 porções", description: "Doçura natural das tâmaras. Dica: Deixe tâmaras de molho.", ingredients: ["Tâmara", "Leite amêndoa", "Banana", "Manteiga amêndoa"], instructions: ["Hidrate tâmaras.", "Bata com o resto."] },
+            { id: 13, title: "Shake de mirtilo e coco", displayCategory: "Proteico Caseiro", tags: ['lanche', 'proteina', 'rapido', 'simples', 'cafe'], calories: 358, time: "5 min", difficulty: "Fácil", yield: "1 porção", description: "Proteína de qualidade sem aditivos.", ingredients: ["Iogurte grego", "Mirtilo", "Flocos de coco", "Leite"], instructions: ["Bata tudo.", "Sirva com coco."] },
+            { id: 14, title: "Shake proteico frutas vermelhas", displayCategory: "Pós-Treino", tags: ['lanche', 'proteina', 'lowcal', 'lowfat', 'rapido', 'zeroacucar'], calories: 163, time: "9 min", difficulty: "Fácil", yield: "1 porção", description: "Leve e proteico com claras pasteurizadas.", ingredients: ["Linhaça", "Água", "Claras", "Iogurte", "Frutas vermelhas"], instructions: ["Hidrate linhaça.", "Bata com claras e iogurte."] },
+            { id: 15, title: "Shake proteína chocolate", displayCategory: "Pré-Treino", tags: ['lanche', 'proteina', 'rapido', 'simples', 'zeroacucar'], calories: 284, time: "5 min", difficulty: "Fácil", yield: "2 porções", description: "Rápido e delicioso com cacau.", ingredients: ["Banana", "Água", "Linhaça", "Aveia", "Proteína", "Cacau"], instructions: ["Bata tudo no liquidificador."] },
+            { id: 16, title: "Mingau de aveia chocolate e morango", displayCategory: "Café Vegano", tags: ['cafe', 'vegano', 'vegetariano', 'doces', 'simples'], calories: 389, time: "10 min", difficulty: "Fácil", yield: "1 porção", description: "Doce e saciante.", ingredients: ["Banana", "Aveia", "Leite amêndoa", "Cacau", "Morango"], instructions: ["Cozinhe aveia com leite e cacau.", "Sirva com frutas."] },
+            { id: 17, title: "Cereal crocante de canela", displayCategory: "Café/Lanche", tags: ['cafe', 'lanche', 'vegano', 'vegetariano', 'lowcarb'], calories: 455, time: "85 min", difficulty: "Normal", yield: "4 porções", description: "Versão caseira e saudável de cereal.", ingredients: ["Óleo de coco", "Amêndoa triturada", "Linhaça", "Canela"], instructions: ["Faça massa.", "Asse até ficar crocante."] },
+            { id: 18, title: "Overnight amêndoa e framboesa", displayCategory: "Café Prático", tags: ['cafe', 'vegano', 'vegetariano', 'simples', 'zeroacucar'], calories: 286, time: "3h+", difficulty: "Fácil", yield: "1 porção", description: "Prepare na noite anterior.", ingredients: ["Aveia", "Amêndoa", "Leite amêndoa", "Framboesa"], instructions: ["Misture e deixe na geladeira."] },
+            { id: 19, title: "Mingau de aveia banana e morango", displayCategory: "Café Rápido", tags: ['cafe', 'vegano', 'vegetariano', 'rapido', 'simples', 'lowcal'], calories: 373, time: "8 min", difficulty: "Fácil", yield: "1 porção", description: "Feito no microondas.", ingredients: ["Banana", "Aveia", "Leite amêndoa", "Canela", "Morango"], instructions: ["Misture.", "Aqueça no microondas."] },
+            { id: 20, title: "Smoothie verde de espinafre", displayCategory: "Detox", tags: ['lanche', 'vegano', 'vegetariano', 'lowcal', 'rapido', 'simples'], calories: 273, time: "5 min", difficulty: "Fácil", yield: "1 porção", description: "Saboroso e cheio de vitaminas.", ingredients: ["Espinafre", "Hortelã", "Banana", "Laranja"], instructions: ["Bata tudo."] },
+            { id: 21, title: "Cereal crocante trigo-vermelho", displayCategory: "Café Caseiro", tags: ['cafe', 'vegano', 'vegetariano', 'simples'], calories: 413, time: "15 min", difficulty: "Normal", yield: "1 porção", description: "Cereal caseiro assado.", ingredients: ["Banana", "Óleo coco", "Leite amêndoa", "Trigo vermelho"], instructions: ["Misture e asse."] },
+            { id: 22, title: "Bruschetta de avocado", displayCategory: "Lanche Salgado", tags: ['lanche', 'jantar', 'vegano', 'vegetariano', 'simples'], calories: 427, time: "15 min", difficulty: "Fácil", yield: "2 porções", description: "Entrada ou lanche refinado.", ingredients: ["Baguete integral", "Azeite", "Tomate", "Avocado", "Temperos"], instructions: ["Toste pão.", "Cubra com mistura de tomate e avocado."] },
+            { id: 23, title: "Misto quente batata-doce", displayCategory: "Pré-Treino", tags: ['lanche', 'cafe', 'vegano', 'vegetariano', 'simples'], calories: 303, time: "28 min", difficulty: "Fácil", yield: "3 porções", description: "Batata doce como pão.", ingredients: ["Batata doce", "Banana", "Pasta amendoim"], instructions: ["Asse fatias de batata.", "Recheie."] },
+            { id: 24, title: "Geleia de morango com chia", displayCategory: "Doce Fit", tags: ['doces', 'vegano', 'vegetariano', 'lowcal', 'zeroacucar', 'simples'], calories: 12, time: "15 min", difficulty: "Fácil", yield: "20 porções", description: "Geleia saudável sem açúcar.", ingredients: ["Morango", "Chia", "Adoçante"], instructions: ["Cozinhe morango.", "Adicione chia para engrossar."] },
+            { id: 25, title: "Sanduíche de tomate e ovos", displayCategory: "Café Prático", tags: ['cafe', 'almoco', 'vegetariano', 'proteina', 'normal'], calories: 240, time: "15 min", difficulty: "Normal", yield: "2 porções", description: "Sanduíche clássico e proteico.", ingredients: ["Ovo", "Alcaparra", "Tomate", "Iogurte", "Pão integral"], instructions: ["Faça pasta de ovos.", "Monte sanduíche."] },
+            { id: 26, title: "Rabanada de morango", displayCategory: "Café Especial", tags: ['cafe', 'vegetariano', 'doces', 'simples', 'rapido'], calories: 260, time: "10 min", difficulty: "Fácil", yield: "2 porções", description: "French toast saudável.", ingredients: ["Ovos", "Canela", "Pão integral", "Morango", "Leite"], instructions: ["Passe pão no ovo e leite.", "Grelhe.", "Sirva com morango."] },
+            { id: 27, title: "Triguilho com framboesas", displayCategory: "Café Energia", tags: ['cafe', 'vegetariano', 'simples', 'rapido'], calories: 467, time: "10 min", difficulty: "Fácil", yield: "1 porção", description: "Rico em fibras.", ingredients: ["Iogurte grego", "Triguilho", "Amêndoas", "Framboesas"], instructions: ["Hidrate triguilho.", "Misture com iogurte e frutas."] },
+            { id: 28, title: "Ovos mexidos espinafre e feta", displayCategory: "Café Low Carb", tags: ['cafe', 'almoco', 'vegetariano', 'proteina', 'lowcarb', 'simples', 'rapido'], calories: 546, time: "10 min", difficulty: "Fácil", yield: "1 porção", description: "Café da manhã reforçado.", ingredients: ["Tomate", "Espinafre", "Ovos", "Feta"], instructions: ["Refogue vegetais.", "Adicione ovos e queijo."] },
+            { id: 29, title: "Muffin de banana e chocolate", displayCategory: "Doce Fit", tags: ['cafe', 'lanche', 'doces', 'vegetariano', 'simples', 'lowcal'], calories: 152, time: "25 min", difficulty: "Fácil", yield: "9 porções", description: "Muffin energético.", ingredients: ["Mel", "Ovo", "Farinha integral", "Chocolate", "Banana"], instructions: ["Misture tudo.", "Asse em forminhas."] },
+            { id: 30, title: "Muffins de proteína (Salgados)", displayCategory: "Café Proteico", tags: ['cafe', 'lanche', 'proteina', 'lowcal', 'lowcarb', 'simples'], calories: 41, time: "35 min", difficulty: "Fácil", yield: "9 porções", description: "Lanche salgado leve.", ingredients: ["Tomate", "Cebolinha", "Ovos", "Claras"], instructions: ["Misture ovos e vegetais.", "Asse."] },
+            { id: 31, title: "Panquecas de presunto e ricota", displayCategory: "Café Proteico", tags: ['cafe', 'almoco', 'proteina', 'salgado', 'rapido'], calories: 476, time: "15 min", difficulty: "Fácil", yield: "2 porções", description: "Panqueca salgada de aveia.", ingredients: ["Ovos", "Aveia", "Cottage", "Presunto", "Ricota"], instructions: ["Faça panqueca.", "Recheie com presunto e queijo."] },
+            { id: 32, title: "Ovos mexidos espinafre presunto", displayCategory: "Café Salgado", tags: ['cafe', 'almoco', 'lowcarb', 'proteina', 'salgado', 'rapido'], calories: 230, time: "25 min", difficulty: "Fácil", yield: "2 porções", description: "Clássico reforçado.", ingredients: ["Ovos", "Espinafre", "Presunto"], instructions: ["Refogue presunto.", "Faça ovos mexidos com espinafre."] },
+            { id: 33, title: "Suflê de mirtilo e iogurte", displayCategory: "Café/Lanche", tags: ['cafe', 'lanche', 'doces', 'proteina', 'vegetariano'], calories: 300, time: "65 min", difficulty: "Fácil", yield: "3 porções", description: "Pode comer quente ou frio.", ingredients: ["Iogurte grego", "Ovos", "Pudim pó", "Mirtilo"], instructions: ["Bata e asse."] },
+            { id: 34, title: "Wrap de omelete e salmão", displayCategory: "Almoço/Jantar", tags: ['almoco', 'jantar', 'proteina', 'lowcarb', 'salgado'], calories: 352, time: "20 min", difficulty: "Normal", yield: "4 porções", description: "Omelete como massa de wrap.", ingredients: ["Ervilha", "Ovos", "Cream cheese", "Salmão"], instructions: ["Faça disco de ovo.", "Recheie e enrole."] },
+            { id: 35, title: "Wraps de morango pro café", displayCategory: "Doce Fit", tags: ['cafe', 'lanche', 'vegetariano', 'doces', 'rapido', 'simples'], calories: 297, time: "10 min", difficulty: "Fácil", yield: "2 porções", description: "Wrap doce refrescante.", ingredients: ["Morango", "Cream cheese", "Aveia", "Tortilha"], instructions: ["Passe cream cheese.", "Adicione morangos e enrole."] },
+            { id: 36, title: "Rolinhos pimentão e cream cheese", displayCategory: "Lanche Leve", tags: ['lanche', 'jantar', 'lowcal', 'rapido', 'simples'], calories: 353, time: "10 min", difficulty: "Fácil", yield: "2 porções", description: "Lanche frio e crocante.", ingredients: ["Pimentão", "Cream cheese", "Peru", "Tortilha"], instructions: ["Recheie tortilha com tudo.", "Corte em rolinhos."] },
+            { id: 37, title: "Gyeran Mari (Omelete coreano)", displayCategory: "Café/Almoço", tags: ['cafe', 'almoco', 'proteina', 'lowcarb', 'rapido'], calories: 303, time: "12 min", difficulty: "Fácil", yield: "2 porções", description: "Omelete enrolado com vegetais.", ingredients: ["Cenoura", "Cebolinha", "Ovos"], instructions: ["Bata ovos com vegetais.", "Frite enrolando."] },
+            { id: 38, title: "Pão Low Carb sem glúten", displayCategory: "Café/Lanche", tags: ['cafe', 'lanche', 'lowcarb', 'proteina', 'simples'], calories: 165, time: "75 min", difficulty: "Normal", yield: "10 fatias", description: "Pão de farinha de amêndoa.", ingredients: ["Iogurte", "Ovos", "Sementes", "Farinha amêndoa"], instructions: ["Misture tudo.", "Asse em forma de pão."] },
+            { id: 39, title: "Ovos mexidos com salmão", displayCategory: "Café Proteico", tags: ['cafe', 'almoco', 'proteina', 'lowcarb', 'rapido'], calories: 500, time: "15 min", difficulty: "Normal", yield: "2 porções", description: "Rico em ômega 3.", ingredients: ["Ovos", "Pimentão", "Salmão defumado"], instructions: ["Refogue vegetais.", "Junte ovos e salmão."] },
+            { id: 40, title: "Sanduíche de peru mediterrâneo", displayCategory: "Lanche Prático", tags: ['lanche', 'jantar', 'proteina', 'rapido', 'normal'], calories: 313, time: "15 min", difficulty: "Normal", yield: "4 porções", description: "Sanduíche completo.", ingredients: ["Maionese", "Extrato tomate", "Pão integral", "Peru", "Vegetais"], instructions: ["Monte o sanduíche."] }
         ];
-
-        // --- FUNCTIONS ---
 
         const views = {
             home: `
@@ -1007,54 +279,42 @@
                             <h3 class="font-bold text-lg text-gray-800">Atalhos</h3>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
-                            <!-- Existing Recipes -->
                             <button onclick="navigate('recipes')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
                                 <div class="w-12 h-12 rounded-full bg-green-100 text-green-500 flex items-center justify-center group-hover:scale-110 transition">
                                     <i class="fa-solid fa-leaf"></i>
                                 </div>
                                 <span class="font-medium text-sm">Receitinhas</span>
                             </button>
-                            <!-- Water (Visual) -->
                             <button onclick="navigate('water')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
                                 <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center group-hover:scale-110 transition">
                                     <i class="fa-solid fa-glass-water"></i>
                                 </div>
                                 <span class="font-medium text-sm">Água</span>
                             </button>
-                            
-                            <!-- Fim de Semana -->
                             <button onclick="navigate('weekend')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
                                 <div class="w-12 h-12 rounded-full bg-purple-100 text-purple-500 flex items-center justify-center group-hover:scale-110 transition">
                                     <i class="fa-solid fa-calendar-check"></i>
                                 </div>
                                 <span class="font-medium text-sm">Fim de Semana</span>
                             </button>
-
-                            <!-- Kit da Bestie -->
                             <button onclick="navigate('kit')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
                                 <div class="w-12 h-12 rounded-full bg-teal-100 text-teal-500 flex items-center justify-center group-hover:scale-110 transition">
                                     <i class="fa-solid fa-kit-medical"></i>
                                 </div>
                                 <span class="font-medium text-sm">Kit da Bestie</span>
                             </button>
-
-                            <!-- Trocas -->
                             <button onclick="navigate('swaps')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
                                 <div class="w-12 h-12 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center group-hover:scale-110 transition">
                                     <i class="fa-solid fa-repeat"></i>
                                 </div>
                                 <span class="font-medium text-sm">Trocas</span>
                             </button>
-
-                            <!-- Economia -->
                             <button onclick="navigate('savings')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
                                 <div class="w-12 h-12 rounded-full bg-yellow-100 text-yellow-500 flex items-center justify-center group-hover:scale-110 transition">
                                     <i class="fa-solid fa-piggy-bank"></i>
                                 </div>
                                 <span class="font-medium text-sm">Economia</span>
                             </button>
-
-                            <!-- Treino -->
                             <button onclick="navigate('workout')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
                                 <div class="w-12 h-12 rounded-full bg-red-100 text-red-500 flex items-center justify-center group-hover:scale-110 transition">
                                     <i class="fa-solid fa-dumbbell"></i>
@@ -1079,18 +339,9 @@
                             <p class="text-sm text-gray-600">Escolha <strong>2 refeições livres</strong> no fim de semana (Sábado ou Domingo) para comer o que tem vontade!</p>
                         </div>
                         <ul class="space-y-3 text-sm text-gray-600">
-                            <li class="flex items-start gap-3">
-                                <i class="fa-solid fa-check text-green-500 mt-1"></i>
-                                <span>Volte para o plano na próxima refeição.</span>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <i class="fa-solid fa-check text-green-500 mt-1"></i>
-                                <span>Beba bastante água antes e depois.</span>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <i class="fa-solid fa-check text-green-500 mt-1"></i>
-                                <span>Coma devagar e aproveite cada mordida!</span>
-                            </li>
+                            <li class="flex items-start gap-3"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Volte para o plano na próxima refeição.</span></li>
+                            <li class="flex items-start gap-3"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Beba bastante água antes e depois.</span></li>
+                            <li class="flex items-start gap-3"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Coma devagar e aproveite cada mordida!</span></li>
                         </ul>
                     </div>
                 </div>
@@ -1103,32 +354,18 @@
                         </button>
                         <h2 class="text-2xl font-bold text-gray-800">Hidratação 💧</h2>
                     </div>
-                    
                     <div class="text-center mb-8">
                         <div class="relative w-40 h-40 mx-auto mb-4 bg-blue-50 rounded-full flex items-center justify-center border-4 border-white shadow-lg overflow-hidden">
                             <div id="water-level" class="absolute bottom-0 left-0 w-full bg-blue-400 transition-all duration-500 ease-out" style="height: 0%"></div>
                             <span id="water-count" class="relative text-3xl font-bold text-blue-600 z-10">0</span>
-                            <span class="relative text-xs text-blue-400 mt-8 -ml-4 z-10">/10</span>
+                            <span class="relative text-xs text-blue-400 mt-8 -ml-4 z-10" id="water-goal-total-cups">/10</span>
                         </div>
-                        <p class="text-gray-500 text-sm">Copos de 250ml</p>
+                        <p class="text-gray-500 text-sm">Meta Diária: <span id="water-goal-liters" class="font-bold text-blue-600">2.5L</span></p>
+                        <p class="text-xs text-gray-400 mt-1">(Baseado no seu peso: 35ml/kg)</p>
                     </div>
-
                     <div class="flex justify-center gap-6">
-                        <button onclick="updateWater(-1)" class="w-14 h-14 rounded-full bg-white border border-gray-200 text-gray-400 flex items-center justify-center text-xl shadow-sm hover:scale-105 transition">
-                            <i class="fa-solid fa-minus"></i>
-                        </button>
-                        <button onclick="updateWater(1)" class="w-14 h-14 rounded-full bg-blue-500 text-white flex items-center justify-center text-xl shadow-lg shadow-blue-200 hover:scale-105 transition">
-                            <i class="fa-solid fa-plus"></i>
-                        </button>
-                    </div>
-
-                    <div class="mt-8 bg-blue-50 rounded-2xl p-5 border border-blue-100 mx-4">
-                        <h3 class="font-bold text-blue-800 text-sm mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-circle-info"></i> Por que beber água?
-                        </h3>
-                        <p class="text-xs text-blue-700 leading-relaxed">
-                            A água ajuda a controlar o apetite, melhora a pele e aumenta o metabolismo. Tente beber pelo menos 2.5L por dia!
-                        </p>
+                        <button onclick="updateWater(-1)" class="w-14 h-14 rounded-full bg-white border border-gray-200 text-gray-400 flex items-center justify-center text-xl shadow-sm hover:scale-105 transition"><i class="fa-solid fa-minus"></i></button>
+                        <button onclick="updateWater(1)" class="w-14 h-14 rounded-full bg-blue-500 text-white flex items-center justify-center text-xl shadow-lg shadow-blue-200 hover:scale-105 transition"><i class="fa-solid fa-plus"></i></button>
                     </div>
                 </div>
             `,
@@ -1140,31 +377,14 @@
                         </button>
                         <h2 class="text-2xl font-bold text-gray-800">Economia 💰</h2>
                     </div>
-                    
                     <div class="bg-yellow-50 border border-yellow-100 rounded-3xl p-6 shadow-sm mb-6">
-                        <h3 class="font-bold text-yellow-700 text-lg mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-star"></i> Dica de Ouro
-                        </h3>
-                        <p class="text-sm text-yellow-800 leading-relaxed">
-                            Para economizar de verdade, compre suplementos em <strong>sites de atacado</strong> ou procure por <strong>cupons de influencers</strong>. 
-                            <br><br>
-                            Para alimentos frescos, vá à <strong>feira local no final do dia</strong> (a "xepa") onde os preços despencam!
-                        </p>
+                        <h3 class="font-bold text-yellow-700 text-lg mb-2 flex items-center gap-2"><i class="fa-solid fa-star"></i> Dica de Ouro</h3>
+                        <p class="text-sm text-yellow-800 leading-relaxed">Para economizar de verdade, compre suplementos em <strong>sites de atacado</strong> ou procure por <strong>cupons de influencers</strong>.<br><br>Para alimentos frescos, vá à <strong>feira local no final do dia</strong> (a "xepa") onde os preços despencam!</p>
                     </div>
-
                     <div class="space-y-3">
-                        <div class="bg-white p-4 rounded-2xl border border-pink-50 flex items-center justify-between">
-                            <span class="text-sm font-medium text-gray-600">Granel</span>
-                            <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-lg">Mais Barato</span>
-                        </div>
-                        <div class="bg-white p-4 rounded-2xl border border-pink-50 flex items-center justify-between">
-                            <span class="text-sm font-medium text-gray-600">Marcas de Supermercado</span>
-                            <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-lg">Custo-Benefício</span>
-                        </div>
-                        <div class="bg-white p-4 rounded-2xl border border-pink-50 flex items-center justify-between">
-                            <span class="text-sm font-medium text-gray-600">Congelados</span>
-                            <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-lg">Duram Mais</span>
-                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-pink-50 flex items-center justify-between"><span class="text-sm font-medium text-gray-600">Granel</span><span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-lg">Mais Barato</span></div>
+                        <div class="bg-white p-4 rounded-2xl border border-pink-50 flex items-center justify-between"><span class="text-sm font-medium text-gray-600">Marcas de Supermercado</span><span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-lg">Custo-Benefício</span></div>
+                        <div class="bg-white p-4 rounded-2xl border border-pink-50 flex items-center justify-between"><span class="text-sm font-medium text-gray-600">Congelados</span><span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-lg">Duram Mais</span></div>
                     </div>
                 </div>
             `,
@@ -1177,27 +397,9 @@
                         <h2 class="text-2xl font-bold text-gray-800">Kit da Bestie 💊</h2>
                     </div>
                     <div class="space-y-4">
-                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-pink-50 flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-xl">💪</div>
-                            <div>
-                                <h3 class="font-bold text-gray-800">Whey Protein</h3>
-                                <p class="text-xs text-gray-500">Pós-treino ou lanches rápidos.</p>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-pink-50 flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full bg-green-50 text-green-500 flex items-center justify-center text-xl">⚡</div>
-                            <div>
-                                <h3 class="font-bold text-gray-800">Creatina</h3>
-                                <p class="text-xs text-gray-500">3g a 5g todo dia (sem falhar!).</p>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-pink-50 flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full bg-yellow-50 text-yellow-500 flex items-center justify-center text-xl">🌞</div>
-                            <div>
-                                <h3 class="font-bold text-gray-800">Multivitamínico</h3>
-                                <p class="text-xs text-gray-500">Pela manhã, junto com o café.</p>
-                            </div>
-                        </div>
+                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-pink-50 flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-xl">💪</div><div><h3 class="font-bold text-gray-800">Whey Protein</h3><p class="text-xs text-gray-500">Pós-treino ou lanches rápidos.</p></div></div>
+                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-pink-50 flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-green-50 text-green-500 flex items-center justify-center text-xl">⚡</div><div><h3 class="font-bold text-gray-800">Creatina</h3><p class="text-xs text-gray-500">3g a 5g todo dia (sem falhar!).</p></div></div>
+                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-pink-50 flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-yellow-50 text-yellow-500 flex items-center justify-center text-xl">🌞</div><div><h3 class="font-bold text-gray-800">Multivitamínico</h3><p class="text-xs text-gray-500">Pela manhã, junto com o café.</p></div></div>
                     </div>
                 </div>
             `,
@@ -1211,12 +413,7 @@
                     </div>
                     <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-pink-100">
                         <table class="w-full text-sm text-left text-gray-600">
-                            <thead class="bg-pink-50 text-bestie uppercase text-xs">
-                                <tr>
-                                    <th class="px-4 py-3">Troque Isso</th>
-                                    <th class="px-4 py-3">Por Isso</th>
-                                </tr>
-                            </thead>
+                            <thead class="bg-pink-50 text-bestie uppercase text-xs"><tr><th class="px-4 py-3">Troque Isso</th><th class="px-4 py-3">Por Isso</th></tr></thead>
                             <tbody class="divide-y divide-pink-50">
                                 <tr><td class="px-4 py-3">Açúcar</td><td class="px-4 py-3 font-medium text-green-600">Adoçante (Stevia/Xilitol)</td></tr>
                                 <tr><td class="px-4 py-3">Óleo de Soja</td><td class="px-4 py-3 font-medium text-green-600">Azeite de Oliva</td></tr>
@@ -1239,42 +436,21 @@
                             <i class="fa-solid fa-wand-magic-sparkles"></i> Chef Bestie
                         </button>
                     </div>
-
-                    <!-- Search -->
                     <div class="relative mb-6">
                         <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-400 text-sm"></i>
                         <input type="text" placeholder="O que vamos cozinhar?" class="w-full bg-white border border-pink-100 rounded-full py-3 pl-10 pr-4 text-sm focus:outline-none focus:border-bestie focus:ring-1 focus:ring-bestie transition placeholder-gray-400 shadow-sm">
                     </div>
-
-                    <!-- Categories / Filters -->
                     <div class="flex gap-2 overflow-x-auto hide-scrollbar mb-6 pb-2 px-1">
                         <button onclick="filterRecipes('all', this)" class="cat-btn active flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-bestie text-white shadow-md shadow-pink-200 transition">Tudo</button>
-                        
-                        <!-- Refeições -->
                         <button onclick="filterRecipes('cafe', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Café da Manhã</button>
                         <button onclick="filterRecipes('almoco', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Almoço</button>
                         <button onclick="filterRecipes('jantar', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Jantar</button>
-                        
-                        <!-- Dietas -->
                         <button onclick="filterRecipes('lowcarb', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Baixo Carboidrato</button>
                         <button onclick="filterRecipes('proteina', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Rico em Proteínas</button>
                         <button onclick="filterRecipes('lowcal', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Baixa Caloria</button>
-                        <button onclick="filterRecipes('lowfat', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Baixa Gordura</button>
-                        <button onclick="filterRecipes('zeroacucar', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Sem Açúcar</button>
-                        
-                        <!-- Preferências -->
                         <button onclick="filterRecipes('vegano', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Vegano</button>
-                        <button onclick="filterRecipes('vegetariano', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Vegetariano</button>
-                        
-                        <!-- Praticidade -->
-                        <button onclick="filterRecipes('simples', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Poucos Ingredientes</button>
-                        <button onclick="filterRecipes('rapido', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Preparo Rápido</button>
                     </div>
-
-                    <!-- Recipe Grid -->
-                    <div id="recipe-grid" class="grid grid-cols-1 gap-4 pb-20">
-                        <!-- Filled by JS -->
-                    </div>
+                    <div id="recipe-grid" class="grid grid-cols-1 gap-4 pb-20"></div>
                 </div>
             `,
             chefBestie: `
@@ -1285,28 +461,16 @@
                         </button>
                         <h2 class="text-2xl font-bold text-gray-800">Chef Bestie ✨</h2>
                     </div>
-
                     <div class="bg-gradient-to-br from-purple-50 to-pink-50 border border-pink-100 rounded-3xl p-6 shadow-sm mb-6">
                         <p class="text-gray-600 text-sm mb-4">Me conte o que você tem na geladeira e eu crio uma receitinha mágica pra você!</p>
-                        
                         <div class="relative">
                             <textarea id="ai-ingredients" rows="3" placeholder="Ex: frango, batata doce, brócolis..." class="w-full bg-white border border-pink-200 rounded-2xl p-4 text-sm focus:outline-none focus:border-bestie focus:ring-1 focus:ring-bestie transition placeholder-gray-400 resize-none"></textarea>
-                            <div class="absolute bottom-3 right-3 text-xs text-gray-400">
-                                <i class="fa-solid fa-carrot"></i>
-                            </div>
+                            <div class="absolute bottom-3 right-3 text-xs text-gray-400"><i class="fa-solid fa-carrot"></i></div>
                         </div>
-
-                        <button onclick="generateAIRecipe()" id="generate-btn" class="w-full mt-4 bg-gradient-to-r from-bestie to-pink-400 text-white py-3 rounded-xl font-bold shadow-lg shadow-pink-200 hover:scale-[1.02] transition active:scale-95 flex items-center justify-center gap-2">
-                            <span>Criar Receita Mágica</span>
-                            <i class="fa-solid fa-wand-magic-sparkles"></i>
-                        </button>
+                        <button onclick="generateAIRecipe()" id="generate-btn" class="w-full mt-4 bg-gradient-to-r from-bestie to-pink-400 text-white py-3 rounded-xl font-bold shadow-lg shadow-pink-200 hover:scale-[1.02] transition active:scale-95 flex items-center justify-center gap-2"><span>Criar Receita Mágica</span><i class="fa-solid fa-wand-magic-sparkles"></i></button>
                     </div>
-
                     <div id="ai-result" class="hidden space-y-4">
-                        <div class="flex items-center gap-2 text-sm text-gray-400 uppercase font-bold tracking-wider mb-2">
-                            <i class="fa-solid fa-star text-yellow-400"></i> Resultado
-                        </div>
-                        <!-- Recipe Card Container -->
+                        <div class="flex items-center gap-2 text-sm text-gray-400 uppercase font-bold tracking-wider mb-2"><i class="fa-solid fa-star text-yellow-400"></i> Resultado</div>
                         <div id="ai-recipe-card"></div>
                     </div>
                 </div>
@@ -1328,14 +492,20 @@
                                 <input type="number" id="calc-age" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition" placeholder="Ex: 25">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Peso (kg)</label>
+                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Peso Atual (kg)</label>
                                 <input type="number" id="calc-weight" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition" placeholder="Ex: 60">
                             </div>
                         </div>
                         
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Altura (cm)</label>
-                            <input type="number" id="calc-height" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition" placeholder="Ex: 165">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Altura (cm)</label>
+                                <input type="number" id="calc-height" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition" placeholder="Ex: 165">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Meta de Peso (kg)</label>
+                                <input type="number" id="calc-target-weight" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition" placeholder="Ex: 55">
+                            </div>
                         </div>
 
                         <div>
@@ -1364,26 +534,15 @@
                             <div class="text-pink-100 text-sm mb-4">kcal / dia</div>
                             
                             <div class="flex gap-2 text-center">
-                                <div class="bg-white/20 backdrop-blur rounded-xl p-2 flex-1">
-                                    <span class="block text-xs text-pink-100">Prot</span>
-                                    <span class="font-bold" id="plan-protein">0g</span>
-                                </div>
-                                <div class="bg-white/20 backdrop-blur rounded-xl p-2 flex-1">
-                                    <span class="block text-xs text-pink-100">Carb</span>
-                                    <span class="font-bold" id="plan-carbs">0g</span>
-                                </div>
-                                <div class="bg-white/20 backdrop-blur rounded-xl p-2 flex-1">
-                                    <span class="block text-xs text-pink-100">Gord</span>
-                                    <span class="font-bold" id="plan-fats">0g</span>
-                                </div>
+                                <div class="bg-white/20 backdrop-blur rounded-xl p-2 flex-1"><span class="block text-xs text-pink-100">Prot</span><span class="font-bold" id="plan-protein">0g</span></div>
+                                <div class="bg-white/20 backdrop-blur rounded-xl p-2 flex-1"><span class="block text-xs text-pink-100">Carb</span><span class="font-bold" id="plan-carbs">0g</span></div>
+                                <div class="bg-white/20 backdrop-blur rounded-xl p-2 flex-1"><span class="block text-xs text-pink-100">Gord</span><span class="font-bold" id="plan-fats">0g</span></div>
                             </div>
                             <div class="mt-4 text-xs text-center text-pink-100 bg-black/10 rounded-lg p-1" id="plan-bmi">IMC: 00.0</div>
                         </div>
 
                         <div class="bg-white rounded-2xl p-5 border border-purple-100 shadow-sm">
-                            <h4 class="font-bold text-purple-600 mb-2 flex items-center gap-2">
-                                <i class="fa-solid fa-lightbulb"></i> Dica da Bestie
-                            </h4>
+                            <h4 class="font-bold text-purple-600 mb-2 flex items-center gap-2"><i class="fa-solid fa-lightbulb"></i> Dica da Bestie</h4>
                             <p class="text-sm text-gray-600" id="plan-tip">...</p>
                         </div>
 
@@ -1415,7 +574,6 @@
                                     <option value="60">60 minutos (Intenso)</option>
                                 </select>
                             </div>
-
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Foco do Treino</label>
                                 <select id="workout-focus" class="w-full bg-white border border-pink-200 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition text-gray-600">
@@ -1425,7 +583,6 @@
                                     <option value="Abs & Cardio">Abdômen e Cardio</option>
                                 </select>
                             </div>
-
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Equipamento</label>
                                 <select id="workout-equip" class="w-full bg-white border border-pink-200 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition text-gray-600">
@@ -1468,13 +625,19 @@
                                 <input type="number" id="profile-age" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Peso (kg)</label>
+                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Peso Atual (kg)</label>
                                 <input type="number" id="profile-weight" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition">
                             </div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Altura (cm)</label>
-                            <input type="number" id="profile-height" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Altura (cm)</label>
+                                <input type="number" id="profile-height" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Meta de Peso (kg)</label>
+                                <input type="number" id="profile-target-weight" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition">
+                            </div>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Objetivo Principal</label>
@@ -1494,18 +657,19 @@
         };
 
         function init() {
-            navigate('home'); // Starts at home
-            // We don't render recipes immediately since we are not on recipes page
+            navigate('home'); 
+            renderRecipes('all');
         }
 
         function saveProfile() {
             const name = document.getElementById('profile-name').value;
             const age = document.getElementById('profile-age').value;
             const weight = document.getElementById('profile-weight').value;
+            const targetWeight = document.getElementById('profile-target-weight').value;
             const height = document.getElementById('profile-height').value;
             const goal = document.getElementById('profile-goal').value;
 
-            userProfile = { name, age, weight, height, goal };
+            userProfile = { name, age, weight, targetWeight, height, goal };
             localStorage.setItem('bestieProfile', JSON.stringify(userProfile));
             
             // Update Avatar
@@ -1530,6 +694,7 @@
                     document.getElementById('profile-name').value = userProfile.name || '';
                     document.getElementById('profile-age').value = userProfile.age || '';
                     document.getElementById('profile-weight').value = userProfile.weight || '';
+                    document.getElementById('profile-target-weight').value = userProfile.targetWeight || '';
                     document.getElementById('profile-height').value = userProfile.height || '';
                     document.getElementById('profile-goal').value = userProfile.goal || 'perder';
                     document.getElementById('profile-avatar').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${userProfile.name || 'Bestie'}`;
@@ -1541,10 +706,31 @@
                     // Pre-fill calculator if profile data exists
                     if(userProfile.age) document.getElementById('calc-age').value = userProfile.age;
                     if(userProfile.weight) document.getElementById('calc-weight').value = userProfile.weight;
+                    if(userProfile.targetWeight) document.getElementById('calc-target-weight').value = userProfile.targetWeight;
                     if(userProfile.height) document.getElementById('calc-height').value = userProfile.height;
                     if(userProfile.goal) document.getElementById('calc-goal').value = userProfile.goal;
                 }, 0);
             }
+
+             if(viewName === 'water') {
+                // Calc dynamic water goal: 35ml per kg. Default to 2.5L if no weight.
+                if (userProfile.weight) {
+                    waterGoalLiters = (userProfile.weight * 0.035).toFixed(1);
+                    // Approx cups (250ml)
+                    waterGoalCups = Math.ceil((waterGoalLiters * 1000) / 250);
+                } else {
+                    waterGoalLiters = 2.5;
+                    waterGoalCups = 10;
+                }
+                
+                // Update DOM elements for water view
+                setTimeout(() => {
+                    document.getElementById('water-goal-liters').innerText = waterGoalLiters + 'L';
+                    document.getElementById('water-goal-total-cups').innerText = '/' + waterGoalCups;
+                    updateWater(0); // Initialize visual state
+                }, 0);
+            }
+
 
             // Update Nav State
             document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -1561,22 +747,24 @@
 
             if(viewName === 'recipes') {
                 renderRecipes('all');
-            } else if (viewName === 'water') {
-                updateWater(0); // Initialize water display
             }
         }
 
         function updateWater(change) {
             waterIntake += change;
             if(waterIntake < 0) waterIntake = 0;
-            if(waterIntake > 10) waterIntake = 10; // Cap at 10 for demo
+            // Cap at goal + extra buffer just for visual fun, but logic is goal
+            if(waterIntake > waterGoalCups + 5) waterIntake = waterGoalCups + 5; 
 
             const countEl = document.getElementById('water-count');
             const fillEl = document.getElementById('water-level');
             
             if(countEl && fillEl) {
                 countEl.innerText = waterIntake;
-                fillEl.style.height = `${(waterIntake / 10) * 100}%`;
+                // Percentage based on dynamic goal
+                let percentage = (waterIntake / waterGoalCups) * 100;
+                if(percentage > 100) percentage = 100;
+                fillEl.style.height = `${percentage}%`;
             }
         }
 
@@ -1704,6 +892,7 @@
         async function generatePlan() {
             const age = document.getElementById('calc-age').value;
             const weight = document.getElementById('calc-weight').value;
+            const targetWeight = document.getElementById('calc-target-weight').value;
             const height = document.getElementById('calc-height').value;
             const goal = document.getElementById('calc-goal').value;
             
@@ -1719,7 +908,7 @@
             btn.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div> Calculando...`;
             resultContainer.classList.add('hidden');
 
-            const planData = await callGeminiPlan({age, weight, height, goal});
+            const planData = await callGeminiPlan({age, weight, targetWeight, height, goal});
 
             if(planData) {
                 document.getElementById('plan-calories').innerText = planData.calories_target;
