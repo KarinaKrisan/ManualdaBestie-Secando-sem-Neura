@@ -208,6 +208,170 @@
             goal: 'perder'
         };
 
+        // --- API FUNCTIONS ---
+        // Defined explicitly to prevent ReferenceErrors
+
+        async function callGemini(ingredients) {
+            const prompt = `Você é a 'Bestie Fit', uma chef especialista em receitas saudáveis, práticas e com poucas calorias para o aplicativo 'Manual da Bestie'. 
+            Crie uma receita criativa e saudável (fit/low carb/proteica) usando OBRIGATORIAMENTE estes ingredientes principais: ${ingredients}. Você pode sugerir temperos básicos extras.
+            
+            IMPORTANTE: Responda APENAS com um objeto JSON válido (sem markdown, sem \`\`\`json) seguindo exatamente esta estrutura:
+            {
+                "title": "Nome Criativo da Receita",
+                "calories": 000 (apenas numero),
+                "time": "00 min",
+                "difficulty": "Fácil",
+                "yield": "1 ou 2 porções",
+                "description": "Uma descrição curta, animada e motivadora estilo 'bestie'. Se houver uma dica especial, comece com 'Dica:'",
+                "ingredients": ["ingrediente 1", "ingrediente 2"],
+                "instructions": ["passo 1", "passo 2", "passo 3"],
+                "category": "almoco" (escolha entre: cafe, almoco, jantar, lanche, doces)
+            }`;
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseMimeType: "application/json"
+                }
+            };
+
+            try {
+                let response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error('Erro na API');
+
+                const data = await response.json();
+                let text = data.candidates[0].content.parts[0].text;
+                
+                // Limpeza robusta do JSON
+                text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+                
+                return JSON.parse(text);
+
+            } catch (error) {
+                console.error("Erro Gemini:", error);
+                return null;
+            }
+        }
+
+        async function callGeminiPlan(userData) {
+            const prompt = `Você é a 'Bestie Fit', uma nutricionista e coach motivacional. Crie um mini plano personalizado com base nestes dados:
+            - Idade: ${userData.age}
+            - Peso Atual: ${userData.weight}kg
+            - Meta de Peso: ${userData.targetWeight}kg
+            - Altura: ${userData.height}cm
+            - Objetivo: ${userData.goal}
+
+            IMPORTANTE: Responda APENAS com um objeto JSON válido (sem markdown) com esta estrutura:
+            {
+                "calories_target": "Ex: 1500-1600",
+                "bmi": "Ex: 22.5 (Normal)",
+                "macros": {
+                    "protein": "Ex: 120g",
+                    "carbs": "Ex: 150g",
+                    "fats": "Ex: 50g"
+                },
+                "motivational_quote": "Uma frase curta e inspiradora estilo 'bestie' para motivar.",
+                "tip": "Uma dica de ouro específica para o objetivo selecionado."
+            }`;
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseMimeType: "application/json"
+                }
+            };
+
+            try {
+                let response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error('Erro na API');
+
+                const data = await response.json();
+                let text = data.candidates[0].content.parts[0].text;
+                
+                // Limpeza robusta do JSON
+                text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+                const firstOpen = text.indexOf('{');
+                const lastClose = text.lastIndexOf('}');
+                if (firstOpen !== -1 && lastClose !== -1) {
+                    text = text.substring(firstOpen, lastClose + 1);
+                }
+                
+                return JSON.parse(text);
+
+            } catch (error) {
+                console.error("Erro Gemini Plan:", error);
+                return null;
+            }
+        }
+
+        async function callGeminiWorkout(data) {
+            const prompt = `Você é a 'Bestie Fit', uma personal trainer animada e motivadora. Crie um treino rápido e eficiente com estas características:
+            - Tempo: ${data.time} minutos
+            - Foco: ${data.focus}
+            - Equipamento: ${data.equipment}
+
+            IMPORTANTE: Responda APENAS com um objeto JSON válido (sem markdown) com esta estrutura:
+            {
+                "title": "Nome Criativo do Treino",
+                "warmup": "Uma frase rápida de aquecimento (Ex: 1 min polichinelos)",
+                "exercises": [
+                    { "name": "Nome do Exercício", "reps": "Ex: 3x 12", "tips": "Dica rápida de execução" },
+                    { "name": "Nome do Exercício 2", "reps": "Ex: 3x 15", "tips": "Dica rápida" }
+                ],
+                "motivation": "Frase final de motivação curta e divertida"
+            }`;
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseMimeType: "application/json"
+                }
+            };
+
+            try {
+                let response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error('Erro na API');
+
+                const data = await response.json();
+                let text = data.candidates[0].content.parts[0].text;
+                
+                // Limpeza robusta do JSON
+                text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+                const firstOpen = text.indexOf('{');
+                const lastClose = text.lastIndexOf('}');
+                if (firstOpen !== -1 && lastClose !== -1) {
+                    text = text.substring(firstOpen, lastClose + 1);
+                }
+
+                return JSON.parse(text);
+
+            } catch (error) {
+                console.error("Erro Gemini Workout:", error);
+                return null;
+            }
+        }
+
         // --- DATA ---
         let waterIntake = 0;
         let waterGoalLiters = 2.5;
@@ -217,7 +381,7 @@
             { id: 1, title: "Crepioca Fit", displayCategory: "Café da Manhã", tags: ['cafe', 'proteina', 'zeroacucar', 'simples', 'rapido', 'lowcal'], calories: 180, time: "10 min", difficulty: "Fácil", yield: "1 porção", description: "A queridinha das dietas! Prática, rápida e versátil para começar o dia.", ingredients: ["1 ovo", "2 colheres goma tapioca", "1 colher requeijão light", "Sal a gosto"], instructions: ["Bata o ovo com a tapioca.", "Tempere.", "Frite em frigideira untada."] },
             { id: 2, title: "Salada de Pote", displayCategory: "Almoço Prático", tags: ['almoco', 'jantar', 'lowcal', 'lowcarb', 'proteina', 'rapido', 'simples'], calories: 320, time: "15 min", difficulty: "Fácil", yield: "1 pote", description: "Perfeita para levar para o trabalho. O segredo está na ordem dos ingredientes!", ingredients: ["Folhas", "100g frango desfiado", "Tomate cereja", "Cenoura", "Molho iogurte"], instructions: ["Molho no fundo.", "Legumes duros.", "Frango.", "Folhas por cima."] },
             { id: 3, title: "Overnight Oats", displayCategory: "Café/Lanche", tags: ['cafe', 'lanche', 'vegetariano', 'simples', 'rapido', 'zeroacucar'], calories: 250, time: "5 min", difficulty: "Muito Fácil", yield: "1 pote", description: "Café da manhã pronto para quem acorda na correria.", ingredients: ["30g aveia", "100ml leite vegetal", "Chia", "Frutas"], instructions: ["Misture tudo.", "Deixe na geladeira a noite toda."] },
-            { id: 4, title: "Brigadeiro de Whey", displayCategory: "Doce Fit", tags: ['lanche', 'proteina', 'zeroacucar', 'simples', 'rapido'], calories: 120, time: "15 min", difficulty: "Fácil", yield: "5 bolinhas", description: "Para matar a vontade de doce sem sair da dieta.", ingredients: ["1 scoop Whey Chocolate", "Cacau em pó", "Leite em pó desnatado", "Água"], instructions: ["Misture secos.", "Adicione água aos poucos até dar ponto."] },
+            { id: 4, title: "Brigadeiro de Whey", displayCategory: "Doce Fit", tags: ['lanche', 'proteina', 'zeroacucar', 'simples', 'rapido'], calories: 120, time: "15 min", difficulty: "Fácil", yield: "5 bolinhas", description: "Para matar a vontade de doce sem sair da dieta.", ingredients: ["1 scoop Whey Chocolate", "Cacau em pó", "Leite em pó desnatado", "Água"], instructions: ["Misture secos.", "Adicione água aos poucos até dar ponto.", "Enrole e gele."] },
             { id: 5, title: "Panqueca de Banana", displayCategory: "Café da Manhã", tags: ['cafe', 'lanche', 'zeroacucar', 'simples', 'rapido', 'lowfat', 'vegetariano'], calories: 210, time: "10 min", difficulty: "Fácil", yield: "1 porção", description: "Apenas 3 ingredientes para um lanche saudável.", ingredients: ["1 banana madura", "2 ovos", "Canela"], instructions: ["Amasse a banana.", "Misture ovos e canela.", "Frite discos."] },
             { id: 6, title: "Brócolis e couve-flor ao forno", displayCategory: "Almoço/Jantar", tags: ['almoco', 'jantar', 'vegetariano', 'lowcarb', 'lowcal', 'lowfat'], calories: 356, time: "25 min", difficulty: "Normal", yield: "2 porções", description: "Este prato de brócolis e couve-flor é muito saboroso com molho de queijo.", ingredients: ["Couve-flor", "Brócolis", "Queijo alpino", "Creme azedo", "Azeite"], instructions: ["Cozinhe vegetais.", "Faça molho de queijo.", "Gratine no forno."] },
             { id: 7, title: "Lassi de Manga", displayCategory: "Café da Manhã", tags: ['cafe', 'lanche', 'vegetariano', 'simples', 'rapido', 'lowcal', 'lowfat'], calories: 211, time: "3 min", difficulty: "Muito Fácil", yield: "2 porções", description: "Bebida refrescante com iogurte e manga. Dica: Use cubos de gelo!", ingredients: ["Manga congelada", "Iogurte light", "Mel", "Cardamomo"], instructions: ["Bata tudo no liquidificador."] },
@@ -279,42 +443,54 @@
                             <h3 class="font-bold text-lg text-gray-800">Atalhos</h3>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
+                            <!-- Existing Recipes -->
                             <button onclick="navigate('recipes')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
                                 <div class="w-12 h-12 rounded-full bg-green-100 text-green-500 flex items-center justify-center group-hover:scale-110 transition">
                                     <i class="fa-solid fa-leaf"></i>
                                 </div>
                                 <span class="font-medium text-sm">Receitinhas</span>
                             </button>
+                            <!-- Water (Visual) -->
                             <button onclick="navigate('water')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
                                 <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center group-hover:scale-110 transition">
                                     <i class="fa-solid fa-glass-water"></i>
                                 </div>
                                 <span class="font-medium text-sm">Água</span>
                             </button>
+                            
+                            <!-- Fim de Semana -->
                             <button onclick="navigate('weekend')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
                                 <div class="w-12 h-12 rounded-full bg-purple-100 text-purple-500 flex items-center justify-center group-hover:scale-110 transition">
                                     <i class="fa-solid fa-calendar-check"></i>
                                 </div>
                                 <span class="font-medium text-sm">Fim de Semana</span>
                             </button>
+
+                            <!-- Kit da Bestie -->
                             <button onclick="navigate('kit')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
                                 <div class="w-12 h-12 rounded-full bg-teal-100 text-teal-500 flex items-center justify-center group-hover:scale-110 transition">
                                     <i class="fa-solid fa-kit-medical"></i>
                                 </div>
                                 <span class="font-medium text-sm">Kit da Bestie</span>
                             </button>
+
+                            <!-- Trocas -->
                             <button onclick="navigate('swaps')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
                                 <div class="w-12 h-12 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center group-hover:scale-110 transition">
                                     <i class="fa-solid fa-repeat"></i>
                                 </div>
                                 <span class="font-medium text-sm">Trocas</span>
                             </button>
+
+                            <!-- Economia -->
                             <button onclick="navigate('savings')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
                                 <div class="w-12 h-12 rounded-full bg-yellow-100 text-yellow-500 flex items-center justify-center group-hover:scale-110 transition">
                                     <i class="fa-solid fa-piggy-bank"></i>
                                 </div>
                                 <span class="font-medium text-sm">Economia</span>
                             </button>
+
+                            <!-- Treino -->
                             <button onclick="navigate('workout')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
                                 <div class="w-12 h-12 rounded-full bg-red-100 text-red-500 flex items-center justify-center group-hover:scale-110 transition">
                                     <i class="fa-solid fa-dumbbell"></i>
@@ -354,6 +530,7 @@
                         </button>
                         <h2 class="text-2xl font-bold text-gray-800">Hidratação 💧</h2>
                     </div>
+                    
                     <div class="text-center mb-8">
                         <div class="relative w-40 h-40 mx-auto mb-4 bg-blue-50 rounded-full flex items-center justify-center border-4 border-white shadow-lg overflow-hidden">
                             <div id="water-level" class="absolute bottom-0 left-0 w-full bg-blue-400 transition-all duration-500 ease-out" style="height: 0%"></div>
@@ -363,9 +540,23 @@
                         <p class="text-gray-500 text-sm">Meta Diária: <span id="water-goal-liters" class="font-bold text-blue-600">2.5L</span></p>
                         <p class="text-xs text-gray-400 mt-1">(Baseado no seu peso: 35ml/kg)</p>
                     </div>
+
                     <div class="flex justify-center gap-6">
-                        <button onclick="updateWater(-1)" class="w-14 h-14 rounded-full bg-white border border-gray-200 text-gray-400 flex items-center justify-center text-xl shadow-sm hover:scale-105 transition"><i class="fa-solid fa-minus"></i></button>
-                        <button onclick="updateWater(1)" class="w-14 h-14 rounded-full bg-blue-500 text-white flex items-center justify-center text-xl shadow-lg shadow-blue-200 hover:scale-105 transition"><i class="fa-solid fa-plus"></i></button>
+                        <button onclick="updateWater(-1)" class="w-14 h-14 rounded-full bg-white border border-gray-200 text-gray-400 flex items-center justify-center text-xl shadow-sm hover:scale-105 transition">
+                            <i class="fa-solid fa-minus"></i>
+                        </button>
+                        <button onclick="updateWater(1)" class="w-14 h-14 rounded-full bg-blue-500 text-white flex items-center justify-center text-xl shadow-lg shadow-blue-200 hover:scale-105 transition">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+
+                    <div class="mt-8 bg-blue-50 rounded-2xl p-5 border border-blue-100 mx-4">
+                        <h3 class="font-bold text-blue-800 text-sm mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-circle-info"></i> Por que beber água?
+                        </h3>
+                        <p class="text-xs text-blue-700 leading-relaxed">
+                            A água ajuda a controlar o apetite, melhora a pele e aumenta o metabolismo. Tente beber pelo menos 2.5L por dia!
+                        </p>
                     </div>
                 </div>
             `,
@@ -377,14 +568,31 @@
                         </button>
                         <h2 class="text-2xl font-bold text-gray-800">Economia 💰</h2>
                     </div>
+                    
                     <div class="bg-yellow-50 border border-yellow-100 rounded-3xl p-6 shadow-sm mb-6">
-                        <h3 class="font-bold text-yellow-700 text-lg mb-2 flex items-center gap-2"><i class="fa-solid fa-star"></i> Dica de Ouro</h3>
-                        <p class="text-sm text-yellow-800 leading-relaxed">Para economizar de verdade, compre suplementos em <strong>sites de atacado</strong> ou procure por <strong>cupons de influencers</strong>.<br><br>Para alimentos frescos, vá à <strong>feira local no final do dia</strong> (a "xepa") onde os preços despencam!</p>
+                        <h3 class="font-bold text-yellow-700 text-lg mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-star"></i> Dica de Ouro
+                        </h3>
+                        <p class="text-sm text-yellow-800 leading-relaxed">
+                            Para economizar de verdade, compre suplementos em <strong>sites de atacado</strong> ou procure por <strong>cupons de influencers</strong>. 
+                            <br><br>
+                            Para alimentos frescos, vá à <strong>feira local no final do dia</strong> (a "xepa") onde os preços despencam!
+                        </p>
                     </div>
+
                     <div class="space-y-3">
-                        <div class="bg-white p-4 rounded-2xl border border-pink-50 flex items-center justify-between"><span class="text-sm font-medium text-gray-600">Granel</span><span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-lg">Mais Barato</span></div>
-                        <div class="bg-white p-4 rounded-2xl border border-pink-50 flex items-center justify-between"><span class="text-sm font-medium text-gray-600">Marcas de Supermercado</span><span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-lg">Custo-Benefício</span></div>
-                        <div class="bg-white p-4 rounded-2xl border border-pink-50 flex items-center justify-between"><span class="text-sm font-medium text-gray-600">Congelados</span><span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-lg">Duram Mais</span></div>
+                        <div class="bg-white p-4 rounded-2xl border border-pink-50 flex items-center justify-between">
+                            <span class="text-sm font-medium text-gray-600">Granel</span>
+                            <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-lg">Mais Barato</span>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-pink-50 flex items-center justify-between">
+                            <span class="text-sm font-medium text-gray-600">Marcas de Supermercado</span>
+                            <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-lg">Custo-Benefício</span>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-pink-50 flex items-center justify-between">
+                            <span class="text-sm font-medium text-gray-600">Congelados</span>
+                            <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-lg">Duram Mais</span>
+                        </div>
                     </div>
                 </div>
             `,
@@ -397,9 +605,27 @@
                         <h2 class="text-2xl font-bold text-gray-800">Kit da Bestie 💊</h2>
                     </div>
                     <div class="space-y-4">
-                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-pink-50 flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-xl">💪</div><div><h3 class="font-bold text-gray-800">Whey Protein</h3><p class="text-xs text-gray-500">Pós-treino ou lanches rápidos.</p></div></div>
-                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-pink-50 flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-green-50 text-green-500 flex items-center justify-center text-xl">⚡</div><div><h3 class="font-bold text-gray-800">Creatina</h3><p class="text-xs text-gray-500">3g a 5g todo dia (sem falhar!).</p></div></div>
-                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-pink-50 flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-yellow-50 text-yellow-500 flex items-center justify-center text-xl">🌞</div><div><h3 class="font-bold text-gray-800">Multivitamínico</h3><p class="text-xs text-gray-500">Pela manhã, junto com o café.</p></div></div>
+                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-pink-50 flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-xl">💪</div>
+                            <div>
+                                <h3 class="font-bold text-gray-800">Whey Protein</h3>
+                                <p class="text-xs text-gray-500">Pós-treino ou lanches rápidos.</p>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-pink-50 flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-green-50 text-green-500 flex items-center justify-center text-xl">⚡</div>
+                            <div>
+                                <h3 class="font-bold text-gray-800">Creatina</h3>
+                                <p class="text-xs text-gray-500">3g a 5g todo dia (sem falhar!).</p>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-pink-50 flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-yellow-50 text-yellow-500 flex items-center justify-center text-xl">🌞</div>
+                            <div>
+                                <h3 class="font-bold text-gray-800">Multivitamínico</h3>
+                                <p class="text-xs text-gray-500">Pela manhã, junto com o café.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `,
@@ -413,7 +639,12 @@
                     </div>
                     <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-pink-100">
                         <table class="w-full text-sm text-left text-gray-600">
-                            <thead class="bg-pink-50 text-bestie uppercase text-xs"><tr><th class="px-4 py-3">Troque Isso</th><th class="px-4 py-3">Por Isso</th></tr></thead>
+                            <thead class="bg-pink-50 text-bestie uppercase text-xs">
+                                <tr>
+                                    <th class="px-4 py-3">Troque Isso</th>
+                                    <th class="px-4 py-3">Por Isso</th>
+                                </tr>
+                            </thead>
                             <tbody class="divide-y divide-pink-50">
                                 <tr><td class="px-4 py-3">Açúcar</td><td class="px-4 py-3 font-medium text-green-600">Adoçante (Stevia/Xilitol)</td></tr>
                                 <tr><td class="px-4 py-3">Óleo de Soja</td><td class="px-4 py-3 font-medium text-green-600">Azeite de Oliva</td></tr>
@@ -436,21 +667,42 @@
                             <i class="fa-solid fa-wand-magic-sparkles"></i> Chef Bestie
                         </button>
                     </div>
+
+                    <!-- Search -->
                     <div class="relative mb-6">
                         <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-400 text-sm"></i>
                         <input type="text" placeholder="O que vamos cozinhar?" class="w-full bg-white border border-pink-100 rounded-full py-3 pl-10 pr-4 text-sm focus:outline-none focus:border-bestie focus:ring-1 focus:ring-bestie transition placeholder-gray-400 shadow-sm">
                     </div>
+
+                    <!-- Categories / Filters -->
                     <div class="flex gap-2 overflow-x-auto hide-scrollbar mb-6 pb-2 px-1">
                         <button onclick="filterRecipes('all', this)" class="cat-btn active flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-bestie text-white shadow-md shadow-pink-200 transition">Tudo</button>
+                        
+                        <!-- Refeições -->
                         <button onclick="filterRecipes('cafe', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Café da Manhã</button>
                         <button onclick="filterRecipes('almoco', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Almoço</button>
                         <button onclick="filterRecipes('jantar', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Jantar</button>
+                        
+                        <!-- Dietas -->
                         <button onclick="filterRecipes('lowcarb', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Baixo Carboidrato</button>
                         <button onclick="filterRecipes('proteina', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Rico em Proteínas</button>
                         <button onclick="filterRecipes('lowcal', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Baixa Caloria</button>
+                        <button onclick="filterRecipes('lowfat', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Baixa Gordura</button>
+                        <button onclick="filterRecipes('zeroacucar', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Sem Açúcar</button>
+                        
+                        <!-- Preferências -->
                         <button onclick="filterRecipes('vegano', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Vegano</button>
+                        <button onclick="filterRecipes('vegetariano', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Vegetariano</button>
+                        
+                        <!-- Praticidade -->
+                        <button onclick="filterRecipes('simples', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Poucos Ingredientes</button>
+                        <button onclick="filterRecipes('rapido', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Preparo Rápido</button>
                     </div>
-                    <div id="recipe-grid" class="grid grid-cols-1 gap-4 pb-20"></div>
+
+                    <!-- Recipe Grid -->
+                    <div id="recipe-grid" class="grid grid-cols-1 gap-4 pb-20">
+                        <!-- Filled by JS -->
+                    </div>
                 </div>
             `,
             chefBestie: `
@@ -461,16 +713,28 @@
                         </button>
                         <h2 class="text-2xl font-bold text-gray-800">Chef Bestie ✨</h2>
                     </div>
+
                     <div class="bg-gradient-to-br from-purple-50 to-pink-50 border border-pink-100 rounded-3xl p-6 shadow-sm mb-6">
                         <p class="text-gray-600 text-sm mb-4">Me conte o que você tem na geladeira e eu crio uma receitinha mágica pra você!</p>
+                        
                         <div class="relative">
                             <textarea id="ai-ingredients" rows="3" placeholder="Ex: frango, batata doce, brócolis..." class="w-full bg-white border border-pink-200 rounded-2xl p-4 text-sm focus:outline-none focus:border-bestie focus:ring-1 focus:ring-bestie transition placeholder-gray-400 resize-none"></textarea>
-                            <div class="absolute bottom-3 right-3 text-xs text-gray-400"><i class="fa-solid fa-carrot"></i></div>
+                            <div class="absolute bottom-3 right-3 text-xs text-gray-400">
+                                <i class="fa-solid fa-carrot"></i>
+                            </div>
                         </div>
-                        <button onclick="generateAIRecipe()" id="generate-btn" class="w-full mt-4 bg-gradient-to-r from-bestie to-pink-400 text-white py-3 rounded-xl font-bold shadow-lg shadow-pink-200 hover:scale-[1.02] transition active:scale-95 flex items-center justify-center gap-2"><span>Criar Receita Mágica</span><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+
+                        <button onclick="generateAIRecipe()" id="generate-btn" class="w-full mt-4 bg-gradient-to-r from-bestie to-pink-400 text-white py-3 rounded-xl font-bold shadow-lg shadow-pink-200 hover:scale-[1.02] transition active:scale-95 flex items-center justify-center gap-2">
+                            <span>Criar Receita Mágica</span>
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </button>
                     </div>
+
                     <div id="ai-result" class="hidden space-y-4">
-                        <div class="flex items-center gap-2 text-sm text-gray-400 uppercase font-bold tracking-wider mb-2"><i class="fa-solid fa-star text-yellow-400"></i> Resultado</div>
+                        <div class="flex items-center gap-2 text-sm text-gray-400 uppercase font-bold tracking-wider mb-2">
+                            <i class="fa-solid fa-star text-yellow-400"></i> Resultado
+                        </div>
+                        <!-- Recipe Card Container -->
                         <div id="ai-recipe-card"></div>
                     </div>
                 </div>
@@ -534,15 +798,26 @@
                             <div class="text-pink-100 text-sm mb-4">kcal / dia</div>
                             
                             <div class="flex gap-2 text-center">
-                                <div class="bg-white/20 backdrop-blur rounded-xl p-2 flex-1"><span class="block text-xs text-pink-100">Prot</span><span class="font-bold" id="plan-protein">0g</span></div>
-                                <div class="bg-white/20 backdrop-blur rounded-xl p-2 flex-1"><span class="block text-xs text-pink-100">Carb</span><span class="font-bold" id="plan-carbs">0g</span></div>
-                                <div class="bg-white/20 backdrop-blur rounded-xl p-2 flex-1"><span class="block text-xs text-pink-100">Gord</span><span class="font-bold" id="plan-fats">0g</span></div>
+                                <div class="bg-white/20 backdrop-blur rounded-xl p-2 flex-1">
+                                    <span class="block text-xs text-pink-100">Prot</span>
+                                    <span class="font-bold" id="plan-protein">0g</span>
+                                </div>
+                                <div class="bg-white/20 backdrop-blur rounded-xl p-2 flex-1">
+                                    <span class="block text-xs text-pink-100">Carb</span>
+                                    <span class="font-bold" id="plan-carbs">0g</span>
+                                </div>
+                                <div class="bg-white/20 backdrop-blur rounded-xl p-2 flex-1">
+                                    <span class="block text-xs text-pink-100">Gord</span>
+                                    <span class="font-bold" id="plan-fats">0g</span>
+                                </div>
                             </div>
                             <div class="mt-4 text-xs text-center text-pink-100 bg-black/10 rounded-lg p-1" id="plan-bmi">IMC: 00.0</div>
                         </div>
 
                         <div class="bg-white rounded-2xl p-5 border border-purple-100 shadow-sm">
-                            <h4 class="font-bold text-purple-600 mb-2 flex items-center gap-2"><i class="fa-solid fa-lightbulb"></i> Dica da Bestie</h4>
+                            <h4 class="font-bold text-purple-600 mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-lightbulb"></i> Dica da Bestie
+                            </h4>
                             <p class="text-sm text-gray-600" id="plan-tip">...</p>
                         </div>
 
@@ -574,6 +849,7 @@
                                     <option value="60">60 minutos (Intenso)</option>
                                 </select>
                             </div>
+
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Foco do Treino</label>
                                 <select id="workout-focus" class="w-full bg-white border border-pink-200 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition text-gray-600">
@@ -583,6 +859,7 @@
                                     <option value="Abs & Cardio">Abdômen e Cardio</option>
                                 </select>
                             </div>
+
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Equipamento</label>
                                 <select id="workout-equip" class="w-full bg-white border border-pink-200 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition text-gray-600">
