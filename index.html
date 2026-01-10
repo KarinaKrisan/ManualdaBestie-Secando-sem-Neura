@@ -3,539 +3,423 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manual da Bestie - Secando sem Neura</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Poppins', 'sans-serif'],
-                    },
-                    colors: {
-                        bestie: {
-                            light: '#ffe4e6', // rose-100
-                            DEFAULT: '#fb7185', // rose-400
-                            dark: '#be123c', // rose-700
-                            bg: '#fff1f2', // rose-50
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <title>Manual da Bestie 💖</title>
     <style>
+        :root {
+            --primary: #ff8fa3;
+            --primary-dark: #ff4d6d;
+            --bg: #fff0f3;
+            --card-bg: #ffffff;
+            --text: #590d22;
+            --text-light: #800f2f;
+            --success: #80b918;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
         body {
-            background-color: #fff1f2;
-            -webkit-tap-highlight-color: transparent;
+            background-color: var(--bg);
+            color: var(--text);
+            padding-bottom: 80px;
         }
-        .hide-scrollbar::-webkit-scrollbar {
-            display: none;
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
         }
-        .hide-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 30px 20px;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3);
         }
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
         }
-        .fade-in {
-            animation: fadeIn 0.3s ease-in-out;
+
+        .subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        /* Card de Resumo */
+        .summary-card {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+
+        .summary-item strong {
+            display: block;
+            font-size: 1.2rem;
+            color: var(--primary-dark);
+        }
+
+        .summary-item span {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        /* Controle de Água */
+        .water-tracker {
+            background: linear-gradient(to right, #e0f7fa, #b2ebf2);
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 2px solid #4dd0e1;
+        }
+
+        .water-bar-container {
+            width: 100%;
+            height: 20px;
+            background-color: rgba(255,255,255,0.6);
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .water-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #00bcd4;
+            transition: width 0.3s ease;
+        }
+
+        .btn-water {
+            background-color: #00bcd4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 188, 212, 0.3);
+        }
+
+        .btn-water:active {
+            transform: scale(0.98);
+        }
+
+        /* Cards de Refeição */
+        .meal-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .meal-card.done {
+            opacity: 0.6;
+            background-color: #f0f0f0;
+            border-left-color: var(--success);
+        }
+
+        .meal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .meal-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--primary-dark);
+        }
+
+        .meal-time {
+            font-size: 0.8rem;
+            background: var(--bg);
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .meal-check {
+            width: 25px;
+            height: 25px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .meal-card.done .meal-check {
+            background-color: var(--success);
+            border-color: var(--success);
+        }
+
+        .food-list {
+            list-style: none;
+        }
+
+        .food-list li {
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 5px;
         }
         
-        .typing-indicator span {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            background-color: #fb7185;
-            border-radius: 50%;
-            animation: typing 1s infinite;
-            margin: 0 2px;
+        .food-list li:last-child {
+            border-bottom: none;
         }
-        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes typing {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
+
+        .highlight {
+            font-weight: bold;
+            color: var(--text);
         }
+
+        .note {
+            font-size: 0.8rem;
+            color: #d62828;
+            font-style: italic;
+            margin-top: 5px;
+            display: block;
+        }
+
+        /* Botão Reset */
+        .reset-btn {
+            display: block;
+            margin: 40px auto;
+            background: transparent;
+            border: 1px solid var(--text-light);
+            color: var(--text-light);
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+        }
+
     </style>
 </head>
-<body class="text-gray-700 pb-20">
+<body>
 
-    <!-- Header -->
-    <header class="fixed top-0 w-full z-40 bg-white/90 backdrop-blur-md shadow-sm border-b border-pink-100">
-        <div class="max-w-md mx-auto px-4 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-full bg-bestie text-white flex items-center justify-center">
-                    <i class="fa-solid fa-heart text-sm"></i>
-                </div>
-                <h1 class="font-bold text-lg text-bestie-dark tracking-wide">Manual da Bestie</h1>
-            </div>
-            <button class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition">
-                <i class="fa-regular fa-bell"></i>
-            </button>
-        </div>
+    <header>
+        <h1>Manual da Bestie 💖</h1>
+        <div class="subtitle">Seu guia diário de alimentação</div>
     </header>
 
-    <!-- Main Content Area -->
-    <main class="max-w-md mx-auto pt-20 px-4 min-h-screen" id="app-content">
-        <!-- Content injected via JS -->
-    </main>
-
-    <!-- Recipe Details Modal -->
-    <div id="recipe-modal" class="fixed inset-0 z-50 hidden">
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeRecipeModal()"></div>
-        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl h-[80vh] overflow-y-auto transform transition-transform duration-300 translate-y-full md:max-w-md md:mx-auto md:inset-x-0" id="modal-panel">
-            <div class="relative p-6">
-                <button onclick="closeRecipeModal()" class="absolute top-4 right-4 w-8 h-8 bg-gray-100 text-gray-500 rounded-full flex items-center justify-center hover:bg-gray-200 transition z-10">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-                <div class="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-6"></div>
-                <div class="flex justify-between items-start mb-4">
-                    <div class="pr-8">
-                        <span id="modal-tag" class="text-xs font-semibold text-bestie uppercase tracking-wider bg-pink-50 px-2 py-1 rounded-md"></span>
-                        <h2 id="modal-title" class="text-2xl font-bold text-gray-800 mt-2 leading-tight"></h2>
-                    </div>
-                    <div class="flex flex-col items-end flex-shrink-0">
-                        <span class="text-lg font-bold text-bestie-dark whitespace-nowrap"><span id="modal-cal">0</span> kcal</span>
-                    </div>
-                </div>
-                <p id="modal-desc" class="text-sm text-gray-500 mb-6 italic leading-relaxed"></p>
-                <div id="modal-tip-container" class="hidden mb-6 bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-                    <h4 class="text-yellow-700 font-bold text-sm mb-1 flex items-center gap-2"><i class="fa-solid fa-star"></i> Dica de Ouro</h4>
-                    <p id="modal-tip-text" class="text-xs text-yellow-800"></p>
-                </div>
-                <div class="flex items-center gap-4 text-sm text-gray-500 mb-6 border-y border-pink-50 py-4 justify-between px-2">
-                    <div class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-bestie"></i><span id="modal-time">0 min</span></div>
-                    <div class="flex items-center gap-1.5"><i class="fa-solid fa-fire text-bestie"></i><span id="modal-difficulty">Fácil</span></div>
-                    <div class="flex items-center gap-1.5"><i class="fa-solid fa-user-group text-bestie"></i><span id="modal-yield">2 porções</span></div>
-                </div>
-                <div class="mb-6">
-                    <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2"><i class="fa-solid fa-basket-shopping text-bestie"></i> Ingredientes</h3>
-                    <ul id="modal-ingredients" class="space-y-3 text-sm text-gray-600 pl-2"></ul>
-                </div>
-                <div class="mb-8">
-                    <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2"><i class="fa-solid fa-spoon text-bestie"></i> Modo de Preparo</h3>
-                    <div id="modal-instructions" class="space-y-4 text-sm text-gray-600"></div>
-                </div>
-                <button class="w-full py-3 bg-bestie text-white font-semibold rounded-xl shadow-lg shadow-pink-200 hover:bg-bestie-dark transition active:scale-95 mb-safe">
-                    <i class="fa-regular fa-heart mr-2"></i> Salvar nos Favoritos
-                </button>
+    <div class="container">
+        <div class="summary-card">
+            <div class="summary-item">
+                <strong>1.600</strong>
+                <span>Kcal</span>
+            </div>
+            <div class="summary-item">
+                <strong>Comfort</strong>
+                <span>Foco</span>
+            </div>
+            <div class="summary-item">
+                <strong>3.5L</strong>
+                <span>Meta Água</span>
             </div>
         </div>
+
+        <div class="water-tracker">
+            <h3>💧 Hidratação</h3>
+            <p>Beba 3 a 3,5 litros hoje!</p>
+            <div class="water-bar-container">
+                <div class="water-bar" id="waterBar"></div>
+            </div>
+            <p style="margin-bottom: 10px;"><span id="waterCount">0</span> ml bebidos</p>
+            <button class="btn-water" onclick="addWater()">+ 250ml Água</button>
+        </div>
+
+        <div id="meals-container">
+            </div>
+
+        <button class="reset-btn" onclick="resetDay()">Começar novo dia ↻</button>
     </div>
 
-    <!-- Bottom Navigation -->
-    <nav class="fixed bottom-0 w-full z-40 bg-white border-t border-pink-100 pb-safe">
-        <div class="max-w-md mx-auto px-6 h-16 flex items-center justify-between">
-            <button onclick="navigate('home')" class="nav-btn active flex flex-col items-center gap-1 text-bestie">
-                <i class="fa-solid fa-house text-xl mb-0.5"></i>
-                <span class="text-[10px] font-medium">Início</span>
-            </button>
-            <button onclick="navigate('recipes')" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-bestie transition">
-                <i class="fa-solid fa-utensils text-xl mb-0.5"></i>
-                <span class="text-[10px] font-medium">Receitas</span>
-            </button>
-            <div class="relative -top-5">
-                <button onclick="navigate('chefBestie')" class="w-12 h-12 rounded-full bg-bestie text-white flex items-center justify-center shadow-lg shadow-pink-300 hover:scale-105 transition">
-                    <i class="fa-solid fa-plus text-xl"></i>
-                </button>
-            </div>
-            <button onclick="navigate('calculator')" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-bestie transition">
-                <i class="fa-solid fa-calculator text-xl mb-0.5"></i>
-                <span class="text-[10px] font-medium">Calc</span>
-            </button>
-            <button onclick="navigate('profile')" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-bestie transition">
-                <i class="fa-regular fa-user text-xl mb-0.5"></i>
-                <span class="text-[10px] font-medium">Perfil</span>
-            </button>
-        </div>
-    </nav>
-
     <script>
-        // --- CONFIG & STATE ---
-        const apiKey = ""; 
-
-        let userProfile = {
-            name: 'Bestie', age: '', weight: '', targetWeight: '', height: '', goal: 'perder'
-        };
-        let waterIntake = 0;
-        let waterGoalLiters = 2.5;
-        let waterGoalCups = 10;
-
-        const recipes = [
-            { id: 1, title: "Crepioca Fit", displayCategory: "Café da Manhã", tags: ['cafe', 'proteina'], calories: 180, time: "10 min", difficulty: "Fácil", yield: "1 porção", description: "A queridinha das dietas! Prática e rápida.", ingredients: ["1 ovo", "2 col. goma tapioca", "1 col. requeijão light"], instructions: ["Bata o ovo com a tapioca.", "Frite em frigideira untada."] },
-            { id: 2, title: "Salada de Pote", displayCategory: "Almoço Prático", tags: ['almoco', 'lowcarb'], calories: 320, time: "15 min", difficulty: "Fácil", yield: "1 pote", description: "Perfeita para levar para o trabalho.", ingredients: ["Folhas", "100g frango desfiado", "Molho"], instructions: ["Coloque o molho no fundo.", "Adicione os legumes e finalize com as folhas."] },
-            { id: 3, title: "Overnight Oats", displayCategory: "Café/Lanche", tags: ['cafe', 'lanche'], calories: 250, time: "5 min", difficulty: "Muito Fácil", yield: "1 pote", description: "Pronto para quem acorda na correria.", ingredients: ["30g aveia", "Leite vegetal", "Chia"], instructions: ["Misture e gele a noite toda."] },
-            { id: 4, title: "Brigadeiro de Whey", displayCategory: "Doce Fit", tags: ['lanche', 'doces'], calories: 120, time: "15 min", difficulty: "Fácil", yield: "5 bolinhas", description: "Mata a vontade de doce sem culpa.", ingredients: ["Whey Chocolate", "Cacau", "Água"], instructions: ["Misture até dar ponto de enrolar."] },
-            { id: 5, title: "Panqueca de Banana", displayCategory: "Café da Manhã", tags: ['cafe', 'lanche'], calories: 210, time: "10 min", difficulty: "Fácil", yield: "1 porção", description: "Apenas 3 ingredientes.", ingredients: ["1 banana", "2 ovos", "Canela"], instructions: ["Amasse a banana, misture com ovos e frite."] },
-            { id: 10, title: "Shake Banana Nozes", displayCategory: "Pós-Treino", tags: ['lanche', 'proteina'], calories: 434, time: "5 min", difficulty: "Fácil", yield: "1 porção", description: "Energia pura e saciedade.", ingredients: ["Banana", "Nozes", "Iogurte"], instructions: ["Bata tudo no liquidificador."] },
-            { id: 22, title: "Bruschetta Avocado", displayCategory: "Lanche Salgado", tags: ['lanche', 'vegano'], calories: 427, time: "15 min", difficulty: "Fácil", yield: "2 porções", description: "Sofisticado e nutritivo.", ingredients: ["Pão integral", "Avocado", "Tomate"], instructions: ["Toste o pão e cubra com a mistura."] },
-            { id: 34, title: "Wrap Omelete", displayCategory: "Almoço/Jantar", tags: ['almoco', 'lowcarb'], calories: 352, time: "20 min", difficulty: "Normal", yield: "4 porções", description: "Substitui a massa por ovo.", ingredients: ["Ovos", "Frango", "Cream cheese"], instructions: ["Faça um disco de ovo e recheie."] },
-            { id: 40, title: "Sanduíche de Peru", displayCategory: "Lanche Prático", tags: ['lanche', 'rapido'], calories: 313, time: "15 min", difficulty: "Normal", yield: "1 porção", description: "Completo e proteico.", ingredients: ["Pão integral", "Peru", "Salada"], instructions: ["Monte o sanduíche com camadas."] }
+        // Dados da Dieta
+        const dietData = [
+            {
+                id: 'cafe',
+                time: '07:00 - 08:00',
+                title: '☕ Café da Manhã',
+                items: [
+                    '<strong>Pão Francês:</strong> 1 unidade (50g) - <span style="font-size:0.8em">sem miolo se der</span>',
+                    '<strong>Requeijão Light:</strong> 1 colher de sopa cheia (30g)',
+                    '<strong>Leite Semi-desnatado:</strong> 1 copo (200ml)',
+                    '<strong>Toddy Light:</strong> 1 colher de sopa rasa (10g) <span class="note">*Se for normal, use meia colher</span>'
+                ]
+            },
+            {
+                id: 'lanche-manha',
+                time: '10:30',
+                title: '🍎 Lanche da Manhã',
+                items: [
+                    'Escolha 1 Fruta:',
+                    '• Maçã média (130g)',
+                    '• Banana Prata (80g)',
+                    '• Melão picado (1 fatia grande)'
+                ]
+            },
+            {
+                id: 'almoco',
+                time: '13:00',
+                title: '🍽️ Almoço',
+                items: [
+                    '<strong>Arroz Branco:</strong> 4 colheres de sopa cheias (100g)',
+                    '<strong>Feijão Carioca:</strong> 1 concha média (mais grão)',
+                    '<strong>Proteína:</strong> 1 filé grande (130g) <br><span class="note">Carne moída, Frango ou Patinho. Sem fígado.</span>',
+                    '<strong>Legumes:</strong> 3 colheres de sopa <br><span class="note">Cenoura, vagem, brócolis. Evite chuchu.</span>',
+                    '<strong>Salada de Folhas:</strong> À vontade',
+                    '<strong>Maionese:</strong> 1 colher de sobremesa (10g)'
+                ]
+            },
+            {
+                id: 'lanche-tarde',
+                time: '16:30',
+                title: '🥪 Lanche da Tarde',
+                items: [
+                    '<strong>Pão de Forma (Branco):</strong> 2 fatias',
+                    '<strong>Requeijão Light:</strong> 1 colher de sopa rasa',
+                    'Escolha a Proteína:',
+                    '• 2 fatias de Peito de Peru',
+                    '• 1 fatia de Queijo Mussarela',
+                    '• Ovos mexidos (2 un)'
+                ]
+            },
+            {
+                id: 'jantar',
+                time: '20:00',
+                title: '🍲 Jantar',
+                items: [
+                    '<strong>Arroz Branco:</strong> 3 colheres (70g) <em>OU</em> <strong>Purê:</strong> 100g',
+                    '<strong>Proteína Magra:</strong> 1 filé médio (120g)',
+                    '<strong>Salada:</strong> Tomate, Pepino e Alface à vontade',
+                    '<strong>Azeite:</strong> 1 fio (5ml)',
+                    '<span class="note">Sem maionese nesta refeição.</span>'
+                ]
+            },
+            {
+                id: 'ceia',
+                time: '22:00 (Opcional)',
+                title: '🌙 Ceia',
+                items: [
+                    '<strong>Iogurte Light/Zero:</strong> 1 unidade',
+                    '<em>OU</em> <strong>Melancia:</strong> 1 fatia (200g)'
+                ]
+            }
         ];
 
-        const views = {
-            home: `
-                <div class="fade-in space-y-6">
-                    <div class="bg-gradient-to-r from-bestie to-pink-400 rounded-3xl p-6 text-white shadow-lg">
-                        <p class="text-pink-100 text-sm font-medium mb-1">Bem-vinda, Bestie! ✨</p>
-                        <h2 class="text-2xl font-bold mb-4">Seu progresso hoje</h2>
-                        <div class="flex gap-3">
-                            <div class="bg-white/20 backdrop-blur rounded-xl p-3 flex-1">
-                                <span class="block text-[10px] text-pink-100 uppercase font-bold">Meta Água</span>
-                                <span class="font-bold text-lg" id="home-water-goal">--</span>
-                            </div>
-                            <div class="bg-white/20 backdrop-blur rounded-xl p-3 flex-1">
-                                <span class="block text-[10px] text-pink-100 uppercase font-bold">Meta Peso</span>
-                                <span class="font-bold text-lg" id="home-meta-goal">--</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <button onclick="navigate('recipes')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 transition hover:border-bestie">
-                            <div class="w-12 h-12 rounded-full bg-green-100 text-green-500 flex items-center justify-center text-xl"><i class="fa-solid fa-leaf"></i></div>
-                            <span class="font-medium text-sm">Receitas</span>
-                        </button>
-                        <button onclick="navigate('water')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 transition hover:border-bestie">
-                            <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center text-xl"><i class="fa-solid fa-glass-water"></i></div>
-                            <span class="font-medium text-sm">Água</span>
-                        </button>
-                        <button onclick="navigate('calculator')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 transition hover:border-bestie">
-                            <div class="w-12 h-12 rounded-full bg-pink-100 text-bestie flex items-center justify-center text-xl"><i class="fa-solid fa-calculator"></i></div>
-                            <span class="font-medium text-sm">Calculadora</span>
-                        </button>
-                        <button onclick="navigate('workout')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 transition hover:border-bestie">
-                            <div class="w-12 h-12 rounded-full bg-red-100 text-red-500 flex items-center justify-center text-xl"><i class="fa-solid fa-dumbbell"></i></div>
-                            <span class="font-medium text-sm">Treino IA</span>
-                        </button>
-                        <button onclick="navigate('swaps')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 transition hover:border-bestie">
-                            <div class="w-12 h-12 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center text-xl"><i class="fa-solid fa-repeat"></i></div>
-                            <span class="font-medium text-sm">Trocas Fit</span>
-                        </button>
-                        <button onclick="navigate('sos')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 transition hover:border-bestie">
-                            <div class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-500 flex items-center justify-center text-xl"><i class="fa-solid fa-bell"></i></div>
-                            <span class="font-medium text-sm">SOS Bestie</span>
-                        </button>
-                    </div>
-                </div>
-            `,
-            recipes: `
-                <div class="fade-in">
-                    <div class="mb-6 flex justify-between items-end">
-                        <h2 class="text-2xl font-bold text-gray-800">Receitinhas 🥗</h2>
-                        <button onclick="navigate('chefBestie')" class="bg-bestie text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg animate-pulse"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> IA Chef</button>
-                    </div>
-                    <div id="recipe-grid" class="grid grid-cols-1 gap-4"></div>
-                </div>
-            `,
-            chefBestie: `
-                <div class="fade-in pb-20">
-                    <div class="mb-6 flex items-center gap-3"><button onclick="navigate('recipes')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center"><i class="fa-solid fa-arrow-left"></i></button><h2 class="text-2xl font-bold text-gray-800">IA Chef ✨</h2></div>
-                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-pink-100">
-                        <p class="text-sm text-gray-600 mb-4">O que tem na sua geladeira?</p>
-                        <textarea id="ai-ingredients" rows="3" class="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 text-sm focus:outline-none focus:border-bestie resize-none" placeholder="Ex: Frango, batata doce, brócolis..."></textarea>
-                        <button onclick="generateAIRecipe()" id="generate-btn" class="w-full mt-4 bg-bestie text-white py-3 rounded-xl font-bold transition active:scale-95">Criar Receita Mágica</button>
-                    </div>
-                    <div id="ai-result" class="hidden mt-6"><div id="ai-recipe-card"></div></div>
-                </div>
-            `,
-            calculator: `
-                <div class="fade-in pb-20 pt-6">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Calculadora Mágica ✨</h2>
-                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-pink-100 space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div><label class="block text-xs font-bold text-gray-400 mb-1">Idade</label><input type="number" id="calc-age" class="w-full bg-gray-50 rounded-xl p-3 text-sm focus:outline-none"></div>
-                            <div><label class="block text-xs font-bold text-gray-400 mb-1">Peso Atual (kg)</label><input type="number" id="calc-weight" class="w-full bg-gray-50 rounded-xl p-3 text-sm focus:outline-none"></div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div><label class="block text-xs font-bold text-gray-400 mb-1">Altura (cm)</label><input type="number" id="calc-height" class="w-full bg-gray-50 rounded-xl p-3 text-sm focus:outline-none"></div>
-                            <div><label class="block text-xs font-bold text-gray-400 mb-1">Meta (kg)</label><input type="number" id="calc-target-weight" class="w-full bg-gray-50 rounded-xl p-3 text-sm focus:outline-none"></div>
-                        </div>
+        // Estado inicial
+        let waterML = 0;
+        const waterGoal = 3500;
+        let checkedMeals = JSON.parse(localStorage.getItem('bestieMeals')) || [];
+
+        // Inicialização
+        function init() {
+            renderMeals();
+            loadWater();
+            updateWaterUI();
+        }
+
+        // Renderizar Refeições
+        function renderMeals() {
+            const container = document.getElementById('meals-container');
+            container.innerHTML = '';
+
+            dietData.forEach(meal => {
+                const isDone = checkedMeals.includes(meal.id);
+                const card = document.createElement('div');
+                card.className = `meal-card ${isDone ? 'done' : ''}`;
+                card.onclick = (e) => toggleMeal(meal.id);
+
+                let listHtml = '';
+                meal.items.forEach(item => {
+                    listHtml += `<li>${item}</li>`;
+                });
+
+                card.innerHTML = `
+                    <div class="meal-header">
                         <div>
-                            <label class="block text-xs font-bold text-gray-400 mb-1">Seu Objetivo</label>
-                            <select id="calc-goal" class="w-full bg-gray-50 border-none rounded-xl p-3 text-sm focus:outline-none text-gray-600">
-                                <option value="perder">Secar (Emagrecer)</option>
-                                <option value="manter">Manter o Peso</option>
-                                <option value="ganhar">Ganhar Massa (Bater Meta)</option>
-                            </select>
+                            <div class="meal-time">${meal.time}</div>
+                            <div class="meal-title">${meal.title}</div>
                         </div>
-                        <button onclick="generatePlan()" id="plan-btn" class="w-full bg-bestie text-white py-3 rounded-xl font-bold transition active:scale-95">Calcular Minhas Metas ✨</button>
+                        <div class="meal-check">${isDone ? '✔' : ''}</div>
                     </div>
-                    <div id="plan-result" class="hidden mt-6 space-y-4">
-                        <div class="bg-gradient-to-r from-bestie to-pink-400 rounded-3xl p-6 text-white text-center">
-                            <h3 class="font-bold text-lg mb-2">Meta Diária</h3>
-                            <div class="text-4xl font-bold mb-1" id="plan-calories">0</div>
-                            <div class="text-pink-100 text-sm mb-4">kcal / dia</div>
-                            <div class="flex gap-2 justify-center text-xs">
-                                <div class="bg-white/20 p-2 rounded flex-1">Prot <br><b id="plan-protein">0g</b></div>
-                                <div class="bg-white/20 p-2 rounded flex-1">Carb <br><b id="plan-carbs">0g</b></div>
-                                <div class="bg-white/20 p-2 rounded flex-1">Gord <br><b id="plan-fats">0g</b></div>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-2xl p-5 border border-purple-100 shadow-sm"><h4 class="font-bold text-purple-600 mb-2 text-sm">Dica da Bestie</h4><p class="text-xs text-gray-600" id="plan-tip"></p></div>
-                    </div>
-                </div>
-            `,
-            profile: `
-                <div class="fade-in pb-20 pt-6 text-center">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Seu Perfil 💖</h2>
-                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-pink-100 space-y-4">
-                        <div class="w-20 h-20 bg-pink-50 rounded-full mx-auto mb-2 overflow-hidden border-2 border-white shadow-sm"><img src="" id="profile-avatar" /></div>
-                        <input type="text" id="profile-name" class="w-full text-center font-bold text-gray-800 bg-transparent focus:outline-none" placeholder="Qual seu nome?">
-                        <div class="grid grid-cols-2 gap-4 text-left">
-                            <div><label class="text-[10px] font-bold text-gray-400 uppercase">Peso Atual</label><input type="number" id="profile-weight" class="w-full bg-gray-50 p-2 rounded-lg text-sm"></div>
-                            <div><label class="text-[10px] font-bold text-gray-400 uppercase">Meta (kg)</label><input type="number" id="profile-target-weight" class="w-full bg-gray-50 p-2 rounded-lg text-sm"></div>
-                        </div>
-                        <button onclick="saveProfile()" class="w-full bg-bestie text-white py-3 rounded-xl font-bold transition active:scale-95">Salvar Alterações</button>
-                    </div>
-                </div>
-            `,
-            workout: `
-                <div class="fade-in pb-20">
-                    <div class="mb-6 flex items-center gap-3"><button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center"><i class="fa-solid fa-arrow-left"></i></button><h2 class="text-2xl font-bold text-gray-800">Treino IA 🏋️‍♀️</h2></div>
-                    <div class="bg-white rounded-3xl p-6 border border-pink-100 space-y-4">
-                        <div><label class="text-xs font-bold text-gray-400">Foco do Treino</label><select id="workout-focus" class="w-full bg-gray-50 p-3 rounded-xl text-sm focus:outline-none"><option value="Full Body">Corpo Todo</option><option value="Pernas">Pernas e Glúteos</option><option value="Superiores">Braços e Costas</option><option value="Cardio">Cardio HIIT</option></select></div>
-                        <button onclick="generateWorkout()" id="workout-btn" class="w-full bg-red-400 text-white py-3 rounded-xl font-bold transition active:scale-95">Montar Meu Treino</button>
-                    </div>
-                    <div id="workout-result" class="hidden mt-6"><div id="workout-card"></div></div>
-                </div>
-            `,
-            water: `
-                 <div class="fade-in pb-20 pt-6">
-                    <div class="mb-6 flex items-center gap-3"><button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center"><i class="fa-solid fa-arrow-left"></i></button><h2 class="text-2xl font-bold text-gray-800">Hidratação 💧</h2></div>
-                    <div class="text-center mb-8">
-                        <div class="relative w-44 h-44 mx-auto mb-6 bg-blue-50 rounded-full flex items-center justify-center border-4 border-white shadow-lg overflow-hidden">
-                            <div id="water-level" class="absolute bottom-0 left-0 w-full bg-blue-400 transition-all duration-700 ease-out" style="height: 0%"></div>
-                            <span id="water-count" class="relative text-4xl font-bold text-blue-600 z-10">0</span>
-                            <span class="relative text-xs text-blue-400 mt-10 -ml-4 z-10" id="water-goal-total-cups">/10</span>
-                        </div>
-                        <p class="text-gray-500 font-medium">Sua meta: <span id="water-goal-liters" class="text-blue-600 font-bold">2.5L</span></p>
-                        <p class="text-[10px] text-gray-400 mt-1 uppercase font-bold">(Peso x 35ml)</p>
-                    </div>
-                    <div class="flex justify-center gap-6"><button onclick="updateWater(-1)" class="w-16 h-16 bg-white border border-gray-100 rounded-full flex items-center justify-center text-xl shadow-sm active:scale-90 transition"><i class="fa-solid fa-minus"></i></button><button onclick="updateWater(1)" class="w-16 h-16 bg-blue-500 text-white rounded-full flex items-center justify-center text-xl shadow-lg active:scale-90 transition"><i class="fa-solid fa-plus"></i></button></div>
-                </div>
-            `,
-            swaps: `
-                 <div class="fade-in pb-20">
-                    <div class="mb-6 flex items-center gap-3"><button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center"><i class="fa-solid fa-arrow-left"></i></button><h2 class="text-2xl font-bold text-gray-800">Trocas Fit 🔄</h2></div>
-                    <div class="bg-white rounded-3xl p-6 border border-orange-100 shadow-sm">
-                        <p class="text-sm text-gray-600 mb-4">Deseja substituir algo? A IA ajuda!</p>
-                        <div class="relative"><input type="text" id="swap-input" placeholder="Ex: Pão francês, Pizza..." class="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 text-sm focus:outline-none focus:border-bestie"><button onclick="generateSwap()" id="swap-btn" class="absolute right-2 top-2 bg-orange-400 text-white p-2 rounded-xl h-10 w-10 flex items-center justify-center"><i class="fa-solid fa-magnifying-glass"></i></button></div>
-                        <div id="swap-result" class="hidden mt-4 p-5 bg-orange-50 rounded-2xl text-sm italic text-orange-800 leading-relaxed"></div>
-                    </div>
-                </div>
-            `,
-            sos: `
-                 <div class="fade-in pb-20">
-                    <div class="mb-6 flex items-center gap-3"><button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center"><i class="fa-solid fa-arrow-left"></i></button><h2 class="text-2xl font-bold text-gray-800">SOS Bestie 🆘</h2></div>
-                    <div class="bg-indigo-50 rounded-3xl p-6 border border-indigo-100">
-                        <p class="text-sm text-indigo-800 mb-4">Qual é a treta, miga? Me conta!</p>
-                        <input type="text" id="sos-input" placeholder="Ex: Jaquei no rodízio!" class="w-full p-4 rounded-2xl border-none focus:ring-2 focus:ring-indigo-300 mb-3 text-sm">
-                        <button onclick="triggerSOS(document.getElementById('sos-input').value)" id="sos-btn" class="w-full bg-indigo-500 text-white py-3 rounded-xl font-bold transition active:scale-95">Me ajuda!</button>
-                    </div>
-                    <div id="sos-result" class="hidden mt-4 p-5 bg-white rounded-2xl border border-indigo-100 shadow-sm text-sm text-gray-600 italic leading-relaxed"></div>
-                </div>
-            `,
-            weekend: `<div class="fade-in p-6"><h2 class="text-xl font-bold mb-4 text-bestie">Fim de Semana 🍕</h2><p class="text-gray-600">Lembre-se: Sábado e Domingo você tem direito a 2 refeições livres para aproveitar sem culpa! 💖</p></div>`,
-            kit: `<div class="fade-in p-6"><h2 class="text-xl font-bold mb-4 text-bestie">Kit da Bestie 💊</h2><p class="text-gray-600">Whey Protein para saciedade, Creatina para o shape e Multivitamínico para a saúde da pele e cabelo!</p></div>`,
-            savings: `<div class="fade-in p-6"><h2 class="text-xl font-bold mb-4 text-bestie">Economia 💰</h2><p class="text-gray-600">Dica: Compre vegetais da estação e procure lojas de produtos naturais a granel!</p></div>`
-        };
-
-        // --- NAVIGATION & INIT ---
-        function navigate(view) {
-            const main = document.getElementById('app-content');
-            if (views[view]) {
-                main.innerHTML = views[view];
-                window.scrollTo(0,0);
-            }
-
-            if(view === 'home') {
-                setTimeout(() => {
-                    const goalWater = userProfile.weight ? (userProfile.weight * 0.035).toFixed(1) : "2.5";
-                    document.getElementById('home-water-goal').innerText = goalWater + 'L';
-                    document.getElementById('home-meta-goal').innerText = (userProfile.targetWeight || "--") + "kg";
-                }, 0);
-            }
-
-            if(view === 'profile') {
-                setTimeout(() => {
-                    document.getElementById('profile-name').value = userProfile.name || '';
-                    document.getElementById('profile-weight').value = userProfile.weight || '';
-                    document.getElementById('profile-target-weight').value = userProfile.targetWeight || '';
-                    document.getElementById('profile-avatar').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${userProfile.name || 'Bestie'}`;
-                }, 0);
-            }
-            
-            if(view === 'calculator') {
-                 setTimeout(() => {
-                    if(userProfile.age) document.getElementById('calc-age').value = userProfile.age;
-                    if(userProfile.weight) document.getElementById('calc-weight').value = userProfile.weight;
-                    if(userProfile.targetWeight) document.getElementById('calc-target-weight').value = userProfile.targetWeight;
-                    if(userProfile.height) document.getElementById('calc-height').value = userProfile.height;
-                }, 0);
-            }
-
-            if(view === 'water') {
-                waterGoalLiters = userProfile.weight ? (userProfile.weight * 0.035).toFixed(1) : 2.5;
-                waterGoalCups = Math.ceil((waterGoalLiters * 1000) / 250);
-                setTimeout(() => {
-                    document.getElementById('water-goal-liters').innerText = waterGoalLiters + 'L';
-                    document.getElementById('water-goal-total-cups').innerText = '/' + waterGoalCups;
-                    updateWater(0);
-                }, 0);
-            }
-
-            if(view === 'recipes') { setTimeout(() => renderRecipes('all'), 0); }
+                    <ul class="food-list">
+                        ${listHtml}
+                    </ul>
+                `;
+                container.appendChild(card);
+            });
         }
 
-        function init() { navigate('home'); }
-
-        // --- FUNCTIONS ---
-        function saveProfile() {
-            const n = document.getElementById('profile-name').value;
-            const w = document.getElementById('profile-weight').value;
-            const tw = document.getElementById('profile-target-weight').value;
-            userProfile.name = n; userProfile.weight = w; userProfile.targetWeight = tw;
-            localStorage.setItem('bestieProfile', JSON.stringify(userProfile));
-            alert('Perfil salvo, bestie! 💖');
-            navigate('home');
+        // Lógica das Refeições
+        function toggleMeal(id) {
+            if (checkedMeals.includes(id)) {
+                checkedMeals = checkedMeals.filter(m => m !== id);
+            } else {
+                checkedMeals.push(id);
+            }
+            localStorage.setItem('bestieMeals', JSON.stringify(checkedMeals));
+            renderMeals();
         }
 
-        function updateWater(c) {
-            waterIntake += c; if(waterIntake < 0) waterIntake = 0;
-            const countEl = document.getElementById('water-count');
-            const fillEl = document.getElementById('water-level');
-            if(countEl && fillEl) {
-                countEl.innerText = waterIntake;
-                let perc = (waterIntake / waterGoalCups) * 100;
-                fillEl.style.height = `${perc > 100 ? 100 : perc}%`;
+        // Lógica da Água
+        function loadWater() {
+            const savedWater = localStorage.getItem('bestieWater');
+            if (savedWater) {
+                waterML = parseInt(savedWater);
             }
         }
 
-        function renderRecipes(tag) {
-            const grid = document.getElementById('recipe-grid');
-            if(!grid) return;
-            const filtered = tag === 'all' ? recipes : recipes.filter(r => r.tags.includes(tag));
-            grid.innerHTML = filtered.map(r => `
-                <div onclick="openRecipe(${r.id})" class="bg-white rounded-2xl p-4 shadow-sm border border-pink-50 flex gap-4 transition cursor-pointer hover:border-bestie">
-                    <div class="flex-1">
-                        <h3 class="font-bold text-gray-800 text-sm">${r.title}</h3>
-                        <div class="flex gap-2 mt-1"><span class="text-[10px] text-bestie font-bold uppercase">${r.calories} kcal</span></div>
-                    </div>
-                    <button class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center"><i class="fa-solid fa-chevron-right text-xs"></i></button>
-                </div>
-            `).join('');
+        function addWater() {
+            waterML += 250;
+            if (waterML > waterGoal + 500) waterML = waterGoal + 500; // Limite visual
+            localStorage.setItem('bestieWater', waterML);
+            updateWaterUI();
         }
 
-        function openRecipe(id) {
-            const r = recipes.find(x => x.id === id);
-            if(!r) return;
-            document.getElementById('modal-tag').innerText = r.displayCategory;
-            document.getElementById('modal-title').innerText = r.title;
-            document.getElementById('modal-cal').innerText = r.calories;
-            document.getElementById('modal-time').innerText = r.time;
-            document.getElementById('modal-difficulty').innerText = r.difficulty || "Fácil";
-            document.getElementById('modal-yield').innerText = r.yield || "1 porção";
-            document.getElementById('modal-desc').innerText = r.description || "";
-            document.getElementById('modal-ingredients').innerHTML = r.ingredients.map(i => `<li>${i}</li>`).join('');
-            document.getElementById('modal-instructions').innerHTML = r.instructions.map((s, i) => `<p class="mb-2"><b>${i+1}.</b> ${s}</p>`).join('');
-            document.getElementById('recipe-modal').classList.remove('hidden');
-            setTimeout(() => document.getElementById('modal-panel').classList.remove('translate-y-full'), 10);
+        function updateWaterUI() {
+            const percentage = Math.min((waterML / waterGoal) * 100, 100);
+            document.getElementById('waterBar').style.width = `${percentage}%`;
+            document.getElementById('waterCount').innerText = waterML;
         }
 
-        function closeRecipeModal() {
-            document.getElementById('modal-panel').classList.add('translate-y-full');
-            setTimeout(() => document.getElementById('recipe-modal').classList.add('hidden'), 300);
-        }
-
-        // --- IA LOGIC ---
-        async function generateAIRecipe() {
-            const ing = document.getElementById('ai-ingredients').value;
-            if(!ing) return;
-            const btn = document.getElementById('generate-btn');
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Criando...`;
-            const data = await fetchAI(`Crie uma receita fit saudável com: ${ing}. JSON: {"title":"", "calories":0, "description":"", "ingredients":[], "instructions":[]}`);
-            if(data) {
-                document.getElementById('ai-recipe-card').innerHTML = `<div class="bg-white rounded-3xl p-6 shadow-lg border border-pink-100"><h3 class="font-bold text-gray-800 text-lg">${data.title}</h3><p class="text-xs italic my-3 text-gray-500">${data.description}</p><p class="text-xs text-gray-600"><b>Ingredientes:</b> ${data.ingredients.join(', ')}</p></div>`;
-                document.getElementById('ai-result').classList.remove('hidden');
+        // Resetar tudo (Novo dia)
+        function resetDay() {
+            if(confirm("Começar um novo dia? Isso vai zerar suas marcações.")) {
+                waterML = 0;
+                checkedMeals = [];
+                localStorage.setItem('bestieWater', 0);
+                localStorage.setItem('bestieMeals', JSON.stringify([]));
+                init();
             }
-            btn.innerHTML = "Criar Receita Mágica";
         }
 
-        async function generatePlan() {
-            const age = document.getElementById('calc-age').value;
-            const weight = document.getElementById('calc-weight').value;
-            const tWeight = document.getElementById('calc-target-weight').value;
-            const height = document.getElementById('calc-height').value;
-            const goal = document.getElementById('calc-goal').value;
-            if(!age || !weight) { alert("Miga, preenche os dados!"); return; }
+        // Iniciar App
+        init();
 
-            const btn = document.getElementById('plan-btn');
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Calculando...`;
-            
-            userProfile = { ...userProfile, age, weight, targetWeight: tWeight, height, goal };
-            localStorage.setItem('bestieProfile', JSON.stringify(userProfile));
-
-            const data = await fetchAI(`Plano: ${age}anos, ${weight}kg, meta ${tWeight}kg, altura ${height}cm, objetivo ${goal}. JSON: {"calories_target":"", "bmi":"", "macros":{"protein":"", "carbs":"", "fats":""}, "tip":"", "motivational_quote":""}`);
-            if(data) {
-                document.getElementById('plan-calories').innerText = data.calories_target;
-                document.getElementById('plan-protein').innerText = data.macros.protein;
-                document.getElementById('plan-carbs').innerText = data.macros.carbs;
-                document.getElementById('plan-fats').innerText = data.macros.fats;
-                document.getElementById('plan-tip').innerText = data.tip;
-                document.getElementById('plan-quote').innerText = `"${data.motivational_quote}"`;
-                document.getElementById('plan-bmi').innerText = "IMC: " + data.bmi;
-                document.getElementById('plan-result').classList.remove('hidden');
-            }
-            btn.innerHTML = "Calcular Minhas Metas ✨";
-        }
-
-        async function generateWorkout() {
-            const f = document.getElementById('workout-focus').value;
-            const btn = document.getElementById('workout-btn');
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Montando...`;
-            const data = await fetchAI(`Treino IA: Foco em ${f}. JSON: {"title":"", "warmup":"", "exercises":[{"name":"", "reps":""}], "motivation":""}`);
-            if(data) {
-                document.getElementById('workout-card').innerHTML = `<div class="bg-white rounded-3xl p-6 shadow-md border border-red-100"><h3 class="font-bold text-gray-800">${data.title}</h3><p class="text-xs text-gray-500 my-2">${data.warmup}</p><ul class="text-xs space-y-1 mb-4">${data.exercises.map(e => `<li>- ${e.name} (${e.reps})</li>`).join('')}</ul><p class="text-xs italic text-red-400 font-bold">"${data.motivation}"</p></div>`;
-                document.getElementById('workout-result').classList.remove('hidden');
-            }
-            btn.innerHTML = "Montar Meu Treino";
-        }
-
-        async function triggerSOS(sit) {
-            if(!sit) return;
-            const btn = document.getElementById('sos-btn');
-            const res = document.getElementById('sos-result');
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
-            res.innerHTML = "Analisando sua situação...";
-            res.classList.remove('hidden');
-            const txt = await fetchAI(`Conselho motivador curto para situação de dieta/treino: "${sit}"`, false);
-            res.innerText = txt || "Respira fundo, miga! Você consegue! 💖";
-            btn.innerHTML = "Me ajuda!";
-        }
-
-        async function generateSwap() {
-            const inp = document.getElementById('swap-input').value;
-            if(!inp) return;
-            const res = document.getElementById('swap-result');
-            res.innerHTML = "Buscando melhor troca fit...";
-            res.classList.remove('hidden');
-            const txt = await fetchAI(`Melhor troca saudável para: ${inp}. Diga o porquê curto.`, false);
-            res.innerText = txt || "Tente versões integrais ou grelhadas! ✨";
-        }
-
-        // --- DOM READY ---
-        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
