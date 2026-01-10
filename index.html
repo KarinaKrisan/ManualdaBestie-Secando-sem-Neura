@@ -13,7 +13,7 @@
             --text: #590d22;
             --text-light: #800f2f;
             --success: #80b918;
-            --overlay: rgba(89, 13, 34, 0.6);
+            --overlay: rgba(89, 13, 34, 0.8);
         }
 
         * {
@@ -55,11 +55,11 @@
             opacity: 0.9;
         }
 
-        /* Botões de Ação (Menu) */
+        /* MENU GRID */
         .action-buttons {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
             margin-bottom: 25px;
         }
 
@@ -67,17 +67,19 @@
             background-color: #fff;
             color: var(--primary-dark);
             border: 2px solid var(--primary);
-            padding: 12px;
+            padding: 10px 5px;
             border-radius: 15px;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             cursor: pointer;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             transition: transform 0.2s;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
+            gap: 5px;
         }
 
         .btn-menu:active {
@@ -85,7 +87,7 @@
             background-color: var(--bg);
         }
 
-        /* Card de Resumo */
+        /* RESUMO CARD */
         .summary-card {
             background: var(--card-bg);
             padding: 15px;
@@ -108,7 +110,7 @@
             color: var(--text-light);
         }
 
-        /* Controle de Água */
+        /* WATER TRACKER */
         .water-tracker {
             background: linear-gradient(to right, #e0f7fa, #b2ebf2);
             padding: 20px;
@@ -149,7 +151,7 @@
             transform: scale(0.98);
         }
 
-        /* Cards de Refeição */
+        /* MEAL CARDS */
         .meal-card {
             background: var(--card-bg);
             border-radius: 20px;
@@ -221,11 +223,6 @@
             border-bottom: none;
         }
 
-        .highlight {
-            font-weight: bold;
-            color: var(--text);
-        }
-
         .note {
             font-size: 0.8rem;
             color: #d62828;
@@ -234,7 +231,6 @@
             display: block;
         }
 
-        /* Botão Reset */
         .reset-btn {
             display: block;
             margin: 40px auto;
@@ -246,7 +242,7 @@
             cursor: pointer;
         }
 
-        /* MODAIS GERAIS */
+        /* MODAIS */
         .modal {
             display: none; 
             position: fixed; 
@@ -301,18 +297,11 @@
             margin-top: 20px;
             margin-bottom: 10px;
             font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
             border-bottom: 2px solid var(--bg);
             padding-bottom: 5px;
         }
-        
-        .category-title:first-child {
-            margin-top: 0;
-        }
 
-        /* Estilo Lista de Compras */
+        /* SHOPPING & SUBS STYLES */
         .shopping-item {
             display: flex;
             align-items: center;
@@ -320,36 +309,35 @@
             padding: 8px 0;
             border-bottom: 1px dashed #f0f0f0;
         }
+        .shopping-item input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary); }
+        .shopping-item input:checked + label { text-decoration: line-through; color: #aaa; }
+        .subs-list { list-style: none; padding-left: 5px; }
+        .subs-list li { margin-bottom: 10px; font-size: 0.9rem; line-height: 1.4; }
 
-        .shopping-item input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            accent-color: var(--primary);
-        }
-
-        .shopping-item label {
+        /* ESTILOS DO FORMULÁRIO DE TREINO */
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--text-light); }
+        .form-group select { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ccc; font-size: 1rem; background: #fff; }
+        .btn-generate {
+            width: 100%;
+            background: linear-gradient(135deg, #2a9d8f, #264653);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
             cursor: pointer;
-            flex: 1;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(42, 157, 143, 0.4);
         }
-
-        .shopping-item input:checked + label {
-            text-decoration: line-through;
-            color: #aaa;
-        }
-
-        /* Estilo Lista de Substituição */
-        .subs-list {
-            list-style: none;
-            padding-left: 5px;
-        }
-        .subs-list li {
-            margin-bottom: 10px;
-            font-size: 0.9rem;
-            line-height: 1.4;
-        }
-        .subs-list strong {
-            color: var(--text-light);
-        }
+        .btn-generate:active { transform: scale(0.98); }
+        
+        .workout-result { display: none; margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 15px; border-left: 5px solid #2a9d8f; }
+        .workout-day { margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 15px; }
+        .workout-day:last-child { border-bottom: none; }
+        .exercise-item { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.95rem; }
+        .exercise-sets { font-weight: bold; color: #2a9d8f; font-size: 0.85rem; }
 
     </style>
 </head>
@@ -378,10 +366,13 @@
 
         <div class="action-buttons">
             <button class="btn-menu" onclick="openModal('shoppingModal')">
-                🛒 Lista de Compras
+                🛒<br>Mercado
             </button>
             <button class="btn-menu" onclick="openModal('subsModal')">
-                🔄 Ver Substituições
+                🔄<br>Trocas
+            </button>
+            <button class="btn-menu" onclick="openModal('workoutModal')" style="border-color: #2a9d8f; color: #264653;">
+                💪<br>Treino IA
             </button>
         </div>
 
@@ -395,9 +386,7 @@
             <button class="btn-water" onclick="addWater()">+ 250ml Água</button>
         </div>
 
-        <div id="meals-container">
-            </div>
-
+        <div id="meals-container"></div>
         <button class="reset-btn" onclick="resetDay()">Começar novo dia ↻</button>
     </div>
 
@@ -408,9 +397,6 @@
                 <button class="close-modal" onclick="closeModal('shoppingModal')">&times;</button>
             </div>
             <div id="shopping-list-content"></div>
-            <p style="text-align: center; margin-top: 20px; font-size: 0.8rem; color: #888;">
-                Itens calculados para uma semana.
-            </p>
         </div>
     </div>
 
@@ -424,161 +410,72 @@
         </div>
     </div>
 
+    <div id="workoutModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Treino da Bestie 💪</h2>
+                <button class="close-modal" onclick="closeModal('workoutModal')">&times;</button>
+            </div>
+            
+            <div id="workout-form">
+                <p style="margin-bottom:15px; font-size:0.9rem;">Responda rápido para a IA montar seu treino de hoje:</p>
+                
+                <div class="form-group">
+                    <label>📍 Onde você vai treinar?</label>
+                    <select id="w-location">
+                        <option value="gym">Academia (Smartfit/Outra)</option>
+                        <option value="home">Em Casa</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>📅 Quantos dias na semana?</label>
+                    <select id="w-days">
+                        <option value="3">3 dias (Iniciante)</option>
+                        <option value="4">4 dias (Intermediário)</option>
+                        <option value="5">5 dias (Foco Total)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>🔋 Energia hoje?</label>
+                    <select id="w-energy">
+                        <option value="normal">Normal</option>
+                        <option value="low">Baixa (Menstruada/Cansada)</option>
+                        <option value="high">Alta (Quero destruir!)</option>
+                    </select>
+                </div>
+
+                <button class="btn-generate" onclick="generateWorkout()">✨ Gerar Treino com IA</button>
+            </div>
+
+            <div id="workout-result" class="workout-result">
+                </div>
+        </div>
+    </div>
+
     <script>
-        // === DADOS DA DIETA ===
+        // === DADOS DA DIETA E LISTAS ===
         const dietData = [
-            {
-                id: 'cafe',
-                time: '07:00 - 08:00',
-                title: '☕ Café da Manhã',
-                items: [
-                    '<strong>Pão Francês:</strong> 1 unidade (50g) - <span style="font-size:0.8em">sem miolo se der</span>',
-                    '<strong>Requeijão Light:</strong> 1 colher de sopa cheia (30g)',
-                    '<strong>Leite Semi-desnatado:</strong> 1 copo (200ml)',
-                    '<strong>Toddy Light:</strong> 1 colher de sopa rasa (10g) <span class="note">*Se for normal, use meia colher</span>'
-                ]
-            },
-            {
-                id: 'lanche-manha',
-                time: '10:30',
-                title: '🍎 Lanche da Manhã',
-                items: [
-                    'Escolha 1 Fruta:',
-                    '• Maçã média (130g)',
-                    '• Banana Prata (80g)',
-                    '• Melão picado (1 fatia grande)'
-                ]
-            },
-            {
-                id: 'almoco',
-                time: '13:00',
-                title: '🍽️ Almoço',
-                items: [
-                    '<strong>Arroz Branco:</strong> 4 colheres de sopa cheias (100g)',
-                    '<strong>Feijão Carioca:</strong> 1 concha média (mais grão)',
-                    '<strong>Proteína:</strong> 1 filé grande (130g) <br><span class="note">Carne moída, Frango ou Patinho. Sem fígado.</span>',
-                    '<strong>Legumes:</strong> 3 colheres de sopa <br><span class="note">Cenoura, vagem, brócolis. Evite chuchu.</span>',
-                    '<strong>Salada de Folhas:</strong> À vontade',
-                    '<strong>Maionese:</strong> 1 colher de sobremesa (10g)'
-                ]
-            },
-            {
-                id: 'lanche-tarde',
-                time: '16:30',
-                title: '🥪 Lanche da Tarde',
-                items: [
-                    '<strong>Pão de Forma (Branco):</strong> 2 fatias',
-                    '<strong>Requeijão Light:</strong> 1 colher de sopa rasa',
-                    'Escolha a Proteína:',
-                    '• 2 fatias de Peito de Peru',
-                    '• 1 fatia de Queijo Mussarela',
-                    '• Ovos mexidos (2 un)'
-                ]
-            },
-            {
-                id: 'jantar',
-                time: '20:00',
-                title: '🍲 Jantar',
-                items: [
-                    '<strong>Arroz Branco:</strong> 3 colheres (70g) <em>OU</em> <strong>Purê:</strong> 100g',
-                    '<strong>Proteína Magra:</strong> 1 filé médio (120g)',
-                    '<strong>Salada:</strong> Tomate, Pepino e Alface à vontade',
-                    '<strong>Azeite:</strong> 1 fio (5ml)',
-                    '<span class="note">Sem maionese nesta refeição.</span>'
-                ]
-            },
-            {
-                id: 'ceia',
-                time: '22:00 (Opcional)',
-                title: '🌙 Ceia',
-                items: [
-                    '<strong>Iogurte Light/Zero:</strong> 1 unidade',
-                    '<em>OU</em> <strong>Melancia:</strong> 1 fatia (200g)'
-                ]
-            }
+            { id: 'cafe', time: '07:00 - 08:00', title: '☕ Café da Manhã', items: ['<strong>Pão Francês:</strong> 1 un (50g) sem miolo', '<strong>Requeijão Light:</strong> 1 colher sopa', '<strong>Leite Semi:</strong> 200ml', '<strong>Toddy Light:</strong> 1 colher sopa'] },
+            { id: 'lanche-manha', time: '10:30', title: '🍎 Lanche da Manhã', items: ['1 Fruta: Maçã, Banana ou Melão'] },
+            { id: 'almoco', time: '13:00', title: '🍽️ Almoço', items: ['<strong>Arroz:</strong> 4 colheres', '<strong>Feijão:</strong> 1 concha', '<strong>Proteína:</strong> 130g', '<strong>Legumes:</strong> 3 colheres', '<strong>Salada:</strong> À vontade', '<strong>Maionese:</strong> 1 colher sobremesa'] },
+            { id: 'lanche-tarde', time: '16:30', title: '🥪 Lanche da Tarde', items: ['<strong>Pão de Forma:</strong> 2 fatias', '<strong>Requeijão:</strong> 1 colher', '<strong>Proteína:</strong> Peito Peru, Queijo ou Ovos'] },
+            { id: 'jantar', time: '20:00', title: '🍲 Jantar', items: ['<strong>Arroz:</strong> 3 colheres OU Purê', '<strong>Proteína:</strong> 120g', '<strong>Salada:</strong> À vontade + Azeite'] },
+            { id: 'ceia', time: '22:00', title: '🌙 Ceia (Opcional)', items: ['1 Iogurte ou 1 fatia Melancia'] }
         ];
 
-        // === DADOS DA LISTA DE COMPRAS ===
         const shoppingList = {
-            "🥦 Hortifruti": [
-                "Maçã, Banana Prata, Melão",
-                "Alface, Rúcula, Agrião",
-                "Tomate, Pepino",
-                "Cenoura, Vagem, Brócolis, Abobrinha",
-                "Batata (opção para jantar)"
-            ],
-            "🥩 Açougue e Frios": [
-                "Frango ou Patinho Moído/Bife (aprox. 2kg)",
-                "Peito de Peru (Fatiado)",
-                "Queijo Mussarela (Fatiado)",
-                "Ovos (1 Dúzia)"
-            ],
-            "🥛 Laticínios": [
-                "Leite Semi-desnatado (3 Litros)",
-                "Requeijão Light (2 potes)",
-                "Iogurte Light ou Natural (7 unidades)"
-            ],
-            "🍞 Mercearia e Padaria": [
-                "Pão Francês",
-                "Pão de Forma Branco",
-                "Arroz Branco",
-                "Feijão Carioca",
-                "Toddy Light",
-                "Maionese Tradicional",
-                "Azeite de Oliva"
-            ]
+            "🥦 Hortifruti": ["Maçã, Banana, Melão", "Alface, Rúcula, Agrião", "Tomate, Pepino", "Cenoura, Vagem, Brócolis", "Batata"],
+            "🥩 Açougue": ["Frango/Carne Moída (2kg)", "Peito de Peru", "Mussarela", "Ovos"],
+            "🥛 Laticínios": ["Leite Semi (3L)", "Requeijão Light (2 un)", "Iogurte (7 un)"],
+            "🍞 Mercearia": ["Pão Francês", "Pão de Forma", "Arroz/Feijão", "Toddy Light", "Maionese", "Azeite"]
         };
 
-        // === DADOS DE SUBSTITUIÇÃO ===
         const subsData = {
-            "🍞 Carboidratos": [
-                "<strong>Macarrão (comum):</strong> 80g cozido (3 colheres)",
-                "<strong>Batata Inglesa:</strong> 140g cozida (1 e meia)",
-                "<strong>Mandioquinha:</strong> 100g (4 colheres)",
-                "<strong>Mandioca/Aipim:</strong> 70g (2 pedaços peq)",
-                "<strong>Rap10:</strong> 1 unidade",
-                "<strong>Tapioca:</strong> 60g (3 colheres)",
-                "<strong>Cuscuz de Milho:</strong> 100g cozido"
-            ],
-            "🍗 Proteínas": [
-                "<strong>Peixe Branco:</strong> 150g (1 filé grande)",
-                "<strong>Lombo Suíno Magro:</strong> 120g (1 bife médio)",
-                "<strong>Carne Moída Magra:</strong> 4 colheres cheias",
-                "<strong>Ovos:</strong> 2 unidades inteiras",
-                "<strong>Atum em lata (água):</strong> 1 lata drenada"
-            ],
-            "🥗 Leguminosas": [
-                "<strong>Feijão Preto:</strong> 1 concha média",
-                "<strong>Lentilha:</strong> 4 colheres de sopa",
-                "<strong>Grão de Bico:</strong> 3 colheres de sopa",
-                "<span class='note'>Lembrete: Nada de ervilha.</span>"
-            ],
-            "🥛 Laticínios": [
-                "<strong>Leite (200ml) por:</strong> 1 Iogurte Natural (170g) ou 2 fatias de Minas Frescal",
-                "<strong>Requeijão por:</strong> Creme de Ricota Light ou Cottage (mesma qtd)",
-                "<strong>Mussarela por:</strong> Queijo Prato ou Minas Padrão (1 fatia)"
-            ],
-            "🍎 Frutas": [
-                "<strong>Morango:</strong> 10 unidades",
-                "<strong>Melancia:</strong> 1 fatia média (200g)",
-                "<strong>Abacaxi:</strong> 2 fatias finas",
-                "<strong>Pera:</strong> 1 unidade média",
-                "<strong>Uvas:</strong> 10 a 12 unidades",
-                "<strong>Mamão Papaia:</strong> 1/2 unidade pequena"
-            ],
-            "🥦 Legumes": [
-                "<strong>Substituir Cenoura/Vagem por:</strong>",
-                "Beterraba (cozida ou crua)",
-                "Couve-flor ou Arroz de Couve-flor",
-                "Espinafre ou Couve Manteiga",
-                "Berinjela (assada/refogada)",
-                "Abóbora Cabotiá/Moranga",
-                "<span class='note'>Lembrete: Nada de chuchu.</span>"
-            ],
-            "🍫 Extras": [
-                "<strong>Substituto Toddy:</strong> Cacau 50% (1 colher sobremesa) + adoçante",
-                "<strong>SOS Doce:</strong> 1 quadradinho (10g) de chocolate meio amargo (esporádico)"
-            ]
+            "🍞 Carboidratos": ["Macarrão (80g)", "Batata Inglesa (140g)", "Mandioquinha (100g)", "Rap10 (1un)", "Tapioca (60g)", "Cuscuz (100g)"],
+            "🍗 Proteínas": ["Peixe Branco (150g)", "Lombo Suíno (120g)", "Ovos (2 un)", "Atum (1 lata)"],
+            "🥦 Legumes": ["Beterraba", "Couve-flor", "Espinafre", "Berinjela", "Abóbora"]
         };
 
         // === ESTADO DO APP ===
@@ -586,7 +483,6 @@
         const waterGoal = 3500;
         let checkedMeals = JSON.parse(localStorage.getItem('bestieMeals')) || [];
 
-        // Inicialização
         function init() {
             renderMeals();
             loadWater();
@@ -595,84 +491,136 @@
             renderSubs();
         }
 
-        // --- LÓGICA DE REFEIÇÕES ---
+        // --- LÓGICA DE TREINO (SIMULAÇÃO GEMINI) ---
+        function generateWorkout() {
+            const location = document.getElementById('w-location').value;
+            const days = document.getElementById('w-days').value;
+            const energy = document.getElementById('w-energy').value;
+            const resultDiv = document.getElementById('workout-result');
+
+            let workoutHTML = `<h3>🗓️ Seu Plano (${days} dias)</h3>`;
+            
+            // Lógica "Inteligente" baseada no perfil
+            if (location === 'gym') {
+                // TREINO ACADEMIA
+                if (energy === 'low') {
+                    workoutHTML += `<p style="color:#d62828; margin-bottom:10px;"><em>Como sua energia está baixa, foca na execução e menos peso hoje!</em></p>`;
+                }
+                
+                // Dia A (Sempre presente)
+                workoutHTML += `
+                <div class="workout-day">
+                    <h4>Treino A: Pernas & Glúteo (Foco Calórico)</h4>
+                    <p style="font-size:0.85rem; color:#666;">Aquecimento: 10min Elíptico ou Esteira Inclinada</p>
+                    ${renderExercise('Leg Press 45º', '3x 12-15 reps')}
+                    ${renderExercise('Cadeira Extensora', '3x 12-15 reps')}
+                    ${renderExercise('Mesa Flexora (Deitada)', '3x 12 reps')}
+                    ${renderExercise('Cadeira Abdutora', '3x 15 reps')}
+                    ${renderExercise('Panturrilha Sentado', '3x 15 reps')}
+                    <p style="margin-top:5px; font-weight:bold; color:#2a9d8f;">🔥 Cardio Final: 20min Esteira (Caminhada Rápida)</p>
+                </div>`;
+
+                // Dia B
+                workoutHTML += `
+                <div class="workout-day">
+                    <h4>Treino B: Superiores & Abdômen</h4>
+                    ${renderExercise('Puxada Aberta (Costas)', '3x 12 reps')}
+                    ${renderExercise('Supino Máquina ou Halteres', '3x 12 reps')}
+                    ${renderExercise('Elevação Lateral', '3x 12 reps')}
+                    ${renderExercise('Tríceps Corda/Polia', '3x 12 reps')}
+                    ${renderExercise('Abdominal Supra (Colchonete)', '3x 20 reps')}
+                    <p style="margin-top:5px; font-weight:bold; color:#2a9d8f;">🔥 Cardio Final: 15min Elíptico (Moderado)</p>
+                </div>`;
+
+                if (days >= 3) {
+                     workoutHTML += `
+                    <div class="workout-day">
+                        <h4>Treino C: Full Body (Gasto Total)</h4>
+                        ${renderExercise('Agachamento Goblet (Halter)', '3x 12 reps')}
+                        ${renderExercise('Remada Sentada (Baixa)', '3x 12 reps')}
+                        ${renderExercise('Desenvolvimento Máquina', '3x 10 reps')}
+                        ${renderExercise('Prancha Isométrica', '3x 30 seg')}
+                        <p style="margin-top:5px; font-weight:bold; color:#2a9d8f;">🔥 Cardio: 25min Esteira</p>
+                    </div>`;
+                }
+
+            } else {
+                // TREINO EM CASA
+                workoutHTML += `<p style="margin-bottom:10px;"><em>Treino em casa para suar sem precisar de muito equipamento!</em></p>`;
+                
+                workoutHTML += `
+                <div class="workout-day">
+                    <h4>Treino Full Body (Casa)</h4>
+                    <p style="font-size:0.85rem; color:#666;">Aquecimento: 30 polichinelos</p>
+                    ${renderExercise('Agachamento Livre (Sentar/Levantar)', '3x 15')}
+                    ${renderExercise('Flexão de Braço (Joelhos no chão)', '3x 8-10')}
+                    ${renderExercise('Afundo (Passada)', '3x 10 cada perna')}
+                    ${renderExercise('Elevação Pélvica (Chão)', '3x 15')}
+                    ${renderExercise('Abdominal Remador', '3x 15')}
+                    ${renderExercise('Corrida parada (no lugar)', '4x 30 seg')}
+                </div>`;
+            }
+
+            workoutHTML += `<div style="text-align:center; margin-top:15px; font-size:0.8rem; color:#666;">
+                *Descanse 45-60s entre séries. Beba água!
+            </div>`;
+
+            resultDiv.innerHTML = workoutHTML;
+            resultDiv.style.display = 'block';
+        }
+
+        function renderExercise(name, sets) {
+            return `
+            <div class="exercise-item">
+                <span>${name}</span>
+                <span class="exercise-sets">${sets}</span>
+            </div>`;
+        }
+
+        // --- FUNÇÕES BÁSICAS (REFEIÇÕES, ÁGUA, MODAIS) ---
         function renderMeals() {
             const container = document.getElementById('meals-container');
             container.innerHTML = '';
-
             dietData.forEach(meal => {
                 const isDone = checkedMeals.includes(meal.id);
-                const card = document.createElement('div');
-                card.className = `meal-card ${isDone ? 'done' : ''}`;
-                card.onclick = (e) => toggleMeal(meal.id);
-
-                let listHtml = '';
-                meal.items.forEach(item => {
-                    listHtml += `<li>${item}</li>`;
-                });
-
-                card.innerHTML = `
-                    <div class="meal-header">
-                        <div>
-                            <div class="meal-time">${meal.time}</div>
-                            <div class="meal-title">${meal.title}</div>
+                let listHtml = meal.items.map(item => `<li>${item}</li>`).join('');
+                container.innerHTML += `
+                    <div class="meal-card ${isDone ? 'done' : ''}" onclick="toggleMeal('${meal.id}')">
+                        <div class="meal-header">
+                            <div><div class="meal-time">${meal.time}</div><div class="meal-title">${meal.title}</div></div>
+                            <div class="meal-check">${isDone ? '✔' : ''}</div>
                         </div>
-                        <div class="meal-check">${isDone ? '✔' : ''}</div>
-                    </div>
-                    <ul class="food-list">
-                        ${listHtml}
-                    </ul>
-                `;
-                container.appendChild(card);
+                        <ul class="food-list">${listHtml}</ul>
+                    </div>`;
             });
         }
 
         function toggleMeal(id) {
-            if (checkedMeals.includes(id)) {
-                checkedMeals = checkedMeals.filter(m => m !== id);
-            } else {
-                checkedMeals.push(id);
-            }
+            checkedMeals = checkedMeals.includes(id) ? checkedMeals.filter(m => m !== id) : [...checkedMeals, id];
             localStorage.setItem('bestieMeals', JSON.stringify(checkedMeals));
             renderMeals();
         }
 
-        // --- LÓGICA DA ÁGUA ---
-        function loadWater() {
-            const savedWater = localStorage.getItem('bestieWater');
-            if (savedWater) {
-                waterML = parseInt(savedWater);
-            }
+        function loadWater() { waterML = parseInt(localStorage.getItem('bestieWater') || 0); }
+        function addWater() { 
+            waterML += 250; 
+            if(waterML > 4000) waterML = 4000;
+            localStorage.setItem('bestieWater', waterML); 
+            updateWaterUI(); 
         }
-
-        function addWater() {
-            waterML += 250;
-            if (waterML > waterGoal + 500) waterML = waterGoal + 500; 
-            localStorage.setItem('bestieWater', waterML);
-            updateWaterUI();
-        }
-
         function updateWaterUI() {
-            const percentage = Math.min((waterML / waterGoal) * 100, 100);
-            document.getElementById('waterBar').style.width = `${percentage}%`;
+            const pct = Math.min((waterML / waterGoal) * 100, 100);
+            document.getElementById('waterBar').style.width = `${pct}%`;
             document.getElementById('waterCount').innerText = waterML;
         }
 
-        // --- RENDERIZAR LISTAS (COMPRAS E SUBS) ---
         function renderShoppingList() {
             const content = document.getElementById('shopping-list-content');
             let html = '';
-
-            for (const [category, items] of Object.entries(shoppingList)) {
-                html += `<h3 class="category-title">${category}</h3>`;
-                items.forEach((item, index) => {
-                    const itemId = `shop-${category.replace(/\s/g, '')}-${index}`;
-                    html += `
-                        <div class="shopping-item">
-                            <input type="checkbox" id="${itemId}">
-                            <label for="${itemId}">${item}</label>
-                        </div>
-                    `;
+            for (const [cat, items] of Object.entries(shoppingList)) {
+                html += `<h3 class="category-title">${cat}</h3>`;
+                items.forEach((item, i) => {
+                    html += `<div class="shopping-item"><input type="checkbox" id="s-${cat}-${i}"><label for="s-${cat}-${i}">${item}</label></div>`;
                 });
             }
             content.innerHTML = html;
@@ -681,46 +629,25 @@
         function renderSubs() {
             const content = document.getElementById('subs-content');
             let html = '';
-
-            for (const [category, items] of Object.entries(subsData)) {
-                html += `<h3 class="category-title">${category}</h3><ul class="subs-list">`;
-                items.forEach(item => {
-                    html += `<li>${item}</li>`;
-                });
-                html += `</ul>`;
+            for (const [cat, items] of Object.entries(subsData)) {
+                html += `<h3 class="category-title">${cat}</h3><ul class="subs-list">${items.map(i => `<li>${i}</li>`).join('')}</ul>`;
             }
             content.innerHTML = html;
         }
 
-        // --- CONTROLE DE MODAIS ---
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
-        }
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        window.onclick = e => { if(e.target.classList.contains('modal')) e.target.style.display = 'none'; }
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = 'none';
-            }
-        }
-
-        // --- RESET GERAL ---
         function resetDay() {
-            if(confirm("Começar um novo dia? Isso vai zerar suas marcações.")) {
-                waterML = 0;
-                checkedMeals = [];
-                localStorage.setItem('bestieWater', 0);
-                localStorage.setItem('bestieMeals', JSON.stringify([]));
+            if(confirm("Começar novo dia?")) {
+                waterML = 0; checkedMeals = [];
+                localStorage.setItem('bestieWater', 0); localStorage.setItem('bestieMeals', '[]');
                 init();
             }
         }
 
-        // Iniciar App
         init();
-
     </script>
 </body>
 </html>
