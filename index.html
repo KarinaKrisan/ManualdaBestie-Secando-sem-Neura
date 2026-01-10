@@ -13,7 +13,7 @@
             --text: #590d22;
             --text-light: #800f2f;
             --success: #80b918;
-            --overlay: rgba(89, 13, 34, 0.8);
+            --overlay: rgba(89, 13, 34, 0.9);
         }
 
         * {
@@ -336,8 +336,41 @@
         .workout-result { display: none; margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 15px; border-left: 5px solid #2a9d8f; }
         .workout-day { margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 15px; }
         .workout-day:last-child { border-bottom: none; }
-        .exercise-item { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.95rem; }
-        .exercise-sets { font-weight: bold; color: #2a9d8f; font-size: 0.85rem; }
+        
+        /* ESTILO DOS EXERCÍCIOS */
+        .exercise-item { 
+            margin-bottom: 12px; 
+            padding-bottom: 12px;
+            border-bottom: 1px dashed #e0e0e0;
+        }
+        .exercise-item:last-child { border-bottom: none; }
+        
+        .exercise-header {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        .exercise-sets { 
+            font-weight: bold; 
+            color: #2a9d8f; 
+            font-size: 0.85rem; 
+            background: #e0f2f1;
+            padding: 2px 8px;
+            border-radius: 8px;
+        }
+
+        .exercise-desc {
+            display: block;
+            margin-top: 4px;
+            font-size: 0.8rem;
+            color: #666;
+            line-height: 1.3;
+            font-style: italic;
+        }
 
     </style>
 </head>
@@ -508,43 +541,43 @@
                 if (focus === 'legs') {
                     title = "Treino de Inferiores (Pernas & Glúteo)";
                     exercises = [
-                        { name: "Agachamento Livre ou Smith", sets: "3x 12-15" },
-                        { name: "Leg Press 45º", sets: "3x 12-15" },
-                        { name: "Cadeira Extensora", sets: "3x 15" },
-                        { name: "Mesa Flexora", sets: "3x 12" },
-                        { name: "Elevação Pélvica", sets: "3x 12-15" },
-                        { name: "Panturrilha Sentado", sets: "3x 15" }
+                        { name: "Agachamento Livre ou Smith", sets: "3x 12-15", desc: "Pés na largura dos ombros, desça jogando o quadril para trás como se fosse sentar. Mantenha coluna reta." },
+                        { name: "Leg Press 45º", sets: "3x 12-15", desc: "Pés firmes na plataforma, empurre com o calcanhar. Não estique totalmente os joelhos na subida." },
+                        { name: "Cadeira Extensora", sets: "3x 15", desc: "Estenda a perna totalmente, segure 1 segundo lá em cima e desça devagar." },
+                        { name: "Mesa Flexora", sets: "3x 12", desc: "Deitada, puxe o rolo em direção ao bumbum e controle a volta para não bater o peso." },
+                        { name: "Elevação Pélvica", sets: "3x 12-15", desc: "Costas no banco, peso no quadril. Suba contraindo bem o glúteo no topo." },
+                        { name: "Panturrilha Sentado", sets: "3x 15", desc: "Suba o máximo que der na ponta dos pés e desça alongando bem." }
                     ];
                     cardio = "15 min Elíptico (Ritmo Leve/Médio)";
                 } else if (focus === 'upper') {
                     title = "Treino de Superiores (Definição)";
                     exercises = [
-                        { name: "Puxada Aberta (Costas)", sets: "3x 12" },
-                        { name: "Supino Reto (Halter/Máquina)", sets: "3x 12" },
-                        { name: "Remada Baixa", sets: "3x 12" },
-                        { name: "Elevação Lateral (Ombros)", sets: "3x 12" },
-                        { name: "Tríceps Corda", sets: "3x 12" },
-                        { name: "Rosca Direta (Bíceps)", sets: "3x 12" }
+                        { name: "Puxada Aberta (Costas)", sets: "3x 12", desc: "Puxe a barra em direção ao peito, cotovelos apontando para o chão. Estique tudo na volta." },
+                        { name: "Supino Reto (Halter/Máquina)", sets: "3x 12", desc: "Deitada, empurre o peso para cima na linha do peito. Desça até o braço fazer 90º." },
+                        { name: "Remada Baixa", sets: "3x 12", desc: "Sentada, coluna reta, puxe o triângulo em direção ao umbigo fechando as costas." },
+                        { name: "Elevação Lateral (Ombros)", sets: "3x 12", desc: "Levante os halteres até a altura dos ombros, braços levemente flexionados." },
+                        { name: "Tríceps Corda", sets: "3x 12", desc: "Polia alta, puxe para baixo separando a corda no final. Cotovelo colado no corpo." },
+                        { name: "Rosca Direta (Bíceps)", sets: "3x 12", desc: "Segure a barra/halter, suba até o peito e desça devagar. Só o antebraço mexe." }
                     ];
                     cardio = "20 min Elíptico (Moderado)";
                 } else if (focus === 'full') {
                     title = "Treino Full Body (Corpo Todo)";
                     exercises = [
-                        { name: "Agachamento Goblet (Halter)", sets: "3x 12" },
-                        { name: "Supino Vertical Máquina", sets: "3x 12" },
-                        { name: "Leg Press Horizontal", sets: "3x 15" },
-                        { name: "Remada Máquina", sets: "3x 12" },
-                        { name: "Desenvolvimento Ombros", sets: "3x 10" },
-                        { name: "Prancha Abdominal", sets: "3x 30s" }
+                        { name: "Agachamento Goblet (Halter)", sets: "3x 12", desc: "Segure um halter no peito e faça o agachamento. Mantém o tronco firme." },
+                        { name: "Supino Vertical Máquina", sets: "3x 12", desc: "Sentada na máquina, empurre para frente e controle a volta." },
+                        { name: "Leg Press Horizontal", sets: "3x 15", desc: "Empurre a plataforma, cuidando para não juntar os joelhos." },
+                        { name: "Remada Máquina", sets: "3x 12", desc: "Peito no apoio, puxe a máquina fechando as escápulas atrás." },
+                        { name: "Desenvolvimento Ombros", sets: "3x 10", desc: "Empurre o peso acima da cabeça e desça até a altura das orelhas." },
+                        { name: "Prancha Abdominal", sets: "3x 30s", desc: "Corpo reto, apoiado nos antebraços e ponta dos pés. Trave o abdômen." }
                     ];
                     cardio = "15 min Elíptico (Recuperação)";
                 } else { // Cardio
                     title = "Treino Cardio & Abdômen";
                     exercises = [
-                        { name: "Abdominal Supra (Colchonete)", sets: "3x 20" },
-                        { name: "Abdominal Infra (Elevação Pernas)", sets: "3x 15" },
-                        { name: "Prancha Isométrica", sets: "3x 45s" },
-                        { name: "Abdominal Remador", sets: "3x 15" }
+                        { name: "Abdominal Supra", sets: "3x 20", desc: "Deitada, joelhos dobrados, suba o tronco tirando os ombros do chão (olhe pro teto)." },
+                        { name: "Abdominal Infra", sets: "3x 15", desc: "Mãos embaixo do quadril, suba e desça as pernas esticadas sem encostar no chão." },
+                        { name: "Prancha Isométrica", sets: "3x 45s", desc: "Segure a posição de prancha. Se tremer, é porque está funcionando!" },
+                        { name: "Abdominal Remador", sets: "3x 15", desc: "Deite esticada, suba abraçando os joelhos e volte a deitar." }
                     ];
                     cardio = "30 min Elíptico (Intervalado/Forte)";
                 }
@@ -554,39 +587,39 @@
                 if (focus === 'legs') {
                     title = "Inferiores em Casa";
                     exercises = [
-                        { name: "Agachamento Livre", sets: "3x 20" },
-                        { name: "Afundo (Passada)", sets: "3x 12 cada" },
-                        { name: "Agachamento Sumô", sets: "3x 15" },
-                        { name: "Elevação Pélvica (Chão)", sets: "3x 20" },
-                        { name: "Panturrilha no degrau", sets: "3x 20" }
+                        { name: "Agachamento Livre", sets: "3x 20", desc: "Pés na largura do ombro, agache como se fosse sentar numa cadeira imaginária." },
+                        { name: "Afundo (Passada)", sets: "3x 12 cada", desc: "Um passo grande à frente, desça o joelho de trás quase até o chão." },
+                        { name: "Agachamento Sumô", sets: "3x 15", desc: "Pés bem afastados apontando para fora. Agache sentindo a parte interna da coxa." },
+                        { name: "Elevação Pélvica", sets: "3x 20", desc: "Deitada, suba o quadril o máximo que conseguir contraindo o bumbum." },
+                        { name: "Panturrilha no degrau", sets: "3x 20", desc: "Na pontinha de um degrau, desça o calcanhar e suba tudo." }
                     ];
                     cardio = "50 Polichinelos";
                 } else if (focus === 'upper') {
                     title = "Superiores em Casa";
                     exercises = [
-                        { name: "Flexão de Braço (Joelhos)", sets: "3x 8-12" },
-                        { name: "Remada Curvada (Garrafa d'água)", sets: "3x 15" },
-                        { name: "Elevação Lateral (Garrafas)", sets: "3x 15" },
-                        { name: "Tríceps Banco (Cadeira)", sets: "3x 12" },
-                        { name: "Prancha Toca Ombro", sets: "3x 20" }
+                        { name: "Flexão de Braço (Joelhos)", sets: "3x 8-12", desc: "Apoie os joelhos, mãos afastadas. Desça o peito até perto do chão." },
+                        { name: "Remada Curvada (Garrafas)", sets: "3x 15", desc: "Incline o tronco p/ frente, coluna reta. Puxe as garrafas na direção da cintura." },
+                        { name: "Elevação Lateral (Garrafas)", sets: "3x 15", desc: "Levante as garrafas para os lados até a altura do ombro (igual voar)." },
+                        { name: "Tríceps Banco", sets: "3x 12", desc: "Apoie as mãos numa cadeira firme, desça o quadril flexionando os braços." },
+                        { name: "Prancha Toca Ombro", sets: "3x 20", desc: "Posição de prancha alta (mãos), toque a mão direita no ombro esquerdo e vice-versa." }
                     ];
                     cardio = "Corrida estacionária 3 min";
                 } else if (focus === 'cardio') {
                     title = "Cardio HIIT em Casa";
                     exercises = [
-                        { name: "Polichinelos", sets: "4x 1 min" },
-                        { name: "Burpee Adaptado", sets: "4x 10" },
-                        { name: "Agachamento com Salto", sets: "4x 15" },
-                        { name: "Montanhista (Mountain Climber)", sets: "4x 30s" }
+                        { name: "Polichinelos", sets: "4x 1 min", desc: "Abra e feche braços e pernas pulando. Mantenha o ritmo!" },
+                        { name: "Burpee Adaptado", sets: "4x 10", desc: "Mão no chão, estica a perna atrás, volta a perna e fica de pé (sem flexão)." },
+                        { name: "Agachamento com Salto", sets: "4x 15", desc: "Agacha e na subida dá um pulinho saindo do chão." },
+                        { name: "Montanhista", sets: "4x 30s", desc: "Mãos no chão (prancha), puxe os joelhos alternados em direção ao peito rápido." }
                     ];
                     cardio = "Alongamento final";
                 } else {
                     title = "Full Body em Casa";
                     exercises = [
-                        { name: "Agachamento", sets: "3x 15" },
-                        { name: "Flexão de Braço", sets: "3x 10" },
-                        { name: "Afundo", sets: "3x 10 cada" },
-                        { name: "Abdominal Remador", sets: "3x 15" }
+                        { name: "Agachamento", sets: "3x 15", desc: "Movimento clássico: senta e levanta." },
+                        { name: "Flexão de Braço", sets: "3x 10", desc: "Use os joelhos se precisar. Foco no peitoral." },
+                        { name: "Afundo Alternado", sets: "3x 10 cada", desc: "Passo à frente e desce. Alterna as pernas." },
+                        { name: "Abdominal Remador", sets: "3x 15", desc: "Estica tudo e abraça o joelho." }
                     ];
                     cardio = "20 Polichinelos entre séries";
                 }
@@ -611,7 +644,7 @@
             html += `<p style="font-size:0.85rem; color:#666; margin-bottom:10px;">${note}</p>`;
             
             for (let i = 0; i < maxExercises; i++) {
-                html += renderExercise(exercises[i].name, exercises[i].sets);
+                html += renderExercise(exercises[i]);
             }
             
             html += `<p style="margin-top:15px; font-weight:bold; color:#2a9d8f;">🔥 Finalização: ${cardio}</p>`;
@@ -621,11 +654,14 @@
             resultDiv.style.display = 'block';
         }
 
-        function renderExercise(name, sets) {
+        function renderExercise(ex) {
             return `
             <div class="exercise-item">
-                <span>${name}</span>
-                <span class="exercise-sets">${sets}</span>
+                <div class="exercise-header">
+                    <span>${ex.name}</span>
+                    <span class="exercise-sets">${ex.sets}</span>
+                </div>
+                <span class="exercise-desc">${ex.desc}</span>
             </div>`;
         }
 
