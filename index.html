@@ -97,6 +97,7 @@
         <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl h-[80vh] overflow-y-auto transform transition-transform duration-300 translate-y-full md:max-w-md md:mx-auto md:inset-x-0" id="modal-panel">
             <!-- Modal Content -->
             <div class="relative p-6">
+                <!-- Close Button -->
                 <button onclick="closeRecipeModal()" class="absolute top-4 right-4 w-8 h-8 bg-gray-100 text-gray-500 rounded-full flex items-center justify-center hover:bg-gray-200 transition z-10">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
@@ -113,8 +114,11 @@
                     </div>
                 </div>
                 
-                <p id="modal-desc" class="text-sm text-gray-500 mb-6 italic leading-relaxed"></p>
+                <p id="modal-desc" class="text-sm text-gray-500 mb-6 italic leading-relaxed">
+                    <!-- Description injected here -->
+                </p>
 
+                <!-- Dica de Ouro Container -->
                 <div id="modal-tip-container" class="hidden mb-6 bg-yellow-50 border border-yellow-200 rounded-xl p-4">
                     <h4 class="text-yellow-700 font-bold text-sm mb-1 flex items-center gap-2">
                         <i class="fa-solid fa-star"></i> Dica de Ouro
@@ -123,19 +127,36 @@
                 </div>
 
                 <div class="flex items-center gap-4 text-sm text-gray-500 mb-6 border-y border-pink-50 py-4 justify-between px-2">
-                    <div class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-bestie"></i><span id="modal-time">0 min</span></div>
-                    <div class="flex items-center gap-1.5"><i class="fa-solid fa-fire text-bestie"></i><span id="modal-difficulty">Fácil</span></div>
-                    <div class="flex items-center gap-1.5"><i class="fa-solid fa-user-group text-bestie"></i><span id="modal-yield">2 porções</span></div>
+                    <div class="flex items-center gap-1.5">
+                        <i class="fa-regular fa-clock text-bestie"></i>
+                        <span id="modal-time">0 min</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <i class="fa-solid fa-fire text-bestie"></i>
+                        <span id="modal-difficulty">Fácil</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <i class="fa-solid fa-user-group text-bestie"></i>
+                        <span id="modal-yield">2 porções</span>
+                    </div>
                 </div>
 
                 <div class="mb-6">
-                    <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2"><i class="fa-solid fa-basket-shopping text-bestie"></i> Ingredientes</h3>
-                    <ul id="modal-ingredients" class="space-y-3 text-sm text-gray-600 pl-2"></ul>
+                    <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-basket-shopping text-bestie"></i> Ingredientes
+                    </h3>
+                    <ul id="modal-ingredients" class="space-y-3 text-sm text-gray-600 pl-2">
+                        <!-- JS Inject -->
+                    </ul>
                 </div>
 
                 <div class="mb-8">
-                    <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2"><i class="fa-solid fa-spoon text-bestie"></i> Modo de Preparo</h3>
-                    <div id="modal-instructions" class="space-y-4 text-sm text-gray-600"></div>
+                    <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-spoon text-bestie"></i> Modo de Preparo
+                    </h3>
+                    <div id="modal-instructions" class="space-y-4 text-sm text-gray-600">
+                        <!-- JS Inject -->
+                    </div>
                 </div>
                 
                 <button class="w-full py-3 bg-bestie text-white font-semibold rounded-xl shadow-lg shadow-pink-200 hover:bg-bestie-dark transition active:scale-95 mb-safe">
@@ -173,18 +194,281 @@
     </nav>
 
     <script>
-        // --- API CONFIG ---
-        const apiKey = ""; 
+        // --- GEMINI API SETUP ---
+        const apiKey = ""; // Environment will provide key
 
-        // --- STATE ---
+        // --- USER PROFILE STATE ---
         let userProfile = JSON.parse(localStorage.getItem('bestieProfile')) || {
-            name: 'Bestie', age: '', weight: '', targetWeight: '', height: '', goal: 'perder'
+            name: 'Bestie',
+            age: '',
+            weight: '',
+            targetWeight: '',
+            height: '',
+            goal: 'perder'
         };
+
+        // --- API FUNCTIONS ---
+
+        async function callGemini(ingredients) {
+            const prompt = `Você é a 'Bestie Fit', uma chef especialista em receitas saudáveis, práticas e com poucas calorias para o aplicativo 'Manual da Bestie'. 
+            Crie uma receita criativa e saudável (fit/low carb/proteica) usando OBRIGATORIAMENTE estes ingredientes principais: ${ingredients}. Você pode sugerir temperos básicos extras.
+            
+            IMPORTANTE: Responda APENAS com um objeto JSON válido (sem markdown, sem \`\`\`json) seguindo exatamente esta estrutura:
+            {
+                "title": "Nome Criativo da Receita",
+                "calories": 000 (apenas numero),
+                "time": "00 min",
+                "difficulty": "Fácil",
+                "yield": "1 ou 2 porções",
+                "description": "Uma descrição curta, animada e motivadora estilo 'bestie'. Se houver uma dica especial, comece com 'Dica:'",
+                "ingredients": ["ingrediente 1", "ingrediente 2"],
+                "instructions": ["passo 1", "passo 2", "passo 3"],
+                "category": "almoco" (escolha entre: cafe, almoco, jantar, lanche, doces)
+            }`;
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseMimeType: "application/json"
+                }
+            };
+
+            try {
+                let response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error('Erro na API');
+
+                const data = await response.json();
+                let text = data.candidates[0].content.parts[0].text;
+                text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+                return JSON.parse(text);
+
+            } catch (error) {
+                console.error("Erro Gemini:", error);
+                return null;
+            }
+        }
+
+        async function callGeminiPlan(userData) {
+            const prompt = `Você é a 'Bestie Fit', uma nutricionista e coach motivacional. Crie um mini plano personalizado com base nestes dados:
+            - Idade: ${userData.age}
+            - Peso Atual: ${userData.weight}kg
+            - Meta de Peso: ${userData.targetWeight}kg
+            - Altura: ${userData.height}cm
+            - Objetivo: ${userData.goal}
+
+            IMPORTANTE: Responda APENAS com um objeto JSON válido (sem markdown) com esta estrutura:
+            {
+                "calories_target": "Ex: 1500-1600",
+                "bmi": "Ex: 22.5 (Normal)",
+                "macros": {
+                    "protein": "Ex: 120g",
+                    "carbs": "Ex: 150g",
+                    "fats": "Ex: 50g"
+                },
+                "motivational_quote": "Uma frase curta e inspiradora estilo 'bestie' para motivar.",
+                "tip": "Uma dica de ouro específica para o objetivo selecionado."
+            }`;
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseMimeType: "application/json"
+                }
+            };
+
+            try {
+                let response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error('Erro na API');
+
+                const data = await response.json();
+                let text = data.candidates[0].content.parts[0].text;
+                text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+                const firstOpen = text.indexOf('{');
+                const lastClose = text.lastIndexOf('}');
+                if (firstOpen !== -1 && lastClose !== -1) {
+                    text = text.substring(firstOpen, lastClose + 1);
+                }
+                return JSON.parse(text);
+
+            } catch (error) {
+                console.error("Erro Gemini Plan:", error);
+                return null;
+            }
+        }
+
+        async function callGeminiWorkout(data) {
+            const prompt = `Você é a 'Bestie Fit', uma personal trainer animada e motivadora. Crie um treino rápido e eficiente com estas características:
+            - Tempo: ${data.time} minutos
+            - Foco: ${data.focus}
+            - Equipamento: ${data.equipment}
+
+            IMPORTANTE: Responda APENAS com um objeto JSON válido (sem markdown) com esta estrutura:
+            {
+                "title": "Nome Criativo do Treino",
+                "warmup": "Uma frase rápida de aquecimento (Ex: 1 min polichinelos)",
+                "exercises": [
+                    { "name": "Nome do Exercício", "reps": "Ex: 3x 12", "tips": "Dica rápida de execução" },
+                    { "name": "Nome do Exercício 2", "reps": "Ex: 3x 15", "tips": "Dica rápida" }
+                ],
+                "motivation": "Frase final de motivação curta e divertida"
+            }`;
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseMimeType: "application/json"
+                }
+            };
+
+            try {
+                let response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error('Erro na API');
+
+                const data = await response.json();
+                let text = data.candidates[0].content.parts[0].text;
+                text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+                const firstOpen = text.indexOf('{');
+                const lastClose = text.lastIndexOf('}');
+                if (firstOpen !== -1 && lastClose !== -1) {
+                    text = text.substring(firstOpen, lastClose + 1);
+                }
+                return JSON.parse(text);
+
+            } catch (error) {
+                console.error("Erro Gemini Workout:", error);
+                return null;
+            }
+        }
+
+        async function callGeminiSOS(situation) {
+            const prompt = `Você é a 'Bestie Fit', a melhor amiga virtual da usuária. A usuária está passando por esta situação: "${situation}".
+            Dê um conselho de emergência curto, prático e sem julgamentos (max 2 frases).
+            Foque em redução de danos ou motivação imediata. Use tom leve e divertido com emojis.`;
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }]
+            };
+
+            try {
+                let response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error('Erro na API');
+
+                const data = await response.json();
+                return data.candidates[0].content.parts[0].text;
+
+            } catch (error) {
+                console.error("Erro Gemini SOS:", error);
+                return "Oii bestie! Tô aqui, respira fundo! Tenta de novo já já! 💖";
+            }
+        }
+
+        async function callGeminiSwap(item) {
+            const prompt = `Você é a 'Bestie Fit'. A usuária quer substituir '${item}' por algo mais saudável na dieta.
+            Sugira a melhor troca fit e explique o porquê em uma frase curta, animada e com emojis. Exemplo: 'Troque por X, porque Y! ✨'`;
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }]
+            };
+
+            try {
+                let response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error('Erro na API');
+
+                const data = await response.json();
+                return data.candidates[0].content.parts[0].text;
+
+            } catch (error) {
+                console.error("Erro Gemini Swap:", error);
+                return "Ops! Minha bola de cristal fit falhou. Tenta de novo! 🔮";
+            }
+        }
+
+        // --- DATA ---
         let waterIntake = 0;
         let waterGoalLiters = 2.5;
         let waterGoalCups = 10;
 
+        const recipes = [
+            // All recipes...
+            { id: 1, title: "Crepioca Fit", displayCategory: "Café da Manhã", tags: ['cafe', 'proteina', 'zeroacucar', 'simples', 'rapido', 'lowcal'], calories: 180, time: "10 min", difficulty: "Fácil", yield: "1 porção", description: "A queridinha das dietas! Prática, rápida e versátil.", ingredients: ["1 ovo", "2 colheres goma tapioca", "1 colher requeijão light", "Sal a gosto"], instructions: ["Bata o ovo com a tapioca.", "Frite em frigideira untada."] },
+            { id: 2, title: "Salada de Pote", displayCategory: "Almoço Prático", tags: ['almoco', 'jantar', 'lowcal', 'lowcarb', 'proteina', 'rapido', 'simples'], calories: 320, time: "15 min", difficulty: "Fácil", yield: "1 pote", description: "Perfeita para levar para o trabalho.", ingredients: ["Folhas", "100g frango desfiado", "Tomate cereja", "Cenoura", "Molho iogurte"], instructions: ["Molho no fundo.", "Legumes duros.", "Frango.", "Folhas por cima."] },
+            { id: 3, title: "Overnight Oats", displayCategory: "Café/Lanche", tags: ['cafe', 'lanche', 'vegetariano'], calories: 250, time: "5 min", difficulty: "Muito Fácil", yield: "1 pote", description: "Café da manhã pronto para quem acorda na correria.", ingredients: ["30g aveia", "Leite vegetal", "Chia", "Frutas"], instructions: ["Misture e gele a noite toda."] },
+            { id: 4, title: "Brigadeiro de Whey", displayCategory: "Doce Fit", tags: ['lanche', 'proteina', 'doces'], calories: 120, time: "15 min", difficulty: "Fácil", yield: "5 bolinhas", description: "Para matar a vontade de doce sem sair da dieta.", ingredients: ["Whey Chocolate", "Cacau", "Leite em pó", "Água"], instructions: ["Misture até dar ponto."] },
+            { id: 5, title: "Panqueca de Banana", displayCategory: "Café da Manhã", tags: ['cafe', 'lanche', 'lowfat'], calories: 210, time: "10 min", difficulty: "Fácil", yield: "1 porção", description: "Apenas 3 ingredientes.", ingredients: ["1 banana", "2 ovos", "Canela"], instructions: ["Amasse banana, misture com ovos, frite."] },
+            { id: 6, title: "Brócolis e couve-flor", displayCategory: "Almoço/Jantar", tags: ['almoco', 'jantar', 'lowcarb'], calories: 356, time: "25 min", difficulty: "Normal", yield: "2 porções", description: "Gratinado delicioso.", ingredients: ["Brócolis", "Couve-flor", "Queijo", "Creme de leite"], instructions: ["Cozinhe legumes, cubra com molho e asse."] },
+            { id: 7, title: "Lassi de Manga", displayCategory: "Café da Manhã", tags: ['cafe', 'lanche', 'vegetariano'], calories: 211, time: "3 min", difficulty: "Muito Fácil", yield: "2 porções", description: "Bebida refrescante.", ingredients: ["Manga", "Iogurte", "Mel"], instructions: ["Bata tudo no liquidificador."] },
+            { id: 8, title: "Shake Choco Hortelã", displayCategory: "Café/Lanche", tags: ['cafe', 'lanche', 'vegano'], calories: 232, time: "3 min", difficulty: "Fácil", yield: "2 porções", description: "Refrescante e doce.", ingredients: ["Cacau", "Hortelã", "Banana", "Leite vegetal"], instructions: ["Bata tudo no liquidificador."] },
+            { id: 9, title: "Smoothie Morango", displayCategory: "Café/Lanche", tags: ['cafe', 'lanche', 'lowcal'], calories: 150, time: "5 min", difficulty: "Fácil", yield: "2 porções", description: "Clássico.", ingredients: ["Morango", "Banana", "Iogurte"], instructions: ["Bata tudo."] },
+            { id: 10, title: "Shake Banana Nozes", displayCategory: "Pós-Treino", tags: ['cafe', 'proteina'], calories: 434, time: "5 min", difficulty: "Fácil", yield: "1 porção", description: "Energia pura.", ingredients: ["Banana", "Nozes", "Iogurte", "Mel"], instructions: ["Bata tudo."] },
+            { id: 11, title: "Shake Pasta Amendoim", displayCategory: "Proteico", tags: ['lanche', 'proteina'], calories: 402, time: "5 min", difficulty: "Fácil", yield: "1 porção", description: "Favorito dos atletas.", ingredients: ["Pasta de amendoim", "Banana", "Whey", "Leite"], instructions: ["Bata tudo."] },
+            { id: 12, title: "Smoothie Banana Tâmara", displayCategory: "Café/Lanche", tags: ['cafe', 'vegano'], calories: 237, time: "15 min", difficulty: "Fácil", yield: "2 porções", description: "Adoçado naturalmente.", ingredients: ["Banana", "Tâmaras", "Leite vegetal"], instructions: ["Hidrate tâmaras, bata tudo."] },
+            { id: 13, title: "Shake Mirtilo Coco", displayCategory: "Proteico Caseiro", tags: ['lanche', 'proteina'], calories: 358, time: "5 min", difficulty: "Fácil", yield: "1 porção", description: "Proteína de qualidade sem aditivos.", ingredients: ["Iogurte Grego", "Mirtilo", "Coco"], instructions: ["Bata tudo."] },
+            { id: 14, title: "Shake Frutas Vermelhas", displayCategory: "Pós-Treino", tags: ['lanche', 'lowcal'], calories: 163, time: "9 min", difficulty: "Fácil", yield: "1 porção", description: "Leve e proteico.", ingredients: ["Claras", "Frutas vermelhas", "Iogurte"], instructions: ["Bata tudo."] },
+            { id: 15, title: "Shake Chocolate Prot", displayCategory: "Pré-Treino", tags: ['lanche', 'proteina'], calories: 284, time: "5 min", difficulty: "Fácil", yield: "2 porções", description: "Rápido e delicioso.", ingredients: ["Banana", "Whey", "Cacau", "Água"], instructions: ["Bata tudo."] },
+            { id: 16, title: "Mingau Aveia Choco", displayCategory: "Café Vegano", tags: ['cafe', 'vegano'], calories: 389, time: "10 min", difficulty: "Fácil", yield: "1 porção", description: "Saciante.", ingredients: ["Aveia", "Cacau", "Banana", "Leite veg"], instructions: ["Cozinhe até engrossar."] },
+            { id: 17, title: "Cereal Caseiro", displayCategory: "Café/Lanche", tags: ['cafe', 'lowcarb'], calories: 455, time: "85 min", difficulty: "Normal", yield: "4 porções", description: "Crocante e saudável.", ingredients: ["Amêndoas", "Coco", "Sementes"], instructions: ["Asse em forno baixo."] },
+            { id: 18, title: "Overnight Framboesa", displayCategory: "Café Prático", tags: ['cafe', 'simples'], calories: 286, time: "3h+", difficulty: "Fácil", yield: "1 porção", description: "Prepare antes.", ingredients: ["Aveia", "Framboesa", "Leite"], instructions: ["Misture e gele."] },
+            { id: 19, title: "Mingau Microondas", displayCategory: "Café Rápido", tags: ['cafe', 'rapido'], calories: 373, time: "8 min", difficulty: "Fácil", yield: "1 porção", description: "Muito prático.", ingredients: ["Aveia", "Banana", "Água/Leite"], instructions: ["Microondas 2 min."] },
+            { id: 20, title: "Smoothie Verde", displayCategory: "Detox", tags: ['lanche', 'vegano'], calories: 273, time: "5 min", difficulty: "Fácil", yield: "1 porção", description: "Vitaminas.", ingredients: ["Espinafre", "Laranja", "Banana"], instructions: ["Bata tudo."] },
+            { id: 21, title: "Cereal Trigo", displayCategory: "Café Caseiro", tags: ['cafe', 'simples'], calories: 413, time: "15 min", difficulty: "Normal", yield: "1 porção", description: "Cereal assado.", ingredients: ["Trigo", "Mel", "Óleo coco"], instructions: ["Asse até dourar."] },
+            { id: 22, title: "Bruschetta Avocado", displayCategory: "Lanche Salgado", tags: ['lanche', 'vegano'], calories: 427, time: "15 min", difficulty: "Fácil", yield: "2 porções", description: "Refinado.", ingredients: ["Pão integral", "Avocado", "Tomate"], instructions: ["Monte no pão tostado."] },
+            { id: 23, title: "Misto Batata Doce", displayCategory: "Pré-Treino", tags: ['lanche', 'vegano'], calories: 303, time: "28 min", difficulty: "Fácil", yield: "3 porções", description: "Substituto do pão.", ingredients: ["Batata doce", "Pasta amendoim"], instructions: ["Asse batata, recheie."] },
+            { id: 24, title: "Geleia Morango Chia", displayCategory: "Doce Fit", tags: ['doces', 'lowcal'], calories: 12, time: "15 min", difficulty: "Fácil", yield: "20 porções", description: "Sem açúcar.", ingredients: ["Morango", "Chia", "Adoçante"], instructions: ["Cozinhe até reduzir."] },
+            { id: 25, title: "Sanduíche Tomate Ovos", displayCategory: "Café Prático", tags: ['cafe', 'almoco'], calories: 240, time: "15 min", difficulty: "Normal", yield: "2 porções", description: "Clássico.", ingredients: ["Pão integral", "Ovo", "Tomate", "Iogurte"], instructions: ["Faça pasta de ovo, monte."] },
+            { id: 26, title: "Rabanada Morango", displayCategory: "Café Especial", tags: ['cafe', 'doces'], calories: 260, time: "10 min", difficulty: "Fácil", yield: "2 porções", description: "Versão fit.", ingredients: ["Pão", "Ovo", "Leite", "Morango"], instructions: ["Molhe pão, grelhe."] },
+            { id: 27, title: "Triguilho Framboesa", displayCategory: "Café Energia", tags: ['cafe', 'rapido'], calories: 467, time: "10 min", difficulty: "Fácil", yield: "1 porção", description: "Fibras.", ingredients: ["Triguilho", "Iogurte", "Frutas"], instructions: ["Misture."] },
+            { id: 28, title: "Ovos Mexidos Espinafre", displayCategory: "Café Low Carb", tags: ['cafe', 'lowcarb'], calories: 546, time: "10 min", difficulty: "Fácil", yield: "1 porção", description: "Salgado.", ingredients: ["Ovos", "Espinafre", "Feta"], instructions: ["Refogue e mexa."] },
+            { id: 29, title: "Muffin Banana Choco", displayCategory: "Doce Fit", tags: ['lanche', 'doces'], calories: 152, time: "25 min", difficulty: "Fácil", yield: "9 porções", description: "Lanche.", ingredients: ["Banana", "Farinha", "Chocolate"], instructions: ["Asse em forminhas."] },
+            { id: 30, title: "Muffins Salgados", displayCategory: "Café Proteico", tags: ['cafe', 'proteina'], calories: 41, time: "35 min", difficulty: "Fácil", yield: "9 porções", description: "Ovos.", ingredients: ["Ovos", "Vegetais"], instructions: ["Asse em forminhas."] },
+            { id: 31, title: "Panqueca Salgada", displayCategory: "Café Proteico", tags: ['cafe', 'almoco'], calories: 476, time: "15 min", difficulty: "Fácil", yield: "2 porções", description: "Aveia.", ingredients: ["Aveia", "Ovos", "Recheio"], instructions: ["Faça disco, recheie."] },
+            { id: 32, title: "Ovos Presunto", displayCategory: "Café Salgado", tags: ['cafe', 'lowcarb'], calories: 230, time: "25 min", difficulty: "Fácil", yield: "2 porções", description: "Básico.", ingredients: ["Ovos", "Presunto", "Espinafre"], instructions: ["Refogue e mexa."] },
+            { id: 33, title: "Suflê Mirtilo", displayCategory: "Café/Lanche", tags: ['cafe', 'doces'], calories: 300, time: "65 min", difficulty: "Fácil", yield: "3 porções", description: "Quente ou frio.", ingredients: ["Iogurte", "Ovos", "Mirtilo"], instructions: ["Bata e asse."] },
+            { id: 34, title: "Wrap Omelete", displayCategory: "Almoço/Jantar", tags: ['almoco', 'lowcarb'], calories: 352, time: "20 min", difficulty: "Normal", yield: "4 porções", description: "Sem farinha.", ingredients: ["Ovos", "Recheio"], instructions: ["Faça disco de ovo, enrole."] },
+            { id: 35, title: "Wrap Morango", displayCategory: "Doce Fit", tags: ['lanche', 'doces'], calories: 297, time: "10 min", difficulty: "Fácil", yield: "2 porções", description: "Doce.", ingredients: ["Tortilha", "Cream cheese", "Morango"], instructions: ["Recheie e enrole."] },
+            { id: 36, title: "Rolinhos Pimentão", displayCategory: "Lanche Leve", tags: ['lanche', 'lowcal'], calories: 353, time: "10 min", difficulty: "Fácil", yield: "2 porções", description: "Frio.", ingredients: ["Tortilha", "Pimentão", "Cream cheese"], instructions: ["Recheie e corte."] },
+            { id: 37, title: "Omelete Coreano", displayCategory: "Café/Almoço", tags: ['cafe', 'almoco'], calories: 303, time: "12 min", difficulty: "Fácil", yield: "2 porções", description: "Enrolado.", ingredients: ["Ovos", "Cenoura"], instructions: ["Frite enrolando."] },
+            { id: 38, title: "Pão Low Carb", displayCategory: "Café/Lanche", tags: ['cafe', 'lowcarb'], calories: 165, time: "75 min", difficulty: "Normal", yield: "10 fatias", description: "Amêndoas.", ingredients: ["Farinha amêndoa", "Ovos"], instructions: ["Asse."] },
+            { id: 39, title: "Ovos com Salmão", displayCategory: "Café Proteico", tags: ['cafe', 'proteina'], calories: 500, time: "15 min", difficulty: "Normal", yield: "2 porções", description: "Sofisticado.", ingredients: ["Ovos", "Salmão defumado"], instructions: ["Mexa tudo."] },
+            { id: 40, title: "Sanduíche Peru", displayCategory: "Lanche Prático", tags: ['lanche', 'rapido'], calories: 313, time: "15 min", difficulty: "Normal", yield: "4 porções", description: "Completo.", ingredients: ["Pão integral", "Peito peru", "Salada"], instructions: ["Monte."] }
+        ];
+
         // --- VIEWS ---
+
         const views = {
             home: `
                 <div class="fade-in space-y-6">
@@ -193,48 +477,81 @@
                         <h2 class="text-2xl font-bold mb-4">Vamos secar hoje?</h2>
                         <div class="flex gap-3">
                             <div class="bg-white/20 backdrop-blur rounded-xl p-3 flex-1">
-                                <span class="block text-xs text-pink-100">Água</span>
-                                <span class="font-bold text-lg">1.2L</span>
+                                <span class="block text-xs text-pink-100">Água (35ml/kg)</span>
+                                <span class="font-bold text-lg" id="home-water-goal">--</span>
                             </div>
                             <div class="bg-white/20 backdrop-blur rounded-xl p-3 flex-1">
                                 <span class="block text-xs text-pink-100">Meta</span>
-                                <span class="font-bold text-lg">55kg</span>
+                                <span class="font-bold text-lg" id="home-meta-goal">--</span>
                             </div>
                         </div>
                     </div>
+
                     <div>
-                        <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg text-gray-800">Atalhos</h3></div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-lg text-gray-800">Atalhos</h3>
+                        </div>
                         <div class="grid grid-cols-2 gap-4">
+                            <!-- Existing Recipes -->
                             <button onclick="navigate('recipes')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
-                                <div class="w-12 h-12 rounded-full bg-green-100 text-green-500 flex items-center justify-center text-xl"><i class="fa-solid fa-leaf"></i></div>
+                                <div class="w-12 h-12 rounded-full bg-green-100 text-green-500 flex items-center justify-center group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-leaf"></i>
+                                </div>
                                 <span class="font-medium text-sm">Receitinhas</span>
                             </button>
+                            <!-- Water (Visual) -->
                             <button onclick="navigate('water')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
-                                <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center text-xl"><i class="fa-solid fa-glass-water"></i></div>
+                                <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-glass-water"></i>
+                                </div>
                                 <span class="font-medium text-sm">Água</span>
                             </button>
+                            
+                            <!-- Fim de Semana -->
                             <button onclick="navigate('weekend')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
-                                <div class="w-12 h-12 rounded-full bg-purple-100 text-purple-500 flex items-center justify-center text-xl"><i class="fa-solid fa-calendar-check"></i></div>
+                                <div class="w-12 h-12 rounded-full bg-purple-100 text-purple-500 flex items-center justify-center group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-calendar-check"></i>
+                                </div>
                                 <span class="font-medium text-sm">Fim de Semana</span>
                             </button>
+
+                            <!-- Kit da Bestie -->
                             <button onclick="navigate('kit')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
-                                <div class="w-12 h-12 rounded-full bg-teal-100 text-teal-500 flex items-center justify-center text-xl"><i class="fa-solid fa-kit-medical"></i></div>
+                                <div class="w-12 h-12 rounded-full bg-teal-100 text-teal-500 flex items-center justify-center group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-kit-medical"></i>
+                                </div>
                                 <span class="font-medium text-sm">Kit da Bestie</span>
                             </button>
+
+                            <!-- Trocas -->
                             <button onclick="navigate('swaps')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
-                                <div class="w-12 h-12 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center text-xl"><i class="fa-solid fa-repeat"></i></div>
+                                <div class="w-12 h-12 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-repeat"></i>
+                                </div>
                                 <span class="font-medium text-sm">Trocas</span>
                             </button>
+
+                            <!-- Economia -->
                             <button onclick="navigate('savings')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
-                                <div class="w-12 h-12 rounded-full bg-yellow-100 text-yellow-500 flex items-center justify-center text-xl"><i class="fa-solid fa-piggy-bank"></i></div>
+                                <div class="w-12 h-12 rounded-full bg-yellow-100 text-yellow-500 flex items-center justify-center group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-piggy-bank"></i>
+                                </div>
                                 <span class="font-medium text-sm">Economia</span>
                             </button>
+
+                            <!-- Treino -->
                             <button onclick="navigate('workout')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
-                                <div class="w-12 h-12 rounded-full bg-red-100 text-red-500 flex items-center justify-center text-xl"><i class="fa-solid fa-dumbbell"></i></div>
+                                <div class="w-12 h-12 rounded-full bg-red-100 text-red-500 flex items-center justify-center group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-dumbbell"></i>
+                                </div>
                                 <span class="font-medium text-sm">Treino</span>
                             </button>
+
+                            <!-- SOS Bestie -->
                             <button onclick="navigate('sos')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
-                                <div class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-500 flex items-center justify-center text-xl"><i class="fa-solid fa-bell"></i></div>
+                                <div class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-500 flex items-center justify-center group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-bell"></i>
+                                </div>
                                 <span class="font-medium text-sm">SOS Bestie</span>
                             </button>
                         </div>
@@ -438,6 +755,17 @@
                 }, 0);
             }
             if(viewName === 'recipes') { setTimeout(() => renderRecipes('all'), 0); }
+            if (viewName === 'home') {
+                setTimeout(() => {
+                    if(userProfile.weight) {
+                         const l = (userProfile.weight * 0.035).toFixed(1);
+                         document.getElementById('home-water-goal').innerText = l + 'L';
+                    }
+                    if(userProfile.targetWeight) {
+                        document.getElementById('home-meta-goal').innerText = userProfile.targetWeight + 'kg';
+                    }
+                }, 0);
+            }
         }
 
         // --- LOGIC ---
@@ -598,6 +926,14 @@
             const btn = document.getElementById('plan-btn');
             btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Calculando...`; btn.disabled = true;
             document.getElementById('plan-result').classList.add('hidden');
+            
+            // Update profile with calculator data
+            userProfile.age = age;
+            userProfile.weight = weight;
+            userProfile.targetWeight = tWeight;
+            userProfile.height = height;
+            userProfile.goal = goal;
+            localStorage.setItem('bestieProfile', JSON.stringify(userProfile));
 
             const p = `Plano nutricional: ${age}anos, ${weight}kg, Meta:${tWeight}kg, ${height}cm, ${goal}. JSON: {"calories_target":"", "bmi":"", "macros":{"protein":"", "carbs":"", "fats":""}, "motivational_quote":"", "tip":""}`;
             const data = await fetchAI(p, true);
