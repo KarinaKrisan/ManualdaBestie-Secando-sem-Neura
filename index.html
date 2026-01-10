@@ -55,28 +55,32 @@
             opacity: 0.9;
         }
 
-        /* Botão Lista de Compras */
-        .btn-shopping {
-            display: block;
-            width: 100%;
+        /* Botões de Ação (Menu) */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .btn-menu {
             background-color: #fff;
             color: var(--primary-dark);
             border: 2px solid var(--primary);
             padding: 12px;
             border-radius: 15px;
             font-weight: bold;
-            font-size: 1rem;
-            margin-bottom: 25px;
+            font-size: 0.9rem;
             cursor: pointer;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             transition: transform 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            text-align: center;
         }
 
-        .btn-shopping:active {
+        .btn-menu:active {
             transform: scale(0.98);
             background-color: var(--bg);
         }
@@ -242,7 +246,7 @@
             cursor: pointer;
         }
 
-        /* MODAL (Lista de Compras) */
+        /* MODAIS GERAIS */
         .modal {
             display: none; 
             position: fixed; 
@@ -262,7 +266,7 @@
             border-radius: 20px;
             width: 100%;
             max-width: 500px;
-            max-height: 80vh;
+            max-height: 85vh;
             overflow-y: auto;
             padding: 20px;
             position: relative;
@@ -294,14 +298,21 @@
 
         .category-title {
             color: var(--primary-dark);
-            margin-top: 15px;
+            margin-top: 20px;
             margin-bottom: 10px;
             font-size: 1.1rem;
             display: flex;
             align-items: center;
             gap: 8px;
+            border-bottom: 2px solid var(--bg);
+            padding-bottom: 5px;
+        }
+        
+        .category-title:first-child {
+            margin-top: 0;
         }
 
+        /* Estilo Lista de Compras */
         .shopping-item {
             display: flex;
             align-items: center;
@@ -324,6 +335,20 @@
         .shopping-item input:checked + label {
             text-decoration: line-through;
             color: #aaa;
+        }
+
+        /* Estilo Lista de Substituição */
+        .subs-list {
+            list-style: none;
+            padding-left: 5px;
+        }
+        .subs-list li {
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        .subs-list strong {
+            color: var(--text-light);
         }
 
     </style>
@@ -351,9 +376,14 @@
             </div>
         </div>
 
-        <button class="btn-shopping" onclick="toggleModal(true)">
-            🛒 Ver Lista de Compras da Semana
-        </button>
+        <div class="action-buttons">
+            <button class="btn-menu" onclick="openModal('shoppingModal')">
+                🛒 Lista de Compras
+            </button>
+            <button class="btn-menu" onclick="openModal('subsModal')">
+                🔄 Ver Substituições
+            </button>
+        </div>
 
         <div class="water-tracker">
             <h3>💧 Hidratação</h3>
@@ -375,13 +405,22 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Lista de Compras 📝</h2>
-                <button class="close-modal" onclick="toggleModal(false)">&times;</button>
+                <button class="close-modal" onclick="closeModal('shoppingModal')">&times;</button>
             </div>
-            <div id="shopping-list-content">
-                </div>
+            <div id="shopping-list-content"></div>
             <p style="text-align: center; margin-top: 20px; font-size: 0.8rem; color: #888;">
-                Itens calculados para uma semana inteira.
+                Itens calculados para uma semana.
             </p>
+        </div>
+    </div>
+
+    <div id="subsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Substituições 🔄</h2>
+                <button class="close-modal" onclick="closeModal('subsModal')">&times;</button>
+            </div>
+            <div id="subs-content"></div>
         </div>
     </div>
 
@@ -490,6 +529,58 @@
             ]
         };
 
+        // === DADOS DE SUBSTITUIÇÃO ===
+        const subsData = {
+            "🍞 Carboidratos": [
+                "<strong>Macarrão (comum):</strong> 80g cozido (3 colheres)",
+                "<strong>Batata Inglesa:</strong> 140g cozida (1 e meia)",
+                "<strong>Mandioquinha:</strong> 100g (4 colheres)",
+                "<strong>Mandioca/Aipim:</strong> 70g (2 pedaços peq)",
+                "<strong>Rap10:</strong> 1 unidade",
+                "<strong>Tapioca:</strong> 60g (3 colheres)",
+                "<strong>Cuscuz de Milho:</strong> 100g cozido"
+            ],
+            "🍗 Proteínas": [
+                "<strong>Peixe Branco:</strong> 150g (1 filé grande)",
+                "<strong>Lombo Suíno Magro:</strong> 120g (1 bife médio)",
+                "<strong>Carne Moída Magra:</strong> 4 colheres cheias",
+                "<strong>Ovos:</strong> 2 unidades inteiras",
+                "<strong>Atum em lata (água):</strong> 1 lata drenada"
+            ],
+            "🥗 Leguminosas": [
+                "<strong>Feijão Preto:</strong> 1 concha média",
+                "<strong>Lentilha:</strong> 4 colheres de sopa",
+                "<strong>Grão de Bico:</strong> 3 colheres de sopa",
+                "<span class='note'>Lembrete: Nada de ervilha.</span>"
+            ],
+            "🥛 Laticínios": [
+                "<strong>Leite (200ml) por:</strong> 1 Iogurte Natural (170g) ou 2 fatias de Minas Frescal",
+                "<strong>Requeijão por:</strong> Creme de Ricota Light ou Cottage (mesma qtd)",
+                "<strong>Mussarela por:</strong> Queijo Prato ou Minas Padrão (1 fatia)"
+            ],
+            "🍎 Frutas": [
+                "<strong>Morango:</strong> 10 unidades",
+                "<strong>Melancia:</strong> 1 fatia média (200g)",
+                "<strong>Abacaxi:</strong> 2 fatias finas",
+                "<strong>Pera:</strong> 1 unidade média",
+                "<strong>Uvas:</strong> 10 a 12 unidades",
+                "<strong>Mamão Papaia:</strong> 1/2 unidade pequena"
+            ],
+            "🥦 Legumes": [
+                "<strong>Substituir Cenoura/Vagem por:</strong>",
+                "Beterraba (cozida ou crua)",
+                "Couve-flor ou Arroz de Couve-flor",
+                "Espinafre ou Couve Manteiga",
+                "Berinjela (assada/refogada)",
+                "Abóbora Cabotiá/Moranga",
+                "<span class='note'>Lembrete: Nada de chuchu.</span>"
+            ],
+            "🍫 Extras": [
+                "<strong>Substituto Toddy:</strong> Cacau 50% (1 colher sobremesa) + adoçante",
+                "<strong>SOS Doce:</strong> 1 quadradinho (10g) de chocolate meio amargo (esporádico)"
+            ]
+        };
+
         // === ESTADO DO APP ===
         let waterML = 0;
         const waterGoal = 3500;
@@ -501,6 +592,7 @@
             loadWater();
             updateWaterUI();
             renderShoppingList();
+            renderSubs();
         }
 
         // --- LÓGICA DE REFEIÇÕES ---
@@ -566,7 +658,7 @@
             document.getElementById('waterCount').innerText = waterML;
         }
 
-        // --- LÓGICA DO SHOPPING LIST ---
+        // --- RENDERIZAR LISTAS (COMPRAS E SUBS) ---
         function renderShoppingList() {
             const content = document.getElementById('shopping-list-content');
             let html = '';
@@ -574,7 +666,6 @@
             for (const [category, items] of Object.entries(shoppingList)) {
                 html += `<h3 class="category-title">${category}</h3>`;
                 items.forEach((item, index) => {
-                    // ID único para cada checkbox
                     const itemId = `shop-${category.replace(/\s/g, '')}-${index}`;
                     html += `
                         <div class="shopping-item">
@@ -587,22 +678,38 @@
             content.innerHTML = html;
         }
 
-        function toggleModal(show) {
-            const modal = document.getElementById('shoppingModal');
-            modal.style.display = show ? 'flex' : 'none';
+        function renderSubs() {
+            const content = document.getElementById('subs-content');
+            let html = '';
+
+            for (const [category, items] of Object.entries(subsData)) {
+                html += `<h3 class="category-title">${category}</h3><ul class="subs-list">`;
+                items.forEach(item => {
+                    html += `<li>${item}</li>`;
+                });
+                html += `</ul>`;
+            }
+            content.innerHTML = html;
         }
 
-        // Fechar modal ao clicar fora
+        // --- CONTROLE DE MODAIS ---
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
         window.onclick = function(event) {
-            const modal = document.getElementById('shoppingModal');
-            if (event.target == modal) {
-                toggleModal(false);
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
             }
         }
 
         // --- RESET GERAL ---
         function resetDay() {
-            if(confirm("Começar um novo dia? Isso vai zerar suas marcações de refeição e água.")) {
+            if(confirm("Começar um novo dia? Isso vai zerar suas marcações.")) {
                 waterML = 0;
                 checkedMeals = [];
                 localStorage.setItem('bestieWater', 0);
