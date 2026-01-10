@@ -418,10 +418,10 @@
             </div>
             
             <div id="workout-form">
-                <p style="margin-bottom:15px; font-size:0.9rem;">Responda rápido para a IA montar seu treino de hoje:</p>
+                <p style="margin-bottom:15px; font-size:0.9rem;">Responda para a IA montar seu treino:</p>
                 
                 <div class="form-group">
-                    <label>📍 Onde você vai treinar?</label>
+                    <label>📍 Onde vai ser?</label>
                     <select id="w-location">
                         <option value="gym">Academia (Smartfit/Outra)</option>
                         <option value="home">Em Casa</option>
@@ -429,24 +429,25 @@
                 </div>
 
                 <div class="form-group">
-                    <label>📅 Quantos dias na semana?</label>
-                    <select id="w-days">
-                        <option value="3">3 dias (Iniciante)</option>
-                        <option value="4">4 dias (Intermediário)</option>
-                        <option value="5">5 dias (Foco Total)</option>
+                    <label>🦵 Qual parte do corpo?</label>
+                    <select id="w-focus">
+                        <option value="legs">Inferiores (Pernas/Glúteo)</option>
+                        <option value="upper">Superiores (Braço/Costas)</option>
+                        <option value="full">Corpo Todo (Full Body)</option>
+                        <option value="cardio">Só Cardio + Abdominais</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label>🔋 Energia hoje?</label>
-                    <select id="w-energy">
-                        <option value="normal">Normal</option>
-                        <option value="low">Baixa (Menstruada/Cansada)</option>
-                        <option value="high">Alta (Quero destruir!)</option>
+                    <label>⏱️ Quanto tempo você tem?</label>
+                    <select id="w-duration">
+                        <option value="30">30 min (Rápido)</option>
+                        <option value="45">45 min (Normal)</option>
+                        <option value="60">60 min+ (Completo)</option>
                     </select>
                 </div>
 
-                <button class="btn-generate" onclick="generateWorkout()">✨ Gerar Treino com IA</button>
+                <button class="btn-generate" onclick="generateWorkout()">✨ Gerar Treino Agora</button>
             </div>
 
             <div id="workout-result" class="workout-result">
@@ -491,81 +492,132 @@
             renderSubs();
         }
 
-        // --- LÓGICA DE TREINO (SIMULAÇÃO GEMINI) ---
+        // --- LÓGICA DE TREINO INTELIGENTE ---
         function generateWorkout() {
             const location = document.getElementById('w-location').value;
-            const days = document.getElementById('w-days').value;
-            const energy = document.getElementById('w-energy').value;
+            const focus = document.getElementById('w-focus').value;
+            const duration = parseInt(document.getElementById('w-duration').value);
             const resultDiv = document.getElementById('workout-result');
 
-            let workoutHTML = `<h3>🗓️ Seu Plano (${days} dias)</h3>`;
-            
-            // Lógica "Inteligente" baseada no perfil
+            let title = "";
+            let exercises = [];
+            let cardio = "";
+
+            // Lógica Academia
             if (location === 'gym') {
-                // TREINO ACADEMIA
-                if (energy === 'low') {
-                    workoutHTML += `<p style="color:#d62828; margin-bottom:10px;"><em>Como sua energia está baixa, foca na execução e menos peso hoje!</em></p>`;
+                if (focus === 'legs') {
+                    title = "Treino de Inferiores (Pernas & Glúteo)";
+                    exercises = [
+                        { name: "Agachamento Livre ou Smith", sets: "3x 12-15" },
+                        { name: "Leg Press 45º", sets: "3x 12-15" },
+                        { name: "Cadeira Extensora", sets: "3x 15" },
+                        { name: "Mesa Flexora", sets: "3x 12" },
+                        { name: "Elevação Pélvica", sets: "3x 12-15" },
+                        { name: "Panturrilha Sentado", sets: "3x 15" }
+                    ];
+                    cardio = "15 min Esteira (Caminhada Inclinada)";
+                } else if (focus === 'upper') {
+                    title = "Treino de Superiores (Definição)";
+                    exercises = [
+                        { name: "Puxada Aberta (Costas)", sets: "3x 12" },
+                        { name: "Supino Reto (Halter/Máquina)", sets: "3x 12" },
+                        { name: "Remada Baixa", sets: "3x 12" },
+                        { name: "Elevação Lateral (Ombros)", sets: "3x 12" },
+                        { name: "Tríceps Corda", sets: "3x 12" },
+                        { name: "Rosca Direta (Bíceps)", sets: "3x 12" }
+                    ];
+                    cardio = "20 min Elíptico Moderado";
+                } else if (focus === 'full') {
+                    title = "Treino Full Body (Corpo Todo)";
+                    exercises = [
+                        { name: "Agachamento Goblet (Halter)", sets: "3x 12" },
+                        { name: "Supino Vertical Máquina", sets: "3x 12" },
+                        { name: "Leg Press Horizontal", sets: "3x 15" },
+                        { name: "Remada Máquina", sets: "3x 12" },
+                        { name: "Desenvolvimento Ombros", sets: "3x 10" },
+                        { name: "Prancha Abdominal", sets: "3x 30s" }
+                    ];
+                    cardio = "15 min Esteira";
+                } else { // Cardio
+                    title = "Treino Cardio & Abdômen";
+                    exercises = [
+                        { name: "Abdominal Supra (Colchonete)", sets: "3x 20" },
+                        { name: "Abdominal Infra (Elevação Pernas)", sets: "3x 15" },
+                        { name: "Prancha Isométrica", sets: "3x 45s" },
+                        { name: "Abdominal Remador", sets: "3x 15" }
+                    ];
+                    cardio = "30 min Esteira ou Bike (Ritmo Forte)";
                 }
-                
-                // Dia A (Sempre presente)
-                workoutHTML += `
-                <div class="workout-day">
-                    <h4>Treino A: Pernas & Glúteo (Foco Calórico)</h4>
-                    <p style="font-size:0.85rem; color:#666;">Aquecimento: 10min Elíptico ou Esteira Inclinada</p>
-                    ${renderExercise('Leg Press 45º', '3x 12-15 reps')}
-                    ${renderExercise('Cadeira Extensora', '3x 12-15 reps')}
-                    ${renderExercise('Mesa Flexora (Deitada)', '3x 12 reps')}
-                    ${renderExercise('Cadeira Abdutora', '3x 15 reps')}
-                    ${renderExercise('Panturrilha Sentado', '3x 15 reps')}
-                    <p style="margin-top:5px; font-weight:bold; color:#2a9d8f;">🔥 Cardio Final: 20min Esteira (Caminhada Rápida)</p>
-                </div>`;
-
-                // Dia B
-                workoutHTML += `
-                <div class="workout-day">
-                    <h4>Treino B: Superiores & Abdômen</h4>
-                    ${renderExercise('Puxada Aberta (Costas)', '3x 12 reps')}
-                    ${renderExercise('Supino Máquina ou Halteres', '3x 12 reps')}
-                    ${renderExercise('Elevação Lateral', '3x 12 reps')}
-                    ${renderExercise('Tríceps Corda/Polia', '3x 12 reps')}
-                    ${renderExercise('Abdominal Supra (Colchonete)', '3x 20 reps')}
-                    <p style="margin-top:5px; font-weight:bold; color:#2a9d8f;">🔥 Cardio Final: 15min Elíptico (Moderado)</p>
-                </div>`;
-
-                if (days >= 3) {
-                     workoutHTML += `
-                    <div class="workout-day">
-                        <h4>Treino C: Full Body (Gasto Total)</h4>
-                        ${renderExercise('Agachamento Goblet (Halter)', '3x 12 reps')}
-                        ${renderExercise('Remada Sentada (Baixa)', '3x 12 reps')}
-                        ${renderExercise('Desenvolvimento Máquina', '3x 10 reps')}
-                        ${renderExercise('Prancha Isométrica', '3x 30 seg')}
-                        <p style="margin-top:5px; font-weight:bold; color:#2a9d8f;">🔥 Cardio: 25min Esteira</p>
-                    </div>`;
+            } 
+            // Lógica Casa
+            else {
+                if (focus === 'legs') {
+                    title = "Inferiores em Casa";
+                    exercises = [
+                        { name: "Agachamento Livre", sets: "3x 20" },
+                        { name: "Afundo (Passada)", sets: "3x 12 cada" },
+                        { name: "Agachamento Sumô", sets: "3x 15" },
+                        { name: "Elevação Pélvica (Chão)", sets: "3x 20" },
+                        { name: "Panturrilha no degrau", sets: "3x 20" }
+                    ];
+                    cardio = "50 Polichinelos";
+                } else if (focus === 'upper') {
+                    title = "Superiores em Casa";
+                    exercises = [
+                        { name: "Flexão de Braço (Joelhos)", sets: "3x 8-12" },
+                        { name: "Remada Curvada (Garrafa d'água)", sets: "3x 15" },
+                        { name: "Elevação Lateral (Garrafas)", sets: "3x 15" },
+                        { name: "Tríceps Banco (Cadeira)", sets: "3x 12" },
+                        { name: "Prancha Toca Ombro", sets: "3x 20" }
+                    ];
+                    cardio = "Corrida estacionária 3 min";
+                } else if (focus === 'cardio') {
+                    title = "Cardio HIIT em Casa";
+                    exercises = [
+                        { name: "Polichinelos", sets: "4x 1 min" },
+                        { name: "Burpee Adaptado", sets: "4x 10" },
+                        { name: "Agachamento com Salto", sets: "4x 15" },
+                        { name: "Montanhista (Mountain Climber)", sets: "4x 30s" }
+                    ];
+                    cardio = "Alongamento final";
+                } else {
+                    title = "Full Body em Casa";
+                    exercises = [
+                        { name: "Agachamento", sets: "3x 15" },
+                        { name: "Flexão de Braço", sets: "3x 10" },
+                        { name: "Afundo", sets: "3x 10 cada" },
+                        { name: "Abdominal Remador", sets: "3x 15" }
+                    ];
+                    cardio = "20 Polichinelos entre séries";
                 }
-
-            } else {
-                // TREINO EM CASA
-                workoutHTML += `<p style="margin-bottom:10px;"><em>Treino em casa para suar sem precisar de muito equipamento!</em></p>`;
-                
-                workoutHTML += `
-                <div class="workout-day">
-                    <h4>Treino Full Body (Casa)</h4>
-                    <p style="font-size:0.85rem; color:#666;">Aquecimento: 30 polichinelos</p>
-                    ${renderExercise('Agachamento Livre (Sentar/Levantar)', '3x 15')}
-                    ${renderExercise('Flexão de Braço (Joelhos no chão)', '3x 8-10')}
-                    ${renderExercise('Afundo (Passada)', '3x 10 cada perna')}
-                    ${renderExercise('Elevação Pélvica (Chão)', '3x 15')}
-                    ${renderExercise('Abdominal Remador', '3x 15')}
-                    ${renderExercise('Corrida parada (no lugar)', '4x 30 seg')}
-                </div>`;
             }
 
-            workoutHTML += `<div style="text-align:center; margin-top:15px; font-size:0.8rem; color:#666;">
-                *Descanse 45-60s entre séries. Beba água!
-            </div>`;
+            // Filtro de Tempo (Duration)
+            let maxExercises = exercises.length;
+            let note = "";
+            
+            if (duration === 30) {
+                // Se 30 min, remove os 2 últimos exercícios
+                if(exercises.length > 4) maxExercises = exercises.length - 2;
+                note = "<em>Como o tempo é curto, focamos nos principais! Descanse menos (30s).</em>";
+                if(location === 'gym') cardio = "10 min intenso";
+            } else if (duration === 45) {
+                // Se 45 min, remove o último
+                if(exercises.length > 5) maxExercises = exercises.length - 1;
+            }
 
-            resultDiv.innerHTML = workoutHTML;
+            // Renderizar HTML
+            let html = `<div class="workout-day"><h4>${title}</h4>`;
+            html += `<p style="font-size:0.85rem; color:#666; margin-bottom:10px;">${note}</p>`;
+            
+            for (let i = 0; i < maxExercises; i++) {
+                html += renderExercise(exercises[i].name, exercises[i].sets);
+            }
+            
+            html += `<p style="margin-top:15px; font-weight:bold; color:#2a9d8f;">🔥 Finalização: ${cardio}</p>`;
+            html += `</div>`;
+            
+            resultDiv.innerHTML = html;
             resultDiv.style.display = 'block';
         }
 
@@ -577,7 +629,7 @@
             </div>`;
         }
 
-        // --- FUNÇÕES BÁSICAS (REFEIÇÕES, ÁGUA, MODAIS) ---
+        // --- FUNÇÕES BÁSICAS ---
         function renderMeals() {
             const container = document.getElementById('meals-container');
             container.innerHTML = '';
