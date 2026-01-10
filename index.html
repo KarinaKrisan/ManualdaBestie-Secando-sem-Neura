@@ -503,7 +503,7 @@
             let exercises = [];
             let cardio = "";
 
-            // Lógica Academia
+            // Lógica Academia (COM ELÍPTICO EM TUDO)
             if (location === 'gym') {
                 if (focus === 'legs') {
                     title = "Treino de Inferiores (Pernas & Glúteo)";
@@ -515,7 +515,7 @@
                         { name: "Elevação Pélvica", sets: "3x 12-15" },
                         { name: "Panturrilha Sentado", sets: "3x 15" }
                     ];
-                    cardio = "15 min Esteira (Caminhada Inclinada)";
+                    cardio = "15 min Elíptico (Ritmo Leve/Médio)";
                 } else if (focus === 'upper') {
                     title = "Treino de Superiores (Definição)";
                     exercises = [
@@ -526,7 +526,7 @@
                         { name: "Tríceps Corda", sets: "3x 12" },
                         { name: "Rosca Direta (Bíceps)", sets: "3x 12" }
                     ];
-                    cardio = "20 min Elíptico Moderado";
+                    cardio = "20 min Elíptico (Moderado)";
                 } else if (focus === 'full') {
                     title = "Treino Full Body (Corpo Todo)";
                     exercises = [
@@ -537,7 +537,7 @@
                         { name: "Desenvolvimento Ombros", sets: "3x 10" },
                         { name: "Prancha Abdominal", sets: "3x 30s" }
                     ];
-                    cardio = "15 min Esteira";
+                    cardio = "15 min Elíptico (Recuperação)";
                 } else { // Cardio
                     title = "Treino Cardio & Abdômen";
                     exercises = [
@@ -546,7 +546,7 @@
                         { name: "Prancha Isométrica", sets: "3x 45s" },
                         { name: "Abdominal Remador", sets: "3x 15" }
                     ];
-                    cardio = "30 min Esteira ou Bike (Ritmo Forte)";
+                    cardio = "30 min Elíptico (Intervalado/Forte)";
                 }
             } 
             // Lógica Casa
@@ -600,7 +600,7 @@
                 // Se 30 min, remove os 2 últimos exercícios
                 if(exercises.length > 4) maxExercises = exercises.length - 2;
                 note = "<em>Como o tempo é curto, focamos nos principais! Descanse menos (30s).</em>";
-                if(location === 'gym') cardio = "10 min intenso";
+                if(location === 'gym') cardio = "10 min Elíptico Intenso";
             } else if (duration === 45) {
                 // Se 45 min, remove o último
                 if(exercises.length > 5) maxExercises = exercises.length - 1;
