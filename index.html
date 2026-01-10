@@ -52,7 +52,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Loading Animation Styles */
         .typing-indicator span {
             display: inline-block;
             width: 6px;
@@ -98,7 +97,6 @@
         <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl h-[80vh] overflow-y-auto transform transition-transform duration-300 translate-y-full md:max-w-md md:mx-auto md:inset-x-0" id="modal-panel">
             <!-- Modal Content -->
             <div class="relative p-6">
-                <!-- Close Button -->
                 <button onclick="closeRecipeModal()" class="absolute top-4 right-4 w-8 h-8 bg-gray-100 text-gray-500 rounded-full flex items-center justify-center hover:bg-gray-200 transition z-10">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
@@ -115,11 +113,8 @@
                     </div>
                 </div>
                 
-                <p id="modal-desc" class="text-sm text-gray-500 mb-6 italic leading-relaxed">
-                    <!-- Description injected here -->
-                </p>
+                <p id="modal-desc" class="text-sm text-gray-500 mb-6 italic leading-relaxed"></p>
 
-                <!-- Dica de Ouro Container -->
                 <div id="modal-tip-container" class="hidden mb-6 bg-yellow-50 border border-yellow-200 rounded-xl p-4">
                     <h4 class="text-yellow-700 font-bold text-sm mb-1 flex items-center gap-2">
                         <i class="fa-solid fa-star"></i> Dica de Ouro
@@ -128,36 +123,19 @@
                 </div>
 
                 <div class="flex items-center gap-4 text-sm text-gray-500 mb-6 border-y border-pink-50 py-4 justify-between px-2">
-                    <div class="flex items-center gap-1.5">
-                        <i class="fa-regular fa-clock text-bestie"></i>
-                        <span id="modal-time">0 min</span>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <i class="fa-solid fa-fire text-bestie"></i>
-                        <span id="modal-difficulty">Fácil</span>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <i class="fa-solid fa-user-group text-bestie"></i>
-                        <span id="modal-yield">2 porções</span>
-                    </div>
+                    <div class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-bestie"></i><span id="modal-time">0 min</span></div>
+                    <div class="flex items-center gap-1.5"><i class="fa-solid fa-fire text-bestie"></i><span id="modal-difficulty">Fácil</span></div>
+                    <div class="flex items-center gap-1.5"><i class="fa-solid fa-user-group text-bestie"></i><span id="modal-yield">2 porções</span></div>
                 </div>
 
                 <div class="mb-6">
-                    <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-basket-shopping text-bestie"></i> Ingredientes
-                    </h3>
-                    <ul id="modal-ingredients" class="space-y-3 text-sm text-gray-600 pl-2">
-                        <!-- JS Inject -->
-                    </ul>
+                    <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2"><i class="fa-solid fa-basket-shopping text-bestie"></i> Ingredientes</h3>
+                    <ul id="modal-ingredients" class="space-y-3 text-sm text-gray-600 pl-2"></ul>
                 </div>
 
                 <div class="mb-8">
-                    <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-spoon text-bestie"></i> Modo de Preparo
-                    </h3>
-                    <div id="modal-instructions" class="space-y-4 text-sm text-gray-600">
-                        <!-- JS Inject -->
-                    </div>
+                    <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2"><i class="fa-solid fa-spoon text-bestie"></i> Modo de Preparo</h3>
+                    <div id="modal-instructions" class="space-y-4 text-sm text-gray-600"></div>
                 </div>
                 
                 <button class="w-full py-3 bg-bestie text-white font-semibold rounded-xl shadow-lg shadow-pink-200 hover:bg-bestie-dark transition active:scale-95 mb-safe">
@@ -195,261 +173,18 @@
     </nav>
 
     <script>
-        // --- GEMINI API SETUP ---
-        const apiKey = ""; // Environment will provide key
+        // --- API CONFIG ---
+        const apiKey = ""; 
 
-        // --- USER PROFILE STATE ---
+        // --- STATE ---
         let userProfile = JSON.parse(localStorage.getItem('bestieProfile')) || {
-            name: 'Bestie',
-            age: '',
-            weight: '',
-            targetWeight: '',
-            height: '',
-            goal: 'perder'
+            name: 'Bestie', age: '', weight: '', targetWeight: '', height: '', goal: 'perder'
         };
-
-        // --- API FUNCTIONS ---
-
-        async function callGemini(ingredients) {
-            const prompt = `Você é a 'Bestie Fit', uma chef especialista em receitas saudáveis, práticas e com poucas calorias para o aplicativo 'Manual da Bestie'. 
-            Crie uma receita criativa e saudável (fit/low carb/proteica) usando OBRIGATORIAMENTE estes ingredientes principais: ${ingredients}. Você pode sugerir temperos básicos extras.
-            
-            IMPORTANTE: Responda APENAS com um objeto JSON válido (sem markdown, sem \`\`\`json) seguindo exatamente esta estrutura:
-            {
-                "title": "Nome Criativo da Receita",
-                "calories": 000 (apenas numero),
-                "time": "00 min",
-                "difficulty": "Fácil",
-                "yield": "1 ou 2 porções",
-                "description": "Uma descrição curta, animada e motivadora estilo 'bestie'. Se houver uma dica especial, comece com 'Dica:'",
-                "ingredients": ["ingrediente 1", "ingrediente 2"],
-                "instructions": ["passo 1", "passo 2", "passo 3"],
-                "category": "almoco" (escolha entre: cafe, almoco, jantar, lanche, doces)
-            }`;
-
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: {
-                    responseMimeType: "application/json"
-                }
-            };
-
-            try {
-                let response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) throw new Error('Erro na API');
-
-                const data = await response.json();
-                let text = data.candidates[0].content.parts[0].text;
-                
-                text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
-                
-                return JSON.parse(text);
-
-            } catch (error) {
-                console.error("Erro Gemini:", error);
-                return null;
-            }
-        }
-
-        async function callGeminiPlan(userData) {
-            const prompt = `Você é a 'Bestie Fit', uma nutricionista e coach motivacional. Crie um mini plano personalizado com base nestes dados:
-            - Idade: ${userData.age}
-            - Peso Atual: ${userData.weight}kg
-            - Meta de Peso: ${userData.targetWeight}kg
-            - Altura: ${userData.height}cm
-            - Objetivo: ${userData.goal}
-
-            IMPORTANTE: Responda APENAS com um objeto JSON válido (sem markdown) com esta estrutura:
-            {
-                "calories_target": "Ex: 1500-1600",
-                "bmi": "Ex: 22.5 (Normal)",
-                "macros": {
-                    "protein": "Ex: 120g",
-                    "carbs": "Ex: 150g",
-                    "fats": "Ex: 50g"
-                },
-                "motivational_quote": "Uma frase curta e inspiradora estilo 'bestie' para motivar.",
-                "tip": "Uma dica de ouro específica para o objetivo selecionado."
-            }`;
-
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: {
-                    responseMimeType: "application/json"
-                }
-            };
-
-            try {
-                let response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) throw new Error('Erro na API');
-
-                const data = await response.json();
-                let text = data.candidates[0].content.parts[0].text;
-                text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
-                const firstOpen = text.indexOf('{');
-                const lastClose = text.lastIndexOf('}');
-                if (firstOpen !== -1 && lastClose !== -1) {
-                    text = text.substring(firstOpen, lastClose + 1);
-                }
-                return JSON.parse(text);
-            } catch (error) {
-                console.error("Erro Gemini Plan:", error);
-                return null;
-            }
-        }
-
-        async function callGeminiWorkout(data) {
-            const prompt = `Você é a 'Bestie Fit', uma personal trainer animada e motivadora. Crie um treino rápido e eficiente com estas características:
-            - Tempo: ${data.time} minutos
-            - Foco: ${data.focus}
-            - Equipamento: ${data.equipment}
-
-            IMPORTANTE: Responda APENAS com um objeto JSON válido (sem markdown) com esta estrutura:
-            {
-                "title": "Nome Criativo do Treino",
-                "warmup": "Uma frase rápida de aquecimento (Ex: 1 min polichinelos)",
-                "exercises": [
-                    { "name": "Nome do Exercício", "reps": "Ex: 3x 12", "tips": "Dica rápida de execução" },
-                    { "name": "Nome do Exercício 2", "reps": "Ex: 3x 15", "tips": "Dica rápida" }
-                ],
-                "motivation": "Frase final de motivação curta e divertida"
-            }`;
-
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: {
-                    responseMimeType: "application/json"
-                }
-            };
-
-            try {
-                let response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) throw new Error('Erro na API');
-
-                const data = await response.json();
-                let text = data.candidates[0].content.parts[0].text;
-                text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
-                const firstOpen = text.indexOf('{');
-                const lastClose = text.lastIndexOf('}');
-                if (firstOpen !== -1 && lastClose !== -1) {
-                    text = text.substring(firstOpen, lastClose + 1);
-                }
-                return JSON.parse(text);
-            } catch (error) {
-                console.error("Erro Gemini Workout:", error);
-                return null;
-            }
-        }
-
-        async function callGeminiSOS(situation) {
-            const prompt = `Você é a 'Bestie Fit', a melhor amiga virtual da usuária. A usuária está passando por esta situação: "${situation}".
-            Dê um conselho de emergência curto, prático e sem julgamentos (max 2 frases).
-            Foque em redução de danos ou motivação imediata. Use tom leve e divertido com emojis.`;
-
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            const payload = { contents: [{ parts: [{ text: prompt }] }] };
-
-            try {
-                let response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!response.ok) throw new Error('Erro na API');
-                const data = await response.json();
-                return data.candidates[0].content.parts[0].text;
-            } catch (error) {
-                console.error("Erro Gemini SOS:", error);
-                return "Oii bestie! Tô aqui, respira fundo! Tenta de novo já já! 💖";
-            }
-        }
-
-        async function callGeminiSwap(item) {
-            const prompt = `Você é a 'Bestie Fit'. A usuária quer substituir '${item}' por algo mais saudável na dieta.
-            Sugira a melhor troca fit e explique o porquê em uma frase curta, animada e com emojis. Exemplo: 'Troque por X, porque Y! ✨'`;
-
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            const payload = { contents: [{ parts: [{ text: prompt }] }] };
-
-            try {
-                let response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!response.ok) throw new Error('Erro na API');
-                const data = await response.json();
-                return data.candidates[0].content.parts[0].text;
-            } catch (error) {
-                console.error("Erro Gemini Swap:", error);
-                return "Ops! Minha bola de cristal fit falhou. Tenta de novo! 🔮";
-            }
-        }
-
-        // --- DATA ---
         let waterIntake = 0;
         let waterGoalLiters = 2.5;
         let waterGoalCups = 10;
 
-        const recipes = [
-            // All 40 recipes embedded here
-            { id: 1, title: "Crepioca Fit", displayCategory: "Café da Manhã", tags: ['cafe', 'proteina', 'zeroacucar', 'simples', 'rapido', 'lowcal'], calories: 180, time: "10 min", difficulty: "Fácil", yield: "1 porção", description: "A queridinha das dietas! Prática, rápida e versátil.", ingredients: ["1 ovo", "2 colheres goma tapioca", "1 colher requeijão light"], instructions: ["Bata o ovo com a tapioca.", "Frite em frigideira untada."] },
-            { id: 2, title: "Salada de Pote", displayCategory: "Almoço Prático", tags: ['almoco', 'jantar', 'lowcal', 'lowcarb'], calories: 320, time: "15 min", difficulty: "Fácil", yield: "1 pote", description: "Perfeita para levar para o trabalho.", ingredients: ["Folhas", "100g frango desfiado", "Legumes"], instructions: ["Molho no fundo.", "Ingredientes em camadas."] },
-            { id: 3, title: "Overnight Oats", displayCategory: "Café/Lanche", tags: ['cafe', 'lanche', 'vegetariano'], calories: 250, time: "5 min", difficulty: "Muito Fácil", yield: "1 pote", description: "Café da manhã pronto para quem acorda na correria.", ingredients: ["30g aveia", "Leite vegetal", "Chia", "Frutas"], instructions: ["Misture e gele a noite toda."] },
-            { id: 4, title: "Brigadeiro de Whey", displayCategory: "Doce Fit", tags: ['lanche', 'proteina', 'doces'], calories: 120, time: "15 min", difficulty: "Fácil", yield: "5 bolinhas", description: "Para matar a vontade de doce sem sair da dieta.", ingredients: ["Whey Chocolate", "Cacau", "Leite em pó", "Água"], instructions: ["Misture até dar ponto."] },
-            { id: 5, title: "Panqueca de Banana", displayCategory: "Café da Manhã", tags: ['cafe', 'lanche', 'lowfat'], calories: 210, time: "10 min", difficulty: "Fácil", yield: "1 porção", description: "Apenas 3 ingredientes.", ingredients: ["1 banana", "2 ovos", "Canela"], instructions: ["Amasse banana, misture com ovos, frite."] },
-            { id: 6, title: "Brócolis e couve-flor", displayCategory: "Almoço/Jantar", tags: ['almoco', 'jantar', 'lowcarb'], calories: 356, time: "25 min", difficulty: "Normal", yield: "2 porções", description: "Gratinado delicioso.", ingredients: ["Brócolis", "Couve-flor", "Queijo", "Creme de leite"], instructions: ["Cozinhe legumes, cubra com molho e asse."] },
-            { id: 7, title: "Lassi de Manga", displayCategory: "Café da Manhã", tags: ['cafe', 'lanche', 'vegetariano'], calories: 211, time: "3 min", difficulty: "Muito Fácil", yield: "2 porções", description: "Bebida refrescante.", ingredients: ["Manga", "Iogurte", "Mel"], instructions: ["Bata tudo no liquidificador."] },
-            { id: 8, title: "Shake Choco Hortelã", displayCategory: "Café/Lanche", tags: ['cafe', 'lanche', 'vegano'], calories: 232, time: "3 min", difficulty: "Fácil", yield: "2 porções", description: "Refrescante e doce.", ingredients: ["Cacau", "Hortelã", "Banana", "Leite vegetal"], instructions: ["Bata tudo no liquidificador."] },
-            { id: 9, title: "Smoothie Morango", displayCategory: "Café/Lanche", tags: ['cafe', 'lanche', 'lowcal'], calories: 150, time: "5 min", difficulty: "Fácil", yield: "2 porções", description: "Clássico.", ingredients: ["Morango", "Banana", "Iogurte"], instructions: ["Bata tudo."] },
-            { id: 10, title: "Shake Banana Nozes", displayCategory: "Pós-Treino", tags: ['cafe', 'proteina'], calories: 434, time: "5 min", difficulty: "Fácil", yield: "1 porção", description: "Energia pura.", ingredients: ["Banana", "Nozes", "Iogurte", "Mel"], instructions: ["Bata tudo."] },
-            { id: 11, title: "Shake Pasta Amendoim", displayCategory: "Proteico", tags: ['lanche', 'proteina'], calories: 402, time: "5 min", difficulty: "Fácil", yield: "1 porção", description: "Favorito dos atletas.", ingredients: ["Pasta de amendoim", "Banana", "Whey", "Leite"], instructions: ["Bata tudo."] },
-            { id: 12, title: "Smoothie Banana Tâmara", displayCategory: "Café/Lanche", tags: ['cafe', 'vegano'], calories: 237, time: "15 min", difficulty: "Fácil", yield: "2 porções", description: "Adoçado naturalmente.", ingredients: ["Banana", "Tâmaras", "Leite vegetal"], instructions: ["Hidrate tâmaras, bata tudo."] },
-            { id: 13, title: "Shake Mirtilo Coco", displayCategory: "Proteico Caseiro", tags: ['lanche', 'proteina'], calories: 358, time: "5 min", difficulty: "Fácil", yield: "1 porção", description: "Proteína sem pó.", ingredients: ["Iogurte Grego", "Mirtilo", "Coco"], instructions: ["Bata tudo."] },
-            { id: 14, title: "Shake Frutas Vermelhas", displayCategory: "Pós-Treino", tags: ['lanche', 'lowcal'], calories: 163, time: "9 min", difficulty: "Fácil", yield: "1 porção", description: "Leve e proteico.", ingredients: ["Claras", "Frutas vermelhas", "Iogurte"], instructions: ["Bata tudo."] },
-            { id: 15, title: "Shake Chocolate Prot", displayCategory: "Pré-Treino", tags: ['lanche', 'proteina'], calories: 284, time: "5 min", difficulty: "Fácil", yield: "2 porções", description: "Rápido e delicioso.", ingredients: ["Banana", "Whey", "Cacau", "Água"], instructions: ["Bata tudo."] },
-            { id: 16, title: "Mingau Aveia Choco", displayCategory: "Café Vegano", tags: ['cafe', 'vegano'], calories: 389, time: "10 min", difficulty: "Fácil", yield: "1 porção", description: "Saciante.", ingredients: ["Aveia", "Cacau", "Banana", "Leite veg"], instructions: ["Cozinhe até engrossar."] },
-            { id: 17, title: "Cereal Caseiro", displayCategory: "Café/Lanche", tags: ['cafe', 'lowcarb'], calories: 455, time: "85 min", difficulty: "Normal", yield: "4 porções", description: "Crocante e saudável.", ingredients: ["Amêndoas", "Coco", "Sementes"], instructions: ["Asse em forno baixo."] },
-            { id: 18, title: "Overnight Framboesa", displayCategory: "Café Prático", tags: ['cafe', 'simples'], calories: 286, time: "3h+", difficulty: "Fácil", yield: "1 porção", description: "Prepare antes.", ingredients: ["Aveia", "Framboesa", "Leite"], instructions: ["Misture e gele."] },
-            { id: 19, title: "Mingau Microondas", displayCategory: "Café Rápido", tags: ['cafe', 'rapido'], calories: 373, time: "8 min", difficulty: "Fácil", yield: "1 porção", description: "Muito prático.", ingredients: ["Aveia", "Banana", "Água/Leite"], instructions: ["Microondas 2 min."] },
-            { id: 20, title: "Smoothie Verde", displayCategory: "Detox", tags: ['lanche', 'vegano'], calories: 273, time: "5 min", difficulty: "Fácil", yield: "1 porção", description: "Vitaminas.", ingredients: ["Espinafre", "Laranja", "Banana"], instructions: ["Bata tudo."] },
-            { id: 21, title: "Cereal Trigo", displayCategory: "Café Caseiro", tags: ['cafe', 'simples'], calories: 413, time: "15 min", difficulty: "Normal", yield: "1 porção", description: "Cereal assado.", ingredients: ["Trigo", "Mel", "Óleo coco"], instructions: ["Asse até dourar."] },
-            { id: 22, title: "Bruschetta Avocado", displayCategory: "Lanche Salgado", tags: ['lanche', 'vegano'], calories: 427, time: "15 min", difficulty: "Fácil", yield: "2 porções", description: "Refinado.", ingredients: ["Pão integral", "Avocado", "Tomate"], instructions: ["Monte no pão tostado."] },
-            { id: 23, title: "Misto Batata Doce", displayCategory: "Pré-Treino", tags: ['lanche', 'vegano'], calories: 303, time: "28 min", difficulty: "Fácil", yield: "3 porções", description: "Substituto do pão.", ingredients: ["Batata doce", "Pasta amendoim"], instructions: ["Asse batata, recheie."] },
-            { id: 24, title: "Geleia Morango Chia", displayCategory: "Doce Fit", tags: ['doces', 'lowcal'], calories: 12, time: "15 min", difficulty: "Fácil", yield: "20 porções", description: "Sem açúcar.", ingredients: ["Morango", "Chia", "Adoçante"], instructions: ["Cozinhe até reduzir."] },
-            { id: 25, title: "Sanduíche Tomate Ovos", displayCategory: "Café Prático", tags: ['cafe', 'almoco'], calories: 240, time: "15 min", difficulty: "Normal", yield: "2 porções", description: "Clássico.", ingredients: ["Pão integral", "Ovo", "Tomate", "Iogurte"], instructions: ["Faça pasta de ovo, monte."] },
-            { id: 26, title: "Rabanada Morango", displayCategory: "Café Especial", tags: ['cafe', 'doces'], calories: 260, time: "10 min", difficulty: "Fácil", yield: "2 porções", description: "Versão fit.", ingredients: ["Pão", "Ovo", "Leite", "Morango"], instructions: ["Molhe pão, grelhe."] },
-            { id: 27, title: "Triguilho Framboesa", displayCategory: "Café Energia", tags: ['cafe', 'rapido'], calories: 467, time: "10 min", difficulty: "Fácil", yield: "1 porção", description: "Fibras.", ingredients: ["Triguilho", "Iogurte", "Frutas"], instructions: ["Misture."] },
-            { id: 28, title: "Ovos Mexidos Espinafre", displayCategory: "Café Low Carb", tags: ['cafe', 'lowcarb'], calories: 546, time: "10 min", difficulty: "Fácil", yield: "1 porção", description: "Salgado.", ingredients: ["Ovos", "Espinafre", "Feta"], instructions: ["Refogue e mexa."] },
-            { id: 29, title: "Muffin Banana Choco", displayCategory: "Doce Fit", tags: ['lanche', 'doces'], calories: 152, time: "25 min", difficulty: "Fácil", yield: "9 porções", description: "Lanche.", ingredients: ["Banana", "Farinha", "Chocolate"], instructions: ["Asse em forminhas."] },
-            { id: 30, title: "Muffins Salgados", displayCategory: "Café Proteico", tags: ['cafe', 'proteina'], calories: 41, time: "35 min", difficulty: "Fácil", yield: "9 porções", description: "Ovos.", ingredients: ["Ovos", "Vegetais"], instructions: ["Asse em forminhas."] },
-            { id: 31, title: "Panqueca Salgada", displayCategory: "Café Proteico", tags: ['cafe', 'almoco'], calories: 476, time: "15 min", difficulty: "Fácil", yield: "2 porções", description: "Aveia.", ingredients: ["Aveia", "Ovos", "Recheio"], instructions: ["Faça disco, recheie."] },
-            { id: 32, title: "Ovos Presunto", displayCategory: "Café Salgado", tags: ['cafe', 'lowcarb'], calories: 230, time: "25 min", difficulty: "Fácil", yield: "2 porções", description: "Básico.", ingredients: ["Ovos", "Presunto", "Espinafre"], instructions: ["Refogue e mexa."] },
-            { id: 33, title: "Suflê Mirtilo", displayCategory: "Café/Lanche", tags: ['cafe', 'doces'], calories: 300, time: "65 min", difficulty: "Fácil", yield: "3 porções", description: "Quente ou frio.", ingredients: ["Iogurte", "Ovos", "Mirtilo"], instructions: ["Asse."] },
-            { id: 34, title: "Wrap Omelete", displayCategory: "Almoço/Jantar", tags: ['almoco', 'lowcarb'], calories: 352, time: "20 min", difficulty: "Normal", yield: "4 porções", description: "Sem farinha.", ingredients: ["Ovos", "Recheio"], instructions: ["Faça disco de ovo, enrole."] },
-            { id: 35, title: "Wrap Morango", displayCategory: "Doce Fit", tags: ['lanche', 'doces'], calories: 297, time: "10 min", difficulty: "Fácil", yield: "2 porções", description: "Doce.", ingredients: ["Tortilha", "Cream cheese", "Morango"], instructions: ["Recheie e enrole."] },
-            { id: 36, title: "Rolinhos Pimentão", displayCategory: "Lanche Leve", tags: ['lanche', 'lowcal'], calories: 353, time: "10 min", difficulty: "Fácil", yield: "2 porções", description: "Frio.", ingredients: ["Tortilha", "Pimentão", "Cream cheese"], instructions: ["Recheie e corte."] },
-            { id: 37, title: "Omelete Coreano", displayCategory: "Café/Almoço", tags: ['cafe', 'almoco'], calories: 303, time: "12 min", difficulty: "Fácil", yield: "2 porções", description: "Enrolado.", ingredients: ["Ovos", "Cenoura"], instructions: ["Frite enrolando."] },
-            { id: 38, title: "Pão Low Carb", displayCategory: "Café/Lanche", tags: ['cafe', 'lowcarb'], calories: 165, time: "75 min", difficulty: "Normal", yield: "10 fatias", description: "Amêndoas.", ingredients: ["Farinha amêndoa", "Ovos"], instructions: ["Asse."] },
-            { id: 39, title: "Ovos com Salmão", displayCategory: "Café Proteico", tags: ['cafe', 'proteina'], calories: 500, time: "15 min", difficulty: "Normal", yield: "2 porções", description: "Sofisticado.", ingredients: ["Ovos", "Salmão defumado"], instructions: ["Mexa tudo."] },
-            { id: 40, title: "Sanduíche Peru", displayCategory: "Lanche Prático", tags: ['lanche', 'rapido'], calories: 313, time: "15 min", difficulty: "Normal", yield: "4 porções", description: "Completo.", ingredients: ["Pão integral", "Peito peru", "Salada"], instructions: ["Monte."] }
-        ];
-
-        // --- FUNCTIONS ---
-
+        // --- VIEWS ---
         const views = {
             home: `
                 <div class="fade-in space-y-6">
@@ -467,599 +202,210 @@
                             </div>
                         </div>
                     </div>
-
                     <div>
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-bold text-lg text-gray-800">Atalhos</h3>
-                        </div>
+                        <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg text-gray-800">Atalhos</h3></div>
                         <div class="grid grid-cols-2 gap-4">
-                            <!-- Existing Recipes -->
                             <button onclick="navigate('recipes')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
-                                <div class="w-12 h-12 rounded-full bg-green-100 text-green-500 flex items-center justify-center group-hover:scale-110 transition">
-                                    <i class="fa-solid fa-leaf"></i>
-                                </div>
+                                <div class="w-12 h-12 rounded-full bg-green-100 text-green-500 flex items-center justify-center text-xl"><i class="fa-solid fa-leaf"></i></div>
                                 <span class="font-medium text-sm">Receitinhas</span>
                             </button>
-                            <!-- Water (Visual) -->
                             <button onclick="navigate('water')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
-                                <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center group-hover:scale-110 transition">
-                                    <i class="fa-solid fa-glass-water"></i>
-                                </div>
+                                <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center text-xl"><i class="fa-solid fa-glass-water"></i></div>
                                 <span class="font-medium text-sm">Água</span>
                             </button>
-                            
-                            <!-- Fim de Semana -->
                             <button onclick="navigate('weekend')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
-                                <div class="w-12 h-12 rounded-full bg-purple-100 text-purple-500 flex items-center justify-center group-hover:scale-110 transition">
-                                    <i class="fa-solid fa-calendar-check"></i>
-                                </div>
+                                <div class="w-12 h-12 rounded-full bg-purple-100 text-purple-500 flex items-center justify-center text-xl"><i class="fa-solid fa-calendar-check"></i></div>
                                 <span class="font-medium text-sm">Fim de Semana</span>
                             </button>
-
-                            <!-- Kit da Bestie -->
                             <button onclick="navigate('kit')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
-                                <div class="w-12 h-12 rounded-full bg-teal-100 text-teal-500 flex items-center justify-center group-hover:scale-110 transition">
-                                    <i class="fa-solid fa-kit-medical"></i>
-                                </div>
+                                <div class="w-12 h-12 rounded-full bg-teal-100 text-teal-500 flex items-center justify-center text-xl"><i class="fa-solid fa-kit-medical"></i></div>
                                 <span class="font-medium text-sm">Kit da Bestie</span>
                             </button>
-
-                            <!-- Trocas -->
                             <button onclick="navigate('swaps')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
-                                <div class="w-12 h-12 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center group-hover:scale-110 transition">
-                                    <i class="fa-solid fa-repeat"></i>
-                                </div>
+                                <div class="w-12 h-12 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center text-xl"><i class="fa-solid fa-repeat"></i></div>
                                 <span class="font-medium text-sm">Trocas</span>
                             </button>
-
-                            <!-- Economia -->
                             <button onclick="navigate('savings')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
-                                <div class="w-12 h-12 rounded-full bg-yellow-100 text-yellow-500 flex items-center justify-center group-hover:scale-110 transition">
-                                    <i class="fa-solid fa-piggy-bank"></i>
-                                </div>
+                                <div class="w-12 h-12 rounded-full bg-yellow-100 text-yellow-500 flex items-center justify-center text-xl"><i class="fa-solid fa-piggy-bank"></i></div>
                                 <span class="font-medium text-sm">Economia</span>
                             </button>
-
-                            <!-- Treino -->
                             <button onclick="navigate('workout')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
-                                <div class="w-12 h-12 rounded-full bg-red-100 text-red-500 flex items-center justify-center group-hover:scale-110 transition">
-                                    <i class="fa-solid fa-dumbbell"></i>
-                                </div>
+                                <div class="w-12 h-12 rounded-full bg-red-100 text-red-500 flex items-center justify-center text-xl"><i class="fa-solid fa-dumbbell"></i></div>
                                 <span class="font-medium text-sm">Treino</span>
                             </button>
-
-                            <!-- SOS Bestie (New) -->
                             <button onclick="navigate('sos')" class="bg-white p-4 rounded-2xl shadow-sm border border-pink-50 flex flex-col items-center gap-2 hover:border-bestie transition group">
-                                <div class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-500 flex items-center justify-center group-hover:scale-110 transition">
-                                    <i class="fa-solid fa-bell"></i>
-                                </div>
+                                <div class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-500 flex items-center justify-center text-xl"><i class="fa-solid fa-bell"></i></div>
                                 <span class="font-medium text-sm">SOS Bestie</span>
                             </button>
                         </div>
                     </div>
                 </div>
             `,
-            weekend: `
-                <div class="fade-in pb-20">
-                    <div class="mb-6 flex items-center gap-3">
-                        <button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition">
-                            <i class="fa-solid fa-arrow-left"></i>
-                        </button>
-                        <h2 class="text-2xl font-bold text-gray-800">Fim de Semana (Sábado e Domingo) 🍕</h2>
-                    </div>
-                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-pink-100 space-y-4">
-                        <div class="bg-purple-50 rounded-xl p-4 border border-purple-100">
-                            <h3 class="font-bold text-purple-700 mb-2">Regra de Ouro</h3>
-                            <p class="text-sm text-gray-600">Escolha <strong>2 refeições livres</strong> no fim de semana (Sábado ou Domingo) para comer o que tem vontade!</p>
-                        </div>
-                        <ul class="space-y-3 text-sm text-gray-600">
-                            <li class="flex items-start gap-3"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Volte para o plano na próxima refeição.</span></li>
-                            <li class="flex items-start gap-3"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Beba bastante água antes e depois.</span></li>
-                            <li class="flex items-start gap-3"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Coma devagar e aproveite cada mordida!</span></li>
-                        </ul>
-                    </div>
-                </div>
-            `,
-            water: `
-                <div class="fade-in pb-20 pt-6">
-                    <div class="mb-6 flex items-center gap-3">
-                        <button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition">
-                            <i class="fa-solid fa-arrow-left"></i>
-                        </button>
-                        <h2 class="text-2xl font-bold text-gray-800">Hidratação 💧</h2>
-                    </div>
-                    
-                    <div class="text-center mb-8">
-                        <div class="relative w-40 h-40 mx-auto mb-4 bg-blue-50 rounded-full flex items-center justify-center border-4 border-white shadow-lg overflow-hidden">
-                            <div id="water-level" class="absolute bottom-0 left-0 w-full bg-blue-400 transition-all duration-500 ease-out" style="height: 0%"></div>
-                            <span id="water-count" class="relative text-3xl font-bold text-blue-600 z-10">0</span>
-                            <span class="relative text-xs text-blue-400 mt-8 -ml-4 z-10" id="water-goal-total-cups">/10</span>
-                        </div>
-                        <p class="text-gray-500 text-sm">Meta Diária: <span id="water-goal-liters" class="font-bold text-blue-600">2.5L</span></p>
-                        <p class="text-xs text-gray-400 mt-1">(Baseado no seu peso: 35ml/kg)</p>
-                    </div>
-
-                    <div class="flex justify-center gap-6">
-                        <button onclick="updateWater(-1)" class="w-14 h-14 rounded-full bg-white border border-gray-200 text-gray-400 flex items-center justify-center text-xl shadow-sm hover:scale-105 transition">
-                            <i class="fa-solid fa-minus"></i>
-                        </button>
-                        <button onclick="updateWater(1)" class="w-14 h-14 rounded-full bg-blue-500 text-white flex items-center justify-center text-xl shadow-lg shadow-blue-200 hover:scale-105 transition">
-                            <i class="fa-solid fa-plus"></i>
-                        </button>
-                    </div>
-
-                    <div class="mt-8 bg-blue-50 rounded-2xl p-5 border border-blue-100 mx-4">
-                        <h3 class="font-bold text-blue-800 text-sm mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-circle-info"></i> Por que beber água?
-                        </h3>
-                        <p class="text-xs text-blue-700 leading-relaxed">
-                            A água ajuda a controlar o apetite, melhora a pele e aumenta o metabolismo. Tente beber pelo menos 2.5L por dia!
-                        </p>
-                    </div>
-                </div>
-            `,
-            savings: `
-                <div class="fade-in pb-20">
-                    <div class="mb-6 flex items-center gap-3">
-                        <button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition">
-                            <i class="fa-solid fa-arrow-left"></i>
-                        </button>
-                        <h2 class="text-2xl font-bold text-gray-800">Economia 💰</h2>
-                    </div>
-                    
-                    <div class="bg-yellow-50 border border-yellow-100 rounded-3xl p-6 shadow-sm mb-6">
-                        <h3 class="font-bold text-yellow-700 text-lg mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-star"></i> Dica de Ouro
-                        </h3>
-                        <p class="text-sm text-yellow-800 leading-relaxed">
-                            Para economizar de verdade, compre suplementos em <strong>sites de atacado</strong> ou procure por <strong>cupons de influencers</strong>. 
-                            <br><br>
-                            Para alimentos frescos, vá à <strong>feira local no final do dia</strong> (a "xepa") onde os preços despencam!
-                        </p>
-                    </div>
-
-                    <div class="space-y-3">
-                        <div class="bg-white p-4 rounded-2xl border border-pink-50 flex items-center justify-between">
-                            <span class="text-sm font-medium text-gray-600">Granel</span>
-                            <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-lg">Mais Barato</span>
-                        </div>
-                        <div class="bg-white p-4 rounded-2xl border border-pink-50 flex items-center justify-between">
-                            <span class="text-sm font-medium text-gray-600">Marcas de Supermercado</span>
-                            <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-lg">Custo-Benefício</span>
-                        </div>
-                        <div class="bg-white p-4 rounded-2xl border border-pink-50 flex items-center justify-between">
-                            <span class="text-sm font-medium text-gray-600">Congelados</span>
-                            <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-lg">Duram Mais</span>
-                        </div>
-                    </div>
-                </div>
-            `,
-            kit: `
-                <div class="fade-in pb-20">
-                    <div class="mb-6 flex items-center gap-3">
-                        <button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition">
-                            <i class="fa-solid fa-arrow-left"></i>
-                        </button>
-                        <h2 class="text-2xl font-bold text-gray-800">Kit da Bestie 💊</h2>
-                    </div>
-                    <div class="space-y-4">
-                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-pink-50 flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-xl">💪</div>
-                            <div>
-                                <h3 class="font-bold text-gray-800">Whey Protein</h3>
-                                <p class="text-xs text-gray-500">Pós-treino ou lanches rápidos.</p>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-pink-50 flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full bg-green-50 text-green-500 flex items-center justify-center text-xl">⚡</div>
-                            <div>
-                                <h3 class="font-bold text-gray-800">Creatina</h3>
-                                <p class="text-xs text-gray-500">3g a 5g todo dia (sem falhar!).</p>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-pink-50 flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full bg-yellow-50 text-yellow-500 flex items-center justify-center text-xl">🌞</div>
-                            <div>
-                                <h3 class="font-bold text-gray-800">Multivitamínico</h3>
-                                <p class="text-xs text-gray-500">Pela manhã, junto com o café.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `,
-            swaps: `
-                <div class="fade-in pb-20">
-                    <div class="mb-6 flex items-center gap-3">
-                        <button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition">
-                            <i class="fa-solid fa-arrow-left"></i>
-                        </button>
-                        <h2 class="text-2xl font-bold text-gray-800">Trocas Inteligentes 🔄</h2>
-                    </div>
-                    
-                    <!-- New AI Feature: Smart Swap Search -->
-                    <div class="bg-gradient-to-br from-orange-50 to-pink-50 border border-orange-100 rounded-3xl p-6 shadow-sm mb-6">
-                        <p class="text-gray-600 text-sm mb-4 font-medium">Quer substituir algo específico? Pergunte pra Bestie Fit! 🥕</p>
-                        
-                        <div class="relative">
-                            <input type="text" id="swap-input" placeholder="Ex: Pão francês, Coxinha, Refri..." class="w-full bg-white border border-orange-200 rounded-2xl p-4 text-sm focus:outline-none focus:border-bestie focus:ring-1 focus:ring-bestie transition placeholder-gray-400">
-                            <button onclick="generateSwap()" id="swap-btn" class="absolute right-2 top-2 bg-orange-400 text-white p-2 rounded-xl hover:bg-orange-500 transition shadow-md">
-                                <i class="fa-solid fa-magnifying-glass"></i>
-                            </button>
-                        </div>
-
-                        <div id="swap-result" class="hidden mt-4 bg-white rounded-xl p-4 border border-orange-100 shadow-sm animate-fade-in">
-                            <h4 class="font-bold text-orange-600 text-sm mb-1 flex items-center gap-2">
-                                <i class="fa-solid fa-leaf"></i> Sugestão da Bestie
-                            </h4>
-                            <p id="swap-text" class="text-sm text-gray-600 italic"></p>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-pink-100">
-                         <div class="p-4 bg-pink-50 border-b border-pink-100">
-                            <h3 class="font-bold text-gray-700 text-sm">Trocas Populares</h3>
-                        </div>
-                        <table class="w-full text-sm text-left text-gray-600">
-                            <thead class="bg-white text-gray-400 uppercase text-xs border-b border-gray-100">
-                                <tr>
-                                    <th class="px-4 py-3 font-medium">Troque Isso</th>
-                                    <th class="px-4 py-3 font-medium">Por Isso</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-50">
-                                <tr><td class="px-4 py-3">Açúcar</td><td class="px-4 py-3 font-medium text-green-600">Adoçante (Stevia/Xilitol)</td></tr>
-                                <tr><td class="px-4 py-3">Óleo de Soja</td><td class="px-4 py-3 font-medium text-green-600">Azeite de Oliva</td></tr>
-                                <tr><td class="px-4 py-3">Refrigerante</td><td class="px-4 py-3 font-medium text-green-600">Água com Gás e Limão</td></tr>
-                                <tr><td class="px-4 py-3">Pão Branco</td><td class="px-4 py-3 font-medium text-green-600">Pão Integral / Tapioca</td></tr>
-                                <tr><td class="px-4 py-3">Creme de Leite</td><td class="px-4 py-3 font-medium text-green-600">Iogurte Grego / Creme de Ricota</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            `,
             recipes: `
                 <div class="fade-in">
                     <div class="mb-6 flex justify-between items-end">
-                        <div>
-                            <h2 class="text-2xl font-bold text-gray-800">Receitinhas 🥗</h2>
-                            <p class="text-gray-500 text-sm">Coma bem sem culpa!</p>
-                        </div>
-                        <button onclick="navigate('chefBestie')" class="bg-gradient-to-r from-bestie to-pink-400 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg shadow-pink-200 hover:scale-105 transition flex items-center gap-2 animate-pulse">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> Chef Bestie
-                        </button>
+                        <div><h2 class="text-2xl font-bold text-gray-800">Receitinhas 🥗</h2><p class="text-gray-500 text-sm">Coma bem sem culpa!</p></div>
+                        <button onclick="navigate('chefBestie')" class="bg-gradient-to-r from-bestie to-pink-400 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg hover:scale-105 transition flex items-center gap-2 animate-pulse"><i class="fa-solid fa-wand-magic-sparkles"></i> Chef Bestie</button>
                     </div>
-
-                    <!-- Search -->
-                    <div class="relative mb-6">
-                        <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-400 text-sm"></i>
-                        <input type="text" placeholder="O que vamos cozinhar?" class="w-full bg-white border border-pink-100 rounded-full py-3 pl-10 pr-4 text-sm focus:outline-none focus:border-bestie focus:ring-1 focus:ring-bestie transition placeholder-gray-400 shadow-sm">
-                    </div>
-
-                    <!-- Categories / Filters -->
+                    <div class="relative mb-6"><i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-400 text-sm"></i><input type="text" placeholder="O que vamos cozinhar?" class="w-full bg-white border border-pink-100 rounded-full py-3 pl-10 pr-4 text-sm focus:outline-none focus:border-bestie shadow-sm"></div>
                     <div class="flex gap-2 overflow-x-auto hide-scrollbar mb-6 pb-2 px-1">
-                        <button onclick="filterRecipes('all', this)" class="cat-btn active flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-bestie text-white shadow-md shadow-pink-200 transition">Tudo</button>
-                        
-                        <!-- Refeições -->
-                        <button onclick="filterRecipes('cafe', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Café da Manhã</button>
-                        <button onclick="filterRecipes('almoco', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Almoço</button>
-                        <button onclick="filterRecipes('jantar', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Jantar</button>
-                        
-                        <!-- Dietas -->
-                        <button onclick="filterRecipes('lowcarb', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Baixo Carboidrato</button>
-                        <button onclick="filterRecipes('proteina', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Rico em Proteínas</button>
-                        <button onclick="filterRecipes('lowcal', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Baixa Caloria</button>
-                        <button onclick="filterRecipes('lowfat', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Baixa Gordura</button>
-                        <button onclick="filterRecipes('zeroacucar', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Sem Açúcar</button>
-                        
-                        <!-- Preferências -->
-                        <button onclick="filterRecipes('vegano', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Vegano</button>
-                        <button onclick="filterRecipes('vegetariano', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Vegetariano</button>
-                        
-                        <!-- Praticidade -->
-                        <button onclick="filterRecipes('simples', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Poucos Ingredientes</button>
-                        <button onclick="filterRecipes('rapido', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:border-bestie hover:text-bestie transition">Preparo Rápido</button>
+                        <button onclick="filterRecipes('all', this)" class="cat-btn active flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-bestie text-white shadow-md transition">Tudo</button>
+                        <button onclick="filterRecipes('cafe', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:text-bestie transition">Café</button>
+                        <button onclick="filterRecipes('almoco', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:text-bestie transition">Almoço</button>
+                        <button onclick="filterRecipes('jantar', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:text-bestie transition">Jantar</button>
+                        <button onclick="filterRecipes('lowcarb', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:text-bestie transition">Low Carb</button>
+                        <button onclick="filterRecipes('proteina', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:text-bestie transition">Proteicos</button>
+                        <button onclick="filterRecipes('doces', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:text-bestie transition">Doces Fit</button>
+                        <button onclick="filterRecipes('vegano', this)" class="cat-btn flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold bg-white text-gray-500 border border-pink-100 hover:text-bestie transition">Vegano</button>
                     </div>
-
-                    <!-- Recipe Grid -->
-                    <div id="recipe-grid" class="grid grid-cols-1 gap-4 pb-20">
-                        <!-- Filled by JS -->
-                    </div>
+                    <div id="recipe-grid" class="grid grid-cols-1 gap-4 pb-20"></div>
                 </div>
             `,
             chefBestie: `
                 <div class="fade-in pb-20">
                     <div class="mb-6 flex items-center gap-3">
-                        <button onclick="navigate('recipes')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition">
-                            <i class="fa-solid fa-arrow-left"></i>
-                        </button>
+                        <button onclick="navigate('recipes')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition"><i class="fa-solid fa-arrow-left"></i></button>
                         <h2 class="text-2xl font-bold text-gray-800">Chef Bestie ✨</h2>
                     </div>
-
                     <div class="bg-gradient-to-br from-purple-50 to-pink-50 border border-pink-100 rounded-3xl p-6 shadow-sm mb-6">
-                        <p class="text-gray-600 text-sm mb-4">Me conte o que você tem na geladeira e eu crio uma receitinha mágica pra você!</p>
-                        
-                        <div class="relative">
-                            <textarea id="ai-ingredients" rows="3" placeholder="Ex: frango, batata doce, brócolis..." class="w-full bg-white border border-pink-200 rounded-2xl p-4 text-sm focus:outline-none focus:border-bestie focus:ring-1 focus:ring-bestie transition placeholder-gray-400 resize-none"></textarea>
-                            <div class="absolute bottom-3 right-3 text-xs text-gray-400">
-                                <i class="fa-solid fa-carrot"></i>
-                            </div>
-                        </div>
-
-                        <button onclick="generateAIRecipe()" id="generate-btn" class="w-full mt-4 bg-gradient-to-r from-bestie to-pink-400 text-white py-3 rounded-xl font-bold shadow-lg shadow-pink-200 hover:scale-[1.02] transition active:scale-95 flex items-center justify-center gap-2">
-                            <span>Criar Receita Mágica</span>
-                            <i class="fa-solid fa-wand-magic-sparkles"></i>
-                        </button>
+                        <p class="text-gray-600 text-sm mb-4">Me conte o que você tem na geladeira e eu crio uma receitinha mágica!</p>
+                        <div class="relative"><textarea id="ai-ingredients" rows="3" placeholder="Ex: frango, batata doce, brócolis..." class="w-full bg-white border border-pink-200 rounded-2xl p-4 text-sm focus:outline-none focus:border-bestie resize-none"></textarea></div>
+                        <button onclick="generateAIRecipe()" id="generate-btn" class="w-full mt-4 bg-gradient-to-r from-bestie to-pink-400 text-white py-3 rounded-xl font-bold shadow-lg hover:scale-[1.02] transition flex items-center justify-center gap-2"><span>Criar Receita Mágica</span><i class="fa-solid fa-wand-magic-sparkles"></i></button>
                     </div>
-
                     <div id="ai-result" class="hidden space-y-4">
-                        <div class="flex items-center gap-2 text-sm text-gray-400 uppercase font-bold tracking-wider mb-2">
-                            <i class="fa-solid fa-star text-yellow-400"></i> Resultado
-                        </div>
-                        <!-- Recipe Card Container -->
+                        <div class="flex items-center gap-2 text-sm text-gray-400 uppercase font-bold tracking-wider mb-2"><i class="fa-solid fa-star text-yellow-400"></i> Resultado</div>
                         <div id="ai-recipe-card"></div>
                     </div>
                 </div>
             `,
             calculator: `
-                 <div class="fade-in pb-20 pt-6">
+                <div class="fade-in pb-20 pt-6">
                     <div class="mb-6 text-center">
-                        <div class="w-16 h-16 bg-pink-100 text-bestie rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
-                            <i class="fa-solid fa-wand-magic-sparkles text-2xl"></i>
-                        </div>
+                        <div class="w-16 h-16 bg-pink-100 text-bestie rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce"><i class="fa-solid fa-wand-magic-sparkles text-2xl"></i></div>
                         <h2 class="text-xl font-bold text-gray-800">Calculadora Mágica ✨</h2>
                         <p class="text-gray-500 mt-2 text-sm">Descubra suas metas ideais!</p>
                     </div>
-
                     <div class="bg-white rounded-3xl p-6 shadow-sm border border-pink-100 space-y-4">
                         <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Idade</label>
-                                <input type="number" id="calc-age" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition" placeholder="Ex: 25">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Peso Atual (kg)</label>
-                                <input type="number" id="calc-weight" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition" placeholder="Ex: 60">
-                            </div>
+                            <div><label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Idade</label><input type="number" id="calc-age" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie" placeholder="Ex: 25"></div>
+                            <div><label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Peso (kg)</label><input type="number" id="calc-weight" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie" placeholder="Ex: 60"></div>
                         </div>
-                        
                         <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Altura (cm)</label>
-                                <input type="number" id="calc-height" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition" placeholder="Ex: 165">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Meta de Peso (kg)</label>
-                                <input type="number" id="calc-target-weight" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition" placeholder="Ex: 55">
-                            </div>
+                            <div><label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Altura (cm)</label><input type="number" id="calc-height" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie" placeholder="Ex: 165"></div>
+                            <div><label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Meta (kg)</label><input type="number" id="calc-target-weight" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie" placeholder="Ex: 55"></div>
                         </div>
-
                         <div>
                             <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Objetivo</label>
-                            <select id="calc-goal" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition text-gray-600">
+                            <select id="calc-goal" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie text-gray-600">
                                 <option value="perder">Secar (Perder Peso)</option>
                                 <option value="manter">Manter Peso</option>
-                                <option value="ganhar">Ganhar Massa (Hipertrofia)</option>
+                                <option value="ganhar">Ganhar Massa</option>
                             </select>
                         </div>
-
-                        <button onclick="generatePlan()" id="plan-btn" class="w-full mt-4 bg-bestie text-white py-3 rounded-xl font-bold shadow-lg shadow-pink-200 hover:scale-[1.02] transition active:scale-95">
-                            Gerar Plano Personalizado ✨
-                        </button>
+                        <button onclick="generatePlan()" id="plan-btn" class="w-full mt-4 bg-bestie text-white py-3 rounded-xl font-bold shadow-lg hover:scale-[1.02] transition">Gerar Plano Personalizado ✨</button>
                     </div>
-
                     <div id="plan-result" class="hidden mt-6 space-y-4">
-                        <div class="bg-gradient-to-r from-bestie to-pink-400 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
-                            <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-10 -mt-10"></div>
-                            
-                            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
-                                <i class="fa-solid fa-bullseye"></i> Sua Meta Diária
-                            </h3>
-                            
+                        <div class="bg-gradient-to-r from-bestie to-pink-400 rounded-3xl p-6 text-white shadow-lg text-center">
+                            <h3 class="font-bold text-lg mb-2">Sua Meta Diária</h3>
                             <div class="text-4xl font-bold mb-1" id="plan-calories">0000</div>
                             <div class="text-pink-100 text-sm mb-4">kcal / dia</div>
-                            
-                            <div class="flex gap-2 text-center">
-                                <div class="bg-white/20 backdrop-blur rounded-xl p-2 flex-1">
-                                    <span class="block text-xs text-pink-100">Prot</span>
-                                    <span class="font-bold" id="plan-protein">0g</span>
-                                </div>
-                                <div class="bg-white/20 backdrop-blur rounded-xl p-2 flex-1">
-                                    <span class="block text-xs text-pink-100">Carb</span>
-                                    <span class="font-bold" id="plan-carbs">0g</span>
-                                </div>
-                                <div class="bg-white/20 backdrop-blur rounded-xl p-2 flex-1">
-                                    <span class="block text-xs text-pink-100">Gord</span>
-                                    <span class="font-bold" id="plan-fats">0g</span>
-                                </div>
+                            <div class="flex gap-2 justify-center text-xs">
+                                <div class="bg-white/20 p-2 rounded flex-1">Prot <br><b id="plan-protein">0g</b></div>
+                                <div class="bg-white/20 p-2 rounded flex-1">Carb <br><b id="plan-carbs">0g</b></div>
+                                <div class="bg-white/20 p-2 rounded flex-1">Gord <br><b id="plan-fats">0g</b></div>
                             </div>
-                            <div class="mt-4 text-xs text-center text-pink-100 bg-black/10 rounded-lg p-1" id="plan-bmi">IMC: 00.0</div>
+                            <div class="mt-4 text-xs bg-black/10 rounded p-1" id="plan-bmi"></div>
                         </div>
-
-                        <div class="bg-white rounded-2xl p-5 border border-purple-100 shadow-sm">
-                            <h4 class="font-bold text-purple-600 mb-2 flex items-center gap-2">
-                                <i class="fa-solid fa-lightbulb"></i> Dica da Bestie
-                            </h4>
-                            <p class="text-sm text-gray-600" id="plan-tip">...</p>
-                        </div>
-
-                        <div class="bg-yellow-50 rounded-2xl p-5 border border-yellow-100 shadow-sm text-center">
-                            <p class="text-sm text-gray-600 italic font-medium" id="plan-quote">"..."</p>
-                        </div>
-                    </div>
-                </div>
-            `,
-            workout: `
-                <div class="fade-in pb-20">
-                    <div class="mb-6 flex items-center gap-3">
-                        <button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition">
-                            <i class="fa-solid fa-arrow-left"></i>
-                        </button>
-                        <h2 class="text-2xl font-bold text-gray-800">Treino da Bestie 🏋️‍♀️</h2>
-                    </div>
-
-                    <div class="bg-gradient-to-br from-red-50 to-pink-50 border border-red-100 rounded-3xl p-6 shadow-sm mb-6">
-                        <p class="text-gray-600 text-sm mb-4">Escolha como você quer treinar hoje e eu monto tudo!</p>
-                        
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Tempo Disponível</label>
-                                <select id="workout-time" class="w-full bg-white border border-pink-200 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition text-gray-600">
-                                    <option value="15">15 minutos (Rápido)</option>
-                                    <option value="30">30 minutos (Médio)</option>
-                                    <option value="45">45 minutos (Completo)</option>
-                                    <option value="60">60 minutos (Intenso)</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Foco do Treino</label>
-                                <select id="workout-focus" class="w-full bg-white border border-pink-200 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition text-gray-600">
-                                    <option value="Full Body">Corpo Todo (Full Body)</option>
-                                    <option value="Legs & Glutes">Pernas e Glúteos</option>
-                                    <option value="Upper Body">Superiores (Braços/Costas)</option>
-                                    <option value="Abs & Cardio">Abdômen e Cardio</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Equipamento</label>
-                                <select id="workout-equip" class="w-full bg-white border border-pink-200 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition text-gray-600">
-                                    <option value="Bodyweight">Só o peso do corpo</option>
-                                    <option value="Dumbbells">Pesos Livres / Halteres</option>
-                                    <option value="Resistance Bands">Elásticos</option>
-                                    <option value="Gym Machine">Máquinas de Academia</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <button onclick="generateWorkout()" id="workout-btn" class="w-full mt-6 bg-gradient-to-r from-red-400 to-pink-500 text-white py-3 rounded-xl font-bold shadow-lg shadow-red-200 hover:scale-[1.02] transition active:scale-95 flex items-center justify-center gap-2">
-                            <span>Gerar Treino Agora</span>
-                            <i class="fa-solid fa-fire"></i>
-                        </button>
-                    </div>
-
-                    <div id="workout-result" class="hidden space-y-4">
-                        <div id="workout-card"></div>
-                    </div>
-                </div>
-            `,
-            sos: `
-                <div class="fade-in pb-20">
-                    <div class="mb-6 flex items-center gap-3">
-                        <button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition">
-                            <i class="fa-solid fa-arrow-left"></i>
-                        </button>
-                        <h2 class="text-2xl font-bold text-gray-800">SOS Bestie 🆘</h2>
-                    </div>
-
-                    <div class="bg-gradient-to-br from-indigo-50 to-pink-50 border border-indigo-100 rounded-3xl p-6 shadow-sm mb-6">
-                        <p class="text-gray-600 text-sm mb-4">Miga, qual é a emergência? Me conta que eu te ajudo sem julgamentos! 💕</p>
-                        
-                        <div class="grid grid-cols-2 gap-3 mb-4">
-                            <button onclick="triggerSOS('Comi demais e estou me sentindo culpada')" class="bg-white border border-indigo-100 rounded-xl p-3 text-xs text-indigo-500 font-medium hover:bg-indigo-50 transition text-center">🍕 Jaquei feio!</button>
-                            <button onclick="triggerSOS('Estou com muita preguiça de treinar hoje')" class="bg-white border border-indigo-100 rounded-xl p-3 text-xs text-indigo-500 font-medium hover:bg-indigo-50 transition text-center">😴 Preguiça de treinar</button>
-                            <button onclick="triggerSOS('Estou muito ansiosa e quero comer doce')" class="bg-white border border-indigo-100 rounded-xl p-3 text-xs text-indigo-500 font-medium hover:bg-indigo-50 transition text-center">🍫 Ansiedade a mil</button>
-                            <button onclick="triggerSOS('Vou sair para comer/beber e não sei o que fazer')" class="bg-white border border-indigo-100 rounded-xl p-3 text-xs text-indigo-500 font-medium hover:bg-indigo-50 transition text-center">🥂 Vou sair hoje</button>
-                        </div>
-                        
-                        <div class="relative">
-                            <input type="text" id="sos-input" placeholder="Outra emergência..." class="w-full bg-white border border-indigo-200 rounded-xl p-3 text-sm focus:outline-none focus:border-indigo-400 transition placeholder-gray-400">
-                            <button onclick="triggerSOS(document.getElementById('sos-input').value)" class="absolute right-2 top-2 w-8 h-8 bg-indigo-400 text-white rounded-lg flex items-center justify-center hover:bg-indigo-500 transition"><i class="fa-solid fa-paper-plane text-xs"></i></button>
-                        </div>
-                    </div>
-
-                    <div id="sos-result" class="hidden space-y-4">
-                        <div class="bg-white rounded-2xl p-5 border border-indigo-100 shadow-sm relative">
-                            <div class="absolute -top-3 left-4 bg-indigo-500 text-white text-[10px] font-bold px-2 py-1 rounded">Conselho da Bestie</div>
-                            <p class="text-sm text-gray-600 leading-relaxed mt-2" id="sos-text">...</p>
-                        </div>
+                        <div class="bg-white rounded-2xl p-5 border border-purple-100 shadow-sm"><h4 class="font-bold text-purple-600 mb-2 text-sm"><i class="fa-solid fa-lightbulb"></i> Dica da Bestie</h4><p class="text-xs text-gray-600" id="plan-tip"></p></div>
+                        <div class="bg-yellow-50 rounded-2xl p-5 border border-yellow-100 shadow-sm text-center"><p class="text-xs text-gray-600 italic font-medium" id="plan-quote"></p></div>
                     </div>
                 </div>
             `,
             profile: `
                 <div class="fade-in pb-20 pt-6">
                     <div class="mb-6 text-center">
-                        <div class="w-20 h-20 bg-pink-100 rounded-full mx-auto mb-4 border-4 border-white shadow-md overflow-hidden">
-                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Bestie" id="profile-avatar" alt="Profile" />
-                        </div>
+                        <div class="w-20 h-20 bg-pink-100 rounded-full mx-auto mb-4 border-4 border-white shadow-md overflow-hidden"><img src="" id="profile-avatar" alt="Profile" /></div>
                         <h2 class="text-xl font-bold text-gray-800">Seu Perfil 💖</h2>
                     </div>
-                    
                     <div class="bg-white rounded-3xl p-6 shadow-sm border border-pink-100 space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Nome / Apelido</label>
-                            <input type="text" id="profile-name" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition">
+                        <div><label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Nome</label><input type="text" id="profile-name" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie"></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Idade</label><input type="number" id="profile-age" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie"></div>
+                            <div><label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Peso (kg)</label><input type="number" id="profile-weight" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie"></div>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Idade</label>
-                                <input type="number" id="profile-age" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Peso Atual (kg)</label>
-                                <input type="number" id="profile-weight" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition">
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Altura (cm)</label>
-                                <input type="number" id="profile-height" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Meta de Peso (kg)</label>
-                                <input type="number" id="profile-target-weight" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition">
-                            </div>
+                            <div><label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Altura (cm)</label><input type="number" id="profile-height" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie"></div>
+                            <div><label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Meta (kg)</label><input type="number" id="profile-target-weight" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie"></div>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Objetivo Principal</label>
-                            <select id="profile-goal" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie transition text-gray-600">
+                            <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Objetivo</label>
+                            <select id="profile-goal" class="w-full bg-gray-50 border border-pink-100 rounded-xl p-3 text-sm focus:outline-none focus:border-bestie text-gray-600">
                                 <option value="perder">Secar (Perder Peso)</option>
                                 <option value="manter">Manter Peso</option>
-                                <option value="ganhar">Ganhar Massa (Hipertrofia)</option>
+                                <option value="ganhar">Ganhar Massa</option>
                             </select>
                         </div>
-
-                        <button onclick="saveProfile()" class="w-full mt-4 bg-bestie text-white py-3 rounded-xl font-bold shadow-lg shadow-pink-200 hover:scale-[1.02] transition active:scale-95">
-                            Salvar Dados
-                        </button>
+                        <button onclick="saveProfile()" class="w-full mt-4 bg-bestie text-white py-3 rounded-xl font-bold shadow-lg hover:scale-[1.02] transition">Salvar Dados</button>
                     </div>
                 </div>
+            `,
+            workout: `
+                <div class="fade-in pb-20">
+                    <div class="mb-6 flex items-center gap-3"><button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition"><i class="fa-solid fa-arrow-left"></i></button><h2 class="text-2xl font-bold text-gray-800">Treino da Bestie 🏋️‍♀️</h2></div>
+                    <div class="bg-gradient-to-br from-red-50 to-pink-50 border border-red-100 rounded-3xl p-6 shadow-sm mb-6">
+                        <p class="text-gray-600 text-sm mb-4">Escolha como você quer treinar hoje!</p>
+                        <div class="space-y-4">
+                            <div><label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Tempo</label><select id="workout-time" class="w-full bg-white border border-pink-200 rounded-xl p-3 text-sm focus:outline-none"><option value="15">15 min (Rápido)</option><option value="30">30 min (Médio)</option><option value="45">45 min (Completo)</option></select></div>
+                            <div><label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Foco</label><select id="workout-focus" class="w-full bg-white border border-pink-200 rounded-xl p-3 text-sm focus:outline-none"><option value="Full Body">Corpo Todo</option><option value="Legs">Pernas</option><option value="Upper">Braços</option><option value="Cardio">Cardio</option></select></div>
+                            <div><label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Equipamento</label><select id="workout-equip" class="w-full bg-white border border-pink-200 rounded-xl p-3 text-sm focus:outline-none"><option value="Bodyweight">Peso do Corpo</option><option value="Dumbbells">Pesos</option><option value="Gym">Academia</option></select></div>
+                        </div>
+                        <button onclick="generateWorkout()" id="workout-btn" class="w-full mt-6 bg-gradient-to-r from-red-400 to-pink-500 text-white py-3 rounded-xl font-bold shadow-lg hover:scale-[1.02] transition flex items-center justify-center gap-2"><span>Gerar Treino</span><i class="fa-solid fa-fire"></i></button>
+                    </div>
+                    <div id="workout-result" class="hidden space-y-4"><div id="workout-card"></div></div>
+                </div>
+            `,
+            water: `
+                 <div class="fade-in pb-20 pt-6">
+                    <div class="mb-6 flex items-center gap-3"><button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition"><i class="fa-solid fa-arrow-left"></i></button><h2 class="text-2xl font-bold text-gray-800">Hidratação 💧</h2></div>
+                    <div class="text-center mb-8">
+                        <div class="relative w-40 h-40 mx-auto mb-4 bg-blue-50 rounded-full flex items-center justify-center border-4 border-white shadow-lg overflow-hidden">
+                            <div id="water-level" class="absolute bottom-0 left-0 w-full bg-blue-400 transition-all duration-500 ease-out" style="height: 0%"></div>
+                            <span id="water-count" class="relative text-3xl font-bold text-blue-600 z-10">0</span>
+                            <span class="relative text-xs text-blue-400 mt-8 -ml-4 z-10" id="water-goal-total-cups">/10</span>
+                        </div>
+                        <p class="text-gray-500 text-sm">Meta: <span id="water-goal-liters" class="font-bold text-blue-600">2.5L</span></p>
+                    </div>
+                    <div class="flex justify-center gap-6"><button onclick="updateWater(-1)" class="w-14 h-14 rounded-full bg-white border border-gray-200 text-gray-400 flex items-center justify-center text-xl shadow-sm hover:scale-105 transition"><i class="fa-solid fa-minus"></i></button><button onclick="updateWater(1)" class="w-14 h-14 rounded-full bg-blue-500 text-white flex items-center justify-center text-xl shadow-lg shadow-blue-200 hover:scale-105 transition"><i class="fa-solid fa-plus"></i></button></div>
+                </div>
+            `,
+            weekend: `
+                 <div class="fade-in pb-20"><div class="mb-6 flex items-center gap-3"><button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition"><i class="fa-solid fa-arrow-left"></i></button><h2 class="text-2xl font-bold text-gray-800">Fim de Semana 🍕</h2></div><div class="bg-white rounded-3xl p-6 shadow-sm border border-pink-100 space-y-4"><div class="bg-purple-50 rounded-xl p-4 border border-purple-100"><h3 class="font-bold text-purple-700 mb-2">Regra de Ouro</h3><p class="text-sm text-gray-600">2 refeições livres (Sábado/Domingo)!</p></div></div></div>
+            `,
+            kit: `
+                 <div class="fade-in pb-20"><div class="mb-6 flex items-center gap-3"><button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition"><i class="fa-solid fa-arrow-left"></i></button><h2 class="text-2xl font-bold text-gray-800">Kit da Bestie 💊</h2></div><div class="space-y-4"><div class="bg-white rounded-2xl p-4 shadow-sm border border-pink-50 flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-xl">💪</div><div><h3 class="font-bold text-gray-800">Whey</h3><p class="text-xs text-gray-500">Pós-treino.</p></div></div></div></div>
+            `,
+            swaps: `
+                 <div class="fade-in pb-20"><div class="mb-6 flex items-center gap-3"><button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition"><i class="fa-solid fa-arrow-left"></i></button><h2 class="text-2xl font-bold text-gray-800">Trocas 🔄</h2></div>
+                 <div class="bg-gradient-to-br from-orange-50 to-pink-50 border border-orange-100 rounded-3xl p-6 shadow-sm mb-6"><div class="relative"><input type="text" id="swap-input" placeholder="Ex: Coxinha..." class="w-full bg-white border border-orange-200 rounded-2xl p-4 text-sm focus:outline-none focus:border-bestie"><button onclick="generateSwap()" id="swap-btn" class="absolute right-2 top-2 bg-orange-400 text-white p-2 rounded-xl hover:bg-orange-500 transition shadow-md"><i class="fa-solid fa-magnifying-glass"></i></button></div><div id="swap-result" class="hidden mt-4 bg-white rounded-xl p-4 border border-orange-100 shadow-sm"><p id="swap-text" class="text-sm text-gray-600 italic"></p></div></div>
+                 <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-pink-100"><table class="w-full text-sm text-left text-gray-600"><thead class="bg-pink-50 text-bestie uppercase text-xs"><tr><th class="px-4 py-3">Troque</th><th class="px-4 py-3">Por</th></tr></thead><tbody class="divide-y divide-pink-50"><tr><td class="px-4 py-3">Açúcar</td><td class="px-4 py-3 font-medium text-green-600">Adoçante</td></tr></tbody></table></div></div>
+            `,
+            savings: `
+                 <div class="fade-in pb-20"><div class="mb-6 flex items-center gap-3"><button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition"><i class="fa-solid fa-arrow-left"></i></button><h2 class="text-2xl font-bold text-gray-800">Economia 💰</h2></div><div class="bg-yellow-50 border border-yellow-100 rounded-3xl p-6 shadow-sm mb-6"><h3 class="font-bold text-yellow-700 text-lg mb-2 flex items-center gap-2"><i class="fa-solid fa-star"></i> Dica</h3><p class="text-sm text-yellow-800">Compre a granel!</p></div></div>
+            `,
+            sos: `
+                 <div class="fade-in pb-20"><div class="mb-6 flex items-center gap-3"><button onclick="navigate('home')" class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center hover:bg-pink-100 transition"><i class="fa-solid fa-arrow-left"></i></button><h2 class="text-2xl font-bold text-gray-800">SOS 🆘</h2></div><div class="bg-gradient-to-br from-indigo-50 to-pink-50 border border-indigo-100 rounded-3xl p-6 shadow-sm mb-6"><p class="text-gray-600 text-sm mb-4">Qual a emergência?</p><div class="relative"><input type="text" id="sos-input" placeholder="Ex: Jaquei..." class="w-full bg-white border border-indigo-200 rounded-xl p-3 text-sm focus:outline-none"><button onclick="triggerSOS(document.getElementById('sos-input').value)" class="absolute right-2 top-2 w-8 h-8 bg-indigo-400 text-white rounded-lg flex items-center justify-center"><i class="fa-solid fa-paper-plane text-xs"></i></button></div></div><div id="sos-result" class="hidden space-y-4"><div class="bg-white rounded-2xl p-5 border border-indigo-100 shadow-sm"><p class="text-sm text-gray-600 leading-relaxed mt-2" id="sos-text">...</p></div></div></div>
             `
         };
 
-        function init() {
-            navigate('home'); 
-            renderRecipes('all');
-        }
-
-        function saveProfile() {
-            const name = document.getElementById('profile-name').value;
-            const age = document.getElementById('profile-age').value;
-            const weight = document.getElementById('profile-weight').value;
-            const targetWeight = document.getElementById('profile-target-weight').value;
-            const height = document.getElementById('profile-height').value;
-            const goal = document.getElementById('profile-goal').value;
-
-            userProfile = { name, age, weight, targetWeight, height, goal };
-            localStorage.setItem('bestieProfile', JSON.stringify(userProfile));
-            
-            // Update Avatar
-            document.getElementById('profile-avatar').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`;
-            
-            alert('Perfil salvo com sucesso! 💖');
-        }
+        // --- INIT & NAV ---
+        function init() { navigate('home'); }
 
         function navigate(viewName) {
-            // Update Content
             const main = document.getElementById('app-content');
             if (views[viewName]) {
                 main.innerHTML = views[viewName];
-            } else {
-                console.error(`View "${viewName}" not found!`);
-                return;
-            }
+            } else { console.error(`View ${viewName} not found`); return; }
 
-            // View Specific Logic
             if(viewName === 'profile') {
                 setTimeout(() => {
                     document.getElementById('profile-name').value = userProfile.name || '';
@@ -1071,10 +417,8 @@
                     document.getElementById('profile-avatar').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${userProfile.name || 'Bestie'}`;
                 }, 0);
             }
-            
             if(viewName === 'calculator') {
                  setTimeout(() => {
-                    // Pre-fill calculator if profile data exists
                     if(userProfile.age) document.getElementById('calc-age').value = userProfile.age;
                     if(userProfile.weight) document.getElementById('calc-weight').value = userProfile.weight;
                     if(userProfile.targetWeight) document.getElementById('calc-target-weight').value = userProfile.targetWeight;
@@ -1082,386 +426,246 @@
                     if(userProfile.goal) document.getElementById('calc-goal').value = userProfile.goal;
                 }, 0);
             }
-
-             if(viewName === 'water') {
-                // Calc dynamic water goal: 35ml per kg. Default to 2.5L if no weight.
+            if(viewName === 'water') {
                 if (userProfile.weight) {
                     waterGoalLiters = (userProfile.weight * 0.035).toFixed(1);
-                    // Approx cups (250ml)
                     waterGoalCups = Math.ceil((waterGoalLiters * 1000) / 250);
-                } else {
-                    waterGoalLiters = 2.5;
-                    waterGoalCups = 10;
                 }
-                
-                // Update DOM elements for water view
                 setTimeout(() => {
                     document.getElementById('water-goal-liters').innerText = waterGoalLiters + 'L';
                     document.getElementById('water-goal-total-cups').innerText = '/' + waterGoalCups;
-                    updateWater(0); // Initialize visual state
+                    updateWater(0);
                 }, 0);
             }
+            if(viewName === 'recipes') { setTimeout(() => renderRecipes('all'), 0); }
+        }
 
+        // --- LOGIC ---
+        function saveProfile() {
+            const name = document.getElementById('profile-name').value;
+            const age = document.getElementById('profile-age').value;
+            const weight = document.getElementById('profile-weight').value;
+            const targetWeight = document.getElementById('profile-target-weight').value;
+            const height = document.getElementById('profile-height').value;
+            const goal = document.getElementById('profile-goal').value;
 
-            // Update Nav State
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('text-bestie');
-                btn.classList.add('text-gray-400');
-                if(viewName === 'home' && btn.innerText.includes('Início')) btn.classList.add('text-bestie'), btn.classList.remove('text-gray-400');
-                if((viewName === 'recipes' || viewName === 'chefBestie') && btn.innerText.includes('Receitas')) {
-                    btn.classList.add('text-bestie');
-                    btn.classList.remove('text-gray-400');
-                }
-                if(viewName === 'calculator' && btn.innerText.includes('Calc')) btn.classList.add('text-bestie'), btn.classList.remove('text-gray-400');
-                if(viewName === 'profile' && btn.innerText.includes('Perfil')) btn.classList.add('text-bestie'), btn.classList.remove('text-gray-400');
-            });
-
-            if(viewName === 'recipes') {
-                renderRecipes('all');
-            }
+            userProfile = { name, age, weight, targetWeight, height, goal };
+            localStorage.setItem('bestieProfile', JSON.stringify(userProfile));
+            document.getElementById('profile-avatar').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`;
+            alert('Perfil salvo com sucesso! 💖');
         }
 
         function updateWater(change) {
             waterIntake += change;
             if(waterIntake < 0) waterIntake = 0;
-            // Cap at goal + extra buffer just for visual fun, but logic is goal
-            if(waterIntake > waterGoalCups + 5) waterIntake = waterGoalCups + 5; 
-
             const countEl = document.getElementById('water-count');
             const fillEl = document.getElementById('water-level');
-            
             if(countEl && fillEl) {
                 countEl.innerText = waterIntake;
-                // Percentage based on dynamic goal
                 let percentage = (waterIntake / waterGoalCups) * 100;
                 if(percentage > 100) percentage = 100;
                 fillEl.style.height = `${percentage}%`;
             }
         }
 
-        function filterRecipes(tag, btnElement) {
-            document.querySelectorAll('.cat-btn').forEach(btn => {
-                btn.classList.remove('bg-bestie', 'text-white', 'shadow-md');
-                btn.classList.add('bg-white', 'text-gray-500', 'border', 'hover:text-bestie');
+        // --- RECIPE LOGIC ---
+        function filterRecipes(tag, btn) {
+            document.querySelectorAll('.cat-btn').forEach(b => {
+                b.classList.remove('bg-bestie', 'text-white', 'shadow-md');
+                b.classList.add('bg-white', 'text-gray-500', 'border');
             });
-            btnElement.classList.remove('bg-white', 'text-gray-500', 'border', 'hover:text-bestie');
-            btnElement.classList.add('bg-bestie', 'text-white', 'shadow-md');
-
+            btn.classList.remove('bg-white', 'text-gray-500', 'border');
+            btn.classList.add('bg-bestie', 'text-white', 'shadow-md');
             renderRecipes(tag);
         }
 
-        function renderRecipes(filterTag) {
+        function renderRecipes(tag) {
             const grid = document.getElementById('recipe-grid');
             if(!grid) return;
-
             grid.innerHTML = '';
+            const filtered = tag === 'all' ? recipes : recipes.filter(r => r.tags && r.tags.includes(tag));
             
-            // Check if recipe tags array includes the selected filter tag
-            const filtered = filterTag === 'all' 
-                ? recipes 
-                : recipes.filter(r => r.tags && r.tags.includes(filterTag));
-
             if(filtered.length === 0) {
-                grid.innerHTML = `
-                    <div class="text-center py-10 flex flex-col items-center">
-                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3 text-gray-300">
-                            <i class="fa-solid fa-cookie-bite text-2xl"></i>
-                        </div>
-                        <p class="text-gray-400 font-medium">Nenhuma receitinha nessa categoria :(</p>
-                        <p class="text-gray-300 text-xs mt-1">Tente outro filtro!</p>
-                    </div>`;
+                grid.innerHTML = '<div class="text-center py-10 text-gray-400"><p>Nenhuma receitinha encontrada :(</p></div>';
                 return;
             }
 
-            filtered.forEach(recipe => {
-                const card = document.createElement('div');
-                card.className = "bg-white rounded-2xl p-3 shadow-sm border border-pink-50 flex gap-4 hover:border-pink-200 transition cursor-pointer";
-                card.onclick = () => openRecipe(recipe.id);
-                
-                card.innerHTML = `
+            filtered.forEach(r => {
+                const div = document.createElement('div');
+                div.className = "bg-white rounded-2xl p-4 shadow-sm border border-pink-50 flex gap-4 hover:border-pink-200 transition cursor-pointer";
+                div.onclick = () => openRecipe(r.id);
+                div.innerHTML = `
                     <div class="flex-1 flex flex-col justify-center">
-                        <div class="flex justify-between items-start">
-                            <h3 class="font-bold text-gray-800 leading-tight line-clamp-2">${recipe.title}</h3>
-                            <i class="fa-regular fa-bookmark text-gray-300"></i>
-                        </div>
-                        <div class="flex flex-wrap gap-1 mt-1.5">
-                            <span class="text-[10px] text-bestie font-bold bg-pink-50 px-2 py-0.5 rounded">${recipe.calories} kcal</span>
-                            <span class="text-[10px] text-gray-500 bg-gray-100 px-2 py-0.5 rounded">${recipe.displayCategory}</span>
-                        </div>
-                        <div class="mt-auto flex items-center gap-3 text-xs text-gray-400">
-                            <span class="flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${recipe.time}</span>
-                            <span class="flex items-center gap-1"><i class="fa-solid fa-list-ul"></i> ${recipe.ingredients.length} ingr.</span>
-                        </div>
+                        <div class="flex justify-between items-start"><h3 class="font-bold text-gray-800 leading-tight">${r.title}</h3><i class="fa-regular fa-bookmark text-gray-300"></i></div>
+                        <div class="flex flex-wrap gap-1 mt-1.5"><span class="text-[10px] text-bestie font-bold bg-pink-50 px-2 py-0.5 rounded">${r.calories} kcal</span><span class="text-[10px] text-gray-500 bg-gray-100 px-2 py-0.5 rounded">${r.displayCategory}</span></div>
+                        <div class="mt-auto flex items-center gap-3 text-xs text-gray-400 mt-2"><span class="flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${r.time}</span></div>
                     </div>
-                    <div class="flex items-center justify-center pr-1">
-                        <button class="w-8 h-8 rounded-full bg-pink-50 text-bestie hover:bg-bestie hover:text-white transition flex items-center justify-center">
-                            <i class="fa-solid fa-chevron-right text-xs"></i>
-                        </button>
-                    </div>
+                    <div class="flex items-center justify-center pr-1"><button class="w-8 h-8 rounded-full bg-pink-50 text-bestie flex items-center justify-center"><i class="fa-solid fa-chevron-right text-xs"></i></button></div>
                 `;
-                grid.appendChild(card);
+                grid.appendChild(div);
             });
         }
 
         function openRecipe(id) {
-            const recipe = recipes.find(r => r.id === id);
-            if(!recipe) return;
+            const r = recipes.find(x => x.id === id);
+            if(!r) return;
+            document.getElementById('modal-tag').innerText = r.displayCategory;
+            document.getElementById('modal-title').innerText = r.title;
+            document.getElementById('modal-cal').innerText = r.calories;
+            document.getElementById('modal-time').innerText = r.time;
+            document.getElementById('modal-difficulty').innerText = r.difficulty;
+            document.getElementById('modal-yield').innerText = r.yield;
 
-            document.getElementById('modal-tag').innerText = recipe.displayCategory;
-            document.getElementById('modal-title').innerText = recipe.title;
-            document.getElementById('modal-cal').innerText = recipe.calories;
-            document.getElementById('modal-time').innerText = recipe.time;
-            document.getElementById('modal-difficulty').innerText = recipe.difficulty || "Fácil";
-            document.getElementById('modal-yield').innerText = recipe.yield || "1 porção";
-            document.getElementById('modal-desc').innerText = recipe.description || "";
-
-            // Handle "Dica de Ouro" extraction
-            const desc = recipe.description || "";
-            const tipContainer = document.getElementById('modal-tip-container');
-            const tipText = document.getElementById('modal-tip-text');
-            
+            const desc = r.description || "";
             if (desc.includes("Dica:")) {
                 const parts = desc.split("Dica:");
                 document.getElementById('modal-desc').innerText = parts[0].trim();
-                tipText.innerText = parts[1].trim();
-                tipContainer.classList.remove('hidden');
+                document.getElementById('modal-tip-text').innerText = parts[1].trim();
+                document.getElementById('modal-tip-container').classList.remove('hidden');
             } else {
                 document.getElementById('modal-desc').innerText = desc;
-                tipContainer.classList.add('hidden');
+                document.getElementById('modal-tip-container').classList.add('hidden');
             }
 
-            const ingList = document.getElementById('modal-ingredients');
-            ingList.innerHTML = recipe.ingredients.map(ing => `<li class="flex items-start gap-2"><span class="w-1.5 h-1.5 rounded-full bg-bestie mt-1.5 flex-shrink-0"></span>${ing}</li>`).join('');
-
-            const instList = document.getElementById('modal-instructions');
-            instList.innerHTML = recipe.instructions.map((step, idx) => `
-                <div class="flex gap-3">
-                    <div class="w-6 h-6 rounded-full bg-pink-100 text-bestie text-xs font-bold flex items-center justify-center flex-shrink-0">${idx + 1}</div>
-                    <p class="leading-snug">${step}</p>
-                </div>
-            `).join('');
-
+            document.getElementById('modal-ingredients').innerHTML = r.ingredients.map(i => `<li class="flex items-start gap-2"><span class="w-1.5 h-1.5 rounded-full bg-bestie mt-1.5 flex-shrink-0"></span>${i}</li>`).join('');
+            document.getElementById('modal-instructions').innerHTML = r.instructions.map((s, i) => `<div class="flex gap-3"><div class="w-6 h-6 rounded-full bg-pink-100 text-bestie text-xs font-bold flex items-center justify-center flex-shrink-0">${i+1}</div><p class="leading-snug">${s}</p></div>`).join('');
+            
             const modal = document.getElementById('recipe-modal');
             const panel = document.getElementById('modal-panel');
-            
             modal.classList.remove('hidden');
-            setTimeout(() => {
-                panel.classList.remove('translate-y-full');
-            }, 10);
+            setTimeout(() => panel.classList.remove('translate-y-full'), 10);
         }
 
         function closeRecipeModal() {
             const modal = document.getElementById('recipe-modal');
             const panel = document.getElementById('modal-panel');
-            
             panel.classList.add('translate-y-full');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        // --- AI CALLS ---
+        async function fetchAI(prompt, jsonMode = true) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const body = { contents: [{ parts: [{ text: prompt }] }] };
+            if(jsonMode) body.generationConfig = { responseMimeType: "application/json" };
+            
+            try {
+                let r = await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
+                if (!r.ok) return null;
+                let d = await r.json();
+                let txt = d.candidates[0].content.parts[0].text;
+                if(jsonMode) {
+                     txt = txt.replace(/```json/gi, '').replace(/```/g, '').trim();
+                     return JSON.parse(txt);
+                }
+                return txt;
+            } catch (e) { console.error(e); return null; }
+        }
+
+        async function generateAIRecipe() {
+            const ing = document.getElementById('ai-ingredients').value;
+            if(!ing) return;
+            const btn = document.getElementById('generate-btn');
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Criando...`; btn.disabled = true;
+            document.getElementById('ai-result').classList.add('hidden');
+
+            const p = `Crie uma receita saudável com: ${ing}. JSON: {"title":"", "calories":0, "time":"", "difficulty":"", "yield":"", "description":"Dica:...", "ingredients":[], "instructions":[], "category":"almoco"}`;
+            const data = await fetchAI(p, true);
+
+            if(data) {
+                document.getElementById('ai-recipe-card').innerHTML = `
+                    <div class="bg-white rounded-3xl p-5 shadow-lg border border-pink-100 relative">
+                        <div class="absolute top-0 right-0 bg-bestie text-white text-xs font-bold px-3 py-1 rounded-bl-xl">IA ✨</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">${data.title}</h3>
+                        <p class="text-sm text-gray-500 italic mb-4">${data.description}</p>
+                        <div class="flex gap-4 text-xs text-gray-500 mb-4 bg-pink-50 p-3 rounded-xl"><span>🔥 ${data.calories} kcal</span><span>⏰ ${data.time}</span></div>
+                        <h4 class="font-bold text-sm mb-2">Ingredientes:</h4><ul class="text-sm text-gray-600 list-disc pl-4 mb-4">${data.ingredients.map(i=>`<li>${i}</li>`).join('')}</ul>
+                        <h4 class="font-bold text-sm mb-2">Preparo:</h4><ol class="text-sm text-gray-600 list-decimal pl-4">${data.instructions.map(i=>`<li>${i}</li>`).join('')}</ol>
+                    </div>`;
+                document.getElementById('ai-result').classList.remove('hidden');
+            } else { alert("Erro na IA."); }
+            btn.innerHTML = `<span>Criar Outra</span> <i class="fa-solid fa-wand-magic-sparkles"></i>`; btn.disabled = false;
         }
 
         async function generatePlan() {
             const age = document.getElementById('calc-age').value;
             const weight = document.getElementById('calc-weight').value;
-            const targetWeight = document.getElementById('calc-target-weight').value;
+            const tWeight = document.getElementById('calc-target-weight').value;
             const height = document.getElementById('calc-height').value;
             const goal = document.getElementById('calc-goal').value;
-            
-            const resultContainer = document.getElementById('plan-result');
+            if(!age || !weight || !height) { alert("Preencha tudo!"); return; }
+
             const btn = document.getElementById('plan-btn');
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Calculando...`; btn.disabled = true;
+            document.getElementById('plan-result').classList.add('hidden');
 
-            if(!age || !weight || !height) {
-                alert("Preencha todos os campos, bestie!");
-                return;
-            }
+            const p = `Plano nutricional: ${age}anos, ${weight}kg, Meta:${tWeight}kg, ${height}cm, ${goal}. JSON: {"calories_target":"", "bmi":"", "macros":{"protein":"", "carbs":"", "fats":""}, "motivational_quote":"", "tip":""}`;
+            const data = await fetchAI(p, true);
 
-            btn.disabled = true;
-            btn.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div> Calculando...`;
-            resultContainer.classList.add('hidden');
-
-            const planData = await callGeminiPlan({age, weight, targetWeight, height, goal});
-
-            if(planData) {
-                document.getElementById('plan-calories').innerText = planData.calories_target;
-                document.getElementById('plan-protein').innerText = planData.macros.protein;
-                document.getElementById('plan-carbs').innerText = planData.macros.carbs;
-                document.getElementById('plan-fats').innerText = planData.macros.fats;
-                document.getElementById('plan-tip').innerText = planData.tip;
-                document.getElementById('plan-quote').innerText = `"${planData.motivational_quote}"`;
-                document.getElementById('plan-bmi').innerText = `IMC: ${planData.bmi}`;
-
-                resultContainer.classList.remove('hidden');
-                resultContainer.scrollIntoView({ behavior: 'smooth' });
-            } else {
-                alert("Erro ao gerar plano. Tente novamente!");
-            }
-
-            btn.disabled = false;
-            btn.innerHTML = `Gerar Plano Personalizado ✨`;
+            if(data) {
+                document.getElementById('plan-calories').innerText = data.calories_target;
+                document.getElementById('plan-protein').innerText = data.macros.protein;
+                document.getElementById('plan-carbs').innerText = data.macros.carbs;
+                document.getElementById('plan-fats').innerText = data.macros.fats;
+                document.getElementById('plan-tip').innerText = data.tip;
+                document.getElementById('plan-quote').innerText = `"${data.motivational_quote}"`;
+                document.getElementById('plan-bmi').innerText = `IMC: ${data.bmi}`;
+                document.getElementById('plan-result').classList.remove('hidden');
+            } else { alert("Erro na IA."); }
+            btn.innerHTML = `Gerar Plano Personalizado ✨`; btn.disabled = false;
         }
 
         async function generateWorkout() {
-            const time = document.getElementById('workout-time').value;
-            const focus = document.getElementById('workout-focus').value;
-            const equip = document.getElementById('workout-equip').value;
-            
-            const resultContainer = document.getElementById('workout-result');
-            const cardDiv = document.getElementById('workout-card');
+            const t = document.getElementById('workout-time').value;
+            const f = document.getElementById('workout-focus').value;
+            const e = document.getElementById('workout-equip').value;
             const btn = document.getElementById('workout-btn');
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Montando...`; btn.disabled = true;
+            document.getElementById('workout-result').classList.add('hidden');
 
-            btn.disabled = true;
-            btn.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div> Montando Treino...`;
-            resultContainer.classList.add('hidden');
+            const p = `Treino: ${t}min, ${f}, ${e}. JSON: {"title":"", "warmup":"", "exercises":[{"name":"", "reps":"", "tips":""}], "motivation":""}`;
+            const data = await fetchAI(p, true);
 
-            const workoutData = await callGeminiWorkout({time, focus, equipment: equip});
-
-            if(workoutData) {
-                cardDiv.innerHTML = `
-                    <div class="bg-white rounded-3xl p-5 shadow-lg border border-red-100 overflow-hidden relative">
-                        <div class="absolute top-0 right-0 bg-red-400 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">
-                            Treino IA 🔥
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">${workoutData.title}</h3>
-                        
-                        <div class="bg-red-50 p-3 rounded-xl mb-4 border border-red-100">
-                            <span class="text-xs font-bold text-red-500 uppercase tracking-wider block mb-1">Aquecimento</span>
-                            <p class="text-sm text-gray-700">${workoutData.warmup}</p>
-                        </div>
-
-                        <div class="mb-4">
-                            <h4 class="font-bold text-gray-800 mb-3 text-sm flex items-center gap-2"><i class="fa-solid fa-dumbbell text-red-400"></i> Exercícios</h4>
-                            <ul class="space-y-3">
-                                ${workoutData.exercises.map(ex => `
-                                    <li class="bg-gray-50 p-3 rounded-xl border border-gray-100">
-                                        <div class="flex justify-between items-center mb-1">
-                                            <span class="font-bold text-gray-700 text-sm">${ex.name}</span>
-                                            <span class="text-xs font-bold bg-white px-2 py-1 rounded text-red-500 border border-red-100">${ex.reps}</span>
-                                        </div>
-                                        <p class="text-xs text-gray-500 italic">${ex.tips}</p>
-                                    </li>
-                                `).join('')}
-                            </ul>
-                        </div>
-
-                        <div class="bg-yellow-50 rounded-xl p-4 text-center border border-yellow-100">
-                            <p class="text-sm text-gray-600 italic font-medium">"${workoutData.motivation}"</p>
-                        </div>
-                    </div>
-                `;
-                resultContainer.classList.remove('hidden');
-                resultContainer.scrollIntoView({ behavior: 'smooth' });
-            } else {
-                alert("Erro ao gerar treino. Tente novamente!");
-            }
-
-            btn.disabled = false;
-            btn.innerHTML = `<span>Gerar Treino Agora</span> <i class="fa-solid fa-fire"></i>`;
+            if(data) {
+                document.getElementById('workout-card').innerHTML = `
+                    <div class="bg-white rounded-3xl p-5 shadow-lg border border-red-100 relative"><h3 class="text-xl font-bold text-gray-800 mb-2">${data.title}</h3>
+                    <div class="bg-red-50 p-3 rounded-xl mb-4"><span class="text-xs font-bold text-red-500 uppercase">Aquecimento</span><p class="text-sm">${data.warmup}</p></div>
+                    <ul class="space-y-3 mb-4">${data.exercises.map(ex => `<li class="bg-gray-50 p-3 rounded-xl border border-gray-100"><div class="flex justify-between items-center mb-1"><span class="font-bold text-gray-700 text-sm">${ex.name}</span><span class="text-xs font-bold bg-white px-2 py-1 rounded text-red-500 border border-red-100">${ex.reps}</span></div><p class="text-xs text-gray-500 italic">${ex.tips}</p></li>`).join('')}</ul>
+                    <div class="bg-yellow-50 rounded-xl p-4 text-center border border-yellow-100"><p class="text-sm text-gray-600 italic">"${data.motivation}"</p></div></div>`;
+                document.getElementById('workout-result').classList.remove('hidden');
+            } else { alert("Erro na IA."); }
+            btn.innerHTML = `<span>Gerar Treino</span> <i class="fa-solid fa-fire"></i>`; btn.disabled = false;
         }
 
-        async function triggerSOS(situation) {
-             const resultDiv = document.getElementById('sos-result');
-             const sosText = document.getElementById('sos-text');
-             
-             if(!situation || situation.trim() === '') return;
-
-             sosText.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div> Buscando ajuda...`;
-             resultDiv.classList.remove('hidden');
-
-             const advice = await callGeminiSOS(situation);
-             
-             if(advice) {
-                 sosText.innerText = advice;
-             } else {
-                 sosText.innerText = "Ops! Não consegui conectar com a central de ajuda agora. Mas respira fundo que vai ficar tudo bem! 💖";
-             }
-        }
-
-        async function generateAIRecipe() {
-            const input = document.getElementById('ai-ingredients');
-            const btn = document.getElementById('generate-btn');
-            const resultDiv = document.getElementById('ai-result');
-            const cardDiv = document.getElementById('ai-recipe-card');
-
-            if (!input.value.trim()) return;
-
-            // Loading State
-            btn.disabled = true;
-            btn.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div> Criando...`;
-            resultDiv.classList.add('hidden');
-
-            const recipeData = await callGemini(input.value);
-
-            if (recipeData) {
-                // Assign a temporary random ID
-                recipeData.id = 999; 
-
-                // Render Card (similar to renderRecipes but customized)
-                cardDiv.innerHTML = `
-                    <div class="bg-white rounded-3xl p-5 shadow-lg border border-pink-100 overflow-hidden relative">
-                        <div class="absolute top-0 right-0 bg-bestie text-white text-xs font-bold px-3 py-1 rounded-bl-xl">
-                            IA ✨
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">${recipeData.title}</h3>
-                        <p class="text-sm text-gray-500 italic mb-4">"${recipeData.description}"</p>
-                        
-                        <div class="flex gap-4 text-xs text-gray-500 mb-4 bg-pink-50 p-3 rounded-xl">
-                            <span class="flex items-center gap-1"><i class="fa-solid fa-fire text-bestie"></i> ${recipeData.calories} kcal</span>
-                            <span class="flex items-center gap-1"><i class="fa-regular fa-clock text-bestie"></i> ${recipeData.time}</span>
-                            <span class="flex items-center gap-1"><i class="fa-solid fa-utensils text-bestie"></i> ${recipeData.difficulty}</span>
-                        </div>
-
-                        <div class="mb-4">
-                            <h4 class="font-bold text-gray-800 mb-2 text-sm flex items-center gap-2"><i class="fa-solid fa-basket-shopping text-bestie"></i> Ingredientes</h4>
-                            <ul class="text-sm text-gray-600 space-y-1 list-disc pl-4">
-                                ${recipeData.ingredients.map(i => `<li>${i}</li>`).join('')}
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4 class="font-bold text-gray-800 mb-2 text-sm flex items-center gap-2"><i class="fa-solid fa-spoon text-bestie"></i> Modo de Preparo</h4>
-                            <ol class="text-sm text-gray-600 space-y-2 list-decimal pl-4">
-                                ${recipeData.instructions.map(i => `<li>${i}</li>`).join('')}
-                            </ol>
-                        </div>
-                    </div>
-                `;
-                resultDiv.classList.remove('hidden');
-                resultDiv.scrollIntoView({ behavior: 'smooth' });
-            } else {
-                alert("Ops! Ocorreu um erro ao criar a receita. Tente novamente!");
-            }
-
-            // Reset Button
-            btn.disabled = false;
-            btn.innerHTML = `<span>Criar Outra Receita</span> <i class="fa-solid fa-wand-magic-sparkles"></i>`;
+        async function triggerSOS(sit) {
+            if(!sit) return;
+            const resDiv = document.getElementById('sos-result');
+            const txt = document.getElementById('sos-text');
+            txt.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Buscando ajuda...`;
+            resDiv.classList.remove('hidden');
+            const data = await fetchAI(`Conselho curto e divertido para: "${sit}"`, false);
+            txt.innerText = data || "Erro na conexão. Respira fundo! 💖";
         }
 
         async function generateSwap() {
-            const input = document.getElementById('swap-input');
-            const btn = document.getElementById('swap-btn');
-            const resultDiv = document.getElementById('swap-result');
-            const swapText = document.getElementById('swap-text');
+             const input = document.getElementById('swap-input');
+             if(!input.value.trim()) return;
+             const btn = document.getElementById('swap-btn');
+             const resDiv = document.getElementById('swap-result');
+             const txt = document.getElementById('swap-text');
+             
+             const originalIcon = btn.innerHTML;
+             btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
+             resDiv.classList.add('hidden');
 
-            if (!input.value.trim()) return;
+             const p = `Substituição saudável e fit para '${input.value}'. Explique o porquê curto e com emoji.`;
+             const data = await fetchAI(p, false); // False because we want plain text response
 
-            // Loading state
-            const originalBtnContent = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
-            
-            resultDiv.classList.add('hidden');
-
-            const suggestion = await callGeminiSwap(input.value);
-
-            if (suggestion) {
-                swapText.innerText = suggestion;
-                resultDiv.classList.remove('hidden');
-            } else {
-                alert("Ops! Bestie ocupada. Tente novamente!");
-            }
-
-            btn.disabled = false;
-            btn.innerHTML = originalBtnContent;
+             if(data) {
+                 txt.innerText = data;
+                 resDiv.classList.remove('hidden');
+             } else { alert("Ops! Tente de novo."); }
+             btn.innerHTML = originalIcon;
         }
 
         window.addEventListener('DOMContentLoaded', init);
